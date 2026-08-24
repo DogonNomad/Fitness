@@ -21,11 +21,13 @@
     --green: #30d158;
     --yellow: #ffd60a;
     --red: #ff453a;
-    --fitness: #ff6b3d;
-    --recovery: #2dd4bf;
-    --content: #0a84ff;
-    --network: #30d158;
-    --job: #bf5af2;
+    /* Pillar palette — rose-gold anchor, alternating dark / light through the section stack */
+    --weight:   #d4a574;  /* Weight training — rose gold (medium warm) */
+    --fitness:  #a0522d;  /* Calisthenics    — sienna / roast (dark warm) */
+    --recovery: #d9c8a9;  /* Body & Recovery — warm champagne (light warm) */
+    --content:  #34568b;  /* Content         — deep navy (dark cool) */
+    --network:  #a4b48a;  /* Network         — sage (light cool) */
+    --job:      #6b3d78;  /* Job hunt        — deep plum (dark cool) */
     --accent: #2997ff;
     --ring-track: rgba(255,255,255,0.1);
     --tint-hi: rgba(255,255,255,0.045);
@@ -84,11 +86,12 @@
     --green: #22a54b;
     --yellow: #c78900;
     --red: #e5352c;
-    --fitness: #e35a2b;
-    --recovery: #0d9488;
-    --content: #0071e3;
-    --network: #22a54b;
-    --job: #9b4dd7;
+    --weight:   #b88458;  /* rose gold — deeper for readability on white */
+    --fitness:  #8b4513;  /* saddle brown */
+    --recovery: #a89968;  /* deeper champagne */
+    --content:  #1e3a5f;  /* deeper navy */
+    --network:  #6b8e5d;  /* deeper sage */
+    --job:      #4c2c58;  /* deeper plum */
     --accent: #0071e3;
     --ring-track: rgba(0,0,0,0.08);
     --tint-hi: rgba(0,0,0,0.02);
@@ -350,39 +353,27 @@
   .chip.yellow { color: var(--yellow); border-color: rgba(251, 191, 36, 0.4); }
   .chip.red { color: var(--red); border-color: rgba(248, 113, 113, 0.4); }
 
+  .pillar-weight h2 .accent   { background: var(--weight); }
   .pillar-fitness h2 .accent  { background: var(--fitness); }
   .pillar-recovery h2 .accent { background: var(--recovery); }
   .pillar-content h2 .accent  { background: var(--content); }
   .pillar-network h2 .accent  { background: var(--network); }
   .pillar-job h2 .accent      { background: var(--job); }
 
-  /* Per-pillar gradient card backgrounds — each dashboard gets its own hue tint */
-  .card.pillar-fitness {
-    background: linear-gradient(180deg, rgba(255,107,61,0.08), rgba(255,107,61,0.01)), var(--surface);
-    border-color: rgba(255,107,61,0.20);
-  }
-  .card.pillar-recovery {
-    background: linear-gradient(180deg, rgba(45,212,191,0.09), rgba(45,212,191,0.01)), var(--surface);
-    border-color: rgba(45,212,191,0.22);
-  }
-  .card.pillar-content {
-    background: linear-gradient(180deg, rgba(10,132,255,0.08), rgba(10,132,255,0.01)), var(--surface);
-    border-color: rgba(10,132,255,0.20);
-  }
-  .card.pillar-network {
-    background: linear-gradient(180deg, rgba(48,209,88,0.08), rgba(48,209,88,0.01)), var(--surface);
-    border-color: rgba(48,209,88,0.20);
-  }
-  .card.pillar-job {
-    background: linear-gradient(180deg, rgba(191,90,242,0.08), rgba(191,90,242,0.01)), var(--surface);
-    border-color: rgba(191,90,242,0.22);
-  }
-  /* Day theme: keep the same tints — 8% alpha reads as a subtle wash on white */
-  :root[data-theme="day"] .card.pillar-fitness  { background: linear-gradient(180deg, rgba(227,90,43,0.08), rgba(227,90,43,0.01)), var(--surface); border-color: rgba(227,90,43,0.22); }
-  :root[data-theme="day"] .card.pillar-recovery { background: linear-gradient(180deg, rgba(13,148,136,0.08), rgba(13,148,136,0.01)), var(--surface); border-color: rgba(13,148,136,0.22); }
-  :root[data-theme="day"] .card.pillar-content  { background: linear-gradient(180deg, rgba(0,113,227,0.08), rgba(0,113,227,0.01)), var(--surface); border-color: rgba(0,113,227,0.22); }
-  :root[data-theme="day"] .card.pillar-network  { background: linear-gradient(180deg, rgba(34,165,75,0.08), rgba(34,165,75,0.01)), var(--surface); border-color: rgba(34,165,75,0.22); }
-  :root[data-theme="day"] .card.pillar-job      { background: linear-gradient(180deg, rgba(155,77,215,0.08), rgba(155,77,215,0.01)), var(--surface); border-color: rgba(155,77,215,0.22); }
+  /* Per-pillar gradient card backgrounds — rose-gold anchor, alternating dark/light tints */
+  .card.pillar-weight   { background: linear-gradient(180deg, rgba(212,165,116,0.14), rgba(212,165,116,0.02)), var(--surface); border-color: rgba(212,165,116,0.30); }
+  .card.pillar-fitness  { background: linear-gradient(180deg, rgba(160,82,45,0.14),   rgba(160,82,45,0.02)),   var(--surface); border-color: rgba(160,82,45,0.30);  }
+  .card.pillar-recovery { background: linear-gradient(180deg, rgba(217,200,169,0.14), rgba(217,200,169,0.02)), var(--surface); border-color: rgba(217,200,169,0.32); }
+  .card.pillar-content  { background: linear-gradient(180deg, rgba(52,86,139,0.14),   rgba(52,86,139,0.02)),   var(--surface); border-color: rgba(52,86,139,0.30);  }
+  .card.pillar-network  { background: linear-gradient(180deg, rgba(164,180,138,0.14), rgba(164,180,138,0.02)), var(--surface); border-color: rgba(164,180,138,0.32); }
+  .card.pillar-job      { background: linear-gradient(180deg, rgba(107,61,120,0.14),  rgba(107,61,120,0.02)),  var(--surface); border-color: rgba(107,61,120,0.30);  }
+  /* Day theme: deeper tint values so gradients still register on white */
+  :root[data-theme="day"] .card.pillar-weight   { background: linear-gradient(180deg, rgba(184,132,88,0.10),  rgba(184,132,88,0.02)),  var(--surface); border-color: rgba(184,132,88,0.28); }
+  :root[data-theme="day"] .card.pillar-fitness  { background: linear-gradient(180deg, rgba(139,69,19,0.10),   rgba(139,69,19,0.02)),   var(--surface); border-color: rgba(139,69,19,0.28); }
+  :root[data-theme="day"] .card.pillar-recovery { background: linear-gradient(180deg, rgba(168,153,104,0.10), rgba(168,153,104,0.02)), var(--surface); border-color: rgba(168,153,104,0.30); }
+  :root[data-theme="day"] .card.pillar-content  { background: linear-gradient(180deg, rgba(30,58,95,0.10),    rgba(30,58,95,0.02)),    var(--surface); border-color: rgba(30,58,95,0.28); }
+  :root[data-theme="day"] .card.pillar-network  { background: linear-gradient(180deg, rgba(107,142,93,0.10),  rgba(107,142,93,0.02)),  var(--surface); border-color: rgba(107,142,93,0.30); }
+  :root[data-theme="day"] .card.pillar-job      { background: linear-gradient(180deg, rgba(76,44,88,0.10),    rgba(76,44,88,0.02)),    var(--surface); border-color: rgba(76,44,88,0.28); }
 
   /* Content day-of-week posting hint */
   .content-day-hint {
@@ -424,6 +415,7 @@
   }
   .page-toc a:hover { background: rgba(255,255,255,0.08); color: var(--ink); }
   .page-toc a:active { transform: scale(0.96); }
+  .page-toc a.toc-workout:hover  { border-color: var(--weight); color: var(--weight); }
   .page-toc a.toc-fitness:hover  { border-color: var(--fitness); color: var(--fitness); }
   .page-toc a.toc-recovery:hover { border-color: var(--recovery); color: var(--recovery); }
   .page-toc a.toc-content:hover  { border-color: var(--content); color: var(--content); }
@@ -525,18 +517,18 @@
 
   /* Today's workout card */
   .workout-card {
-    background: linear-gradient(180deg, rgba(255,107,61,0.10), rgba(255,107,61,0.02));
-    border: 1px solid rgba(255,107,61,0.28);
+    background: linear-gradient(180deg, rgba(212,165,116,0.14), rgba(212,165,116,0.02));
+    border: 1px solid rgba(212,165,116,0.32);
     border-radius: 16px;
     padding: 20px 22px;
     margin-top: 10px;
   }
   .workout-card.rest {
-    background: linear-gradient(180deg, rgba(10,132,255,0.08), rgba(10,132,255,0.02));
-    border-color: rgba(10,132,255,0.24);
+    background: linear-gradient(180deg, rgba(52,86,139,0.12), rgba(52,86,139,0.02));
+    border-color: rgba(52,86,139,0.28);
   }
   .workout-card .title { font-size: 17px; font-weight: 600; letter-spacing: -0.015em; color: var(--ink); margin-bottom: 6px; }
-  .workout-card .sub { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fitness); margin-bottom: 14px; font-weight: 600; }
+  .workout-card .sub { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--weight); margin-bottom: 14px; font-weight: 600; }
   .workout-card.rest .sub { color: var(--content); }
   .workout-list { display: flex; flex-direction: column; gap: 6px; }
   .ex-grid {
@@ -853,7 +845,7 @@
       <a href="#sec-job"      class="toc-job">Job</a>
     </nav>
 
-    <div id="sec-workout" class="toc-scroll-target card pillar-fitness">
+    <div id="sec-workout" class="toc-scroll-target card pillar-weight">
       <h2><span class="accent"></span> Weight training</h2>
       <div class="lede" id="workoutLede">—</div>
       <div id="workoutCard"></div>
@@ -1142,20 +1134,11 @@ const PILLAR_METRICS = {
     { key: 'kneeRaises',      label: 'Knee raises',   target: Math.round(CAL_TARGETS.kneeRaises/7),      input: 'sets', repLabel: 'reps' }
   ],
   recovery: [
-    { key: 'sleepHours', label: 'Sleep',         target: 7,    unit: 'hrs', input: 'number', step: 0.1 },
-    { key: 'weightKg',   label: 'Bodyweight',    target: null, unit: 'kg',  input: 'number', step: 0.1 },
-    { key: 'steamMin',   label: 'Sauna',         target: 15,   unit: 'min', input: 'number' },
-    { key: 'coldPlunge', label: 'Cold plunge',   target: 3,    unit: 'min', input: 'number', step: 0.5 },
-    { key: 'proteinHit', label: 'Protein ≥205g', target: 1,                 input: 'check' },
-    { key: 'sessionType', label: 'Session', target: null, input: 'select',
-        options: [
-          {v:'',            t:'— none —'},
-          {v:'gym',         t:'Gym (per template)'},
-          {v:'cardio',      t:'Cardio (Zone 2)'},
-          {v:'interval',    t:'Cardio (VO₂ interval)'},
-          {v:'dive',        t:'Dive / freedive'},
-          {v:'active-rest', t:'Active rest / mobility'}
-        ] }
+    { key: 'sleepHours', label: 'Sleep',       target: 7,    unit: 'hrs', input: 'number', step: 0.1 },
+    { key: 'weightKg',   label: 'Bodyweight',  target: null, unit: 'kg',  input: 'number', step: 0.1 },
+    { key: 'steamMin',   label: 'Sauna',       target: 15,   unit: 'min', input: 'number' },
+    { key: 'coldPlunge', label: 'Cold plunge', target: 3,    unit: 'min', input: 'number', step: 0.5 },
+    { key: 'creatineG',  label: 'Creatine',    target: 5,    unit: 'g',   input: 'number', step: 0.5 }
   ],
   content: [
     { key: 'longForm',   label: 'Long-form (3+ min)', target: CONTENT_TARGETS.longForm,  scope: 'week', input: 'entries',
@@ -1410,7 +1393,7 @@ function renderWorkoutCard(iso, dayData) {
       tile.className = 'ex-tile';
       const svgContainer = document.createElement('div');
       svgContainer.className = 'ring-svg-container';
-      svgContainer.appendChild(makeRingSvg(pct, getPillarVar('fitness'), 76));
+      svgContainer.appendChild(makeRingSvg(pct, getPillarVar('weight'), 76));
       const setsLbl = document.createElement('div');
       setsLbl.className = 'sets-label';
       setsLbl.textContent = `${doneSets} / ${targetSets} sets`;
@@ -2055,6 +2038,7 @@ function parseTargetSets(target) {
 /* Refresh a single exercise's ring + sets label after set change */
 function updateExerciseRing(exName) {
   const iso = activeDate();
+  // (color pulls from --weight via getPillarVar below)
   const deck = document.querySelector(`.ex-deck[data-name="${CSS.escape(exName)}"]`);
   if (!deck) return;
   const target = Number(deck.dataset.targetSets) || 3;
@@ -2065,7 +2049,7 @@ function updateExerciseRing(exName) {
   const container = deck.querySelector('.ring-svg-container');
   if (container) {
     container.innerHTML = '';
-    container.appendChild(makeRingSvg(pct, getPillarVar('fitness'), 76));
+    container.appendChild(makeRingSvg(pct, getPillarVar('weight'), 76));
   }
   const setsLabel = deck.querySelector('.sets-label');
   if (setsLabel) setsLabel.textContent = `${done} / ${target} sets`;
@@ -2280,7 +2264,7 @@ function aggregateWeek(week) {
     }
   });
 
-  const proteinHitDays = days.filter(d => d.proteinHit).length;
+  const creatineDays = days.filter(d => Number(d.creatineG) >= 5).length;
   const shootDays = days.filter(d => d.shootDay).length;
   const editBlocks = days.filter(d => d.editBlock).length;
   const engageBlocks = days.filter(d => d.engageBlock).length;
@@ -2298,7 +2282,7 @@ function aggregateWeek(week) {
     week, days,
     pushups: sum('pushups'), mountedCrunches: sum('mountedCrunches'), heelTaps: sum('heelTaps'), plankMinutes: sum('plankMinutes'),
     gymCount, cardioCount, sessionsTotal: gymCount + cardioCount,
-    proteinHitDays, saunaMin, saunaDays,
+    creatineDays, saunaMin, saunaDays,
     avgSleep, closingWeight, weightsCount: weights.length,
     longForm: sum('longForm'), reels: sum('reels'), carousels: sum('carousels'),
     clips: sum('clips'), bestReach: Math.max(0, ...days.map(d => Number(d.bestReach) || 0)),
@@ -2377,7 +2361,7 @@ function renderWeek() {
   fbody.innerHTML = '';
   fbody.appendChild(stat('Avg sleep', agg.avgSleep ? (Math.round(agg.avgSleep*10)/10)+' h' : '—', 'target ≥7'));
   fbody.appendChild(stat('Closing weight', agg.closingWeight ? agg.closingWeight.toFixed(1)+' kg' : '—', `${agg.weightsCount} entries`));
-  fbody.appendChild(stat('Protein ≥205g', `${agg.proteinHitDays}/7`, 'target ≥5'));
+  fbody.appendChild(stat('Creatine ≥5g', `${agg.creatineDays}/7`, 'target ≥5'));
   fbody.appendChild(stat('Sauna days', agg.saunaDays, `${agg.saunaMin} min total`));
 
   const cad = document.getElementById('cadenceChart');
