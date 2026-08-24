@@ -140,6 +140,59 @@
   :root[data-theme="day"] .theme-toggle { background: rgba(0,0,0,0.04); }
   .theme-toggle:hover { transform: translateY(-1px) rotate(-8deg); border-color: var(--line-2); }
   .theme-toggle:active { transform: translateY(0) scale(0.96); }
+
+  /* Sync modal */
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+    backdrop-filter: saturate(180%) blur(12px); -webkit-backdrop-filter: saturate(180%) blur(12px);
+    z-index: 100; display: flex; align-items: center; justify-content: center;
+    padding: 20px; animation: fade 260ms var(--ease-out);
+  }
+  .modal-backdrop[hidden] { display: none; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 24px 26px 20px;
+    max-width: 480px; width: 100%;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+  }
+  .modal h3 {
+    margin: 0 0 4px; font-size: 20px; font-weight: 600;
+    letter-spacing: -0.018em; color: var(--ink); text-transform: none;
+  }
+  .modal .modal-sub { font-size: 13px; color: var(--ink-dim); margin: 0 0 18px; letter-spacing: -0.005em; }
+  .modal .field-mini { margin-bottom: 12px; }
+  .modal .field-mini input {
+    width: 100%; padding: 10px 14px; background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12); color: var(--ink);
+    border-radius: 10px; font: inherit; font-size: 14px; outline: none;
+    letter-spacing: -0.005em;
+    transition: border-color 260ms var(--ease), box-shadow 260ms var(--ease);
+  }
+  :root[data-theme="day"] .modal .field-mini input { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.12); }
+  .modal .field-mini input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(41,151,255,0.15); }
+  .modal-help {
+    font-size: 12px; color: var(--ink-dim); line-height: 1.55; margin: 6px 0 16px;
+    padding: 10px 12px; background: rgba(41,151,255,0.08);
+    border: 1px solid rgba(41,151,255,0.22); border-radius: 10px;
+  }
+  .modal-help code { font-size: 11px; background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 4px; }
+  :root[data-theme="day"] .modal-help code { background: rgba(0,0,0,0.06); }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+
+  /* Sync status pill in save-bar */
+  .sync-status {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--ink-faint); letter-spacing: 0.02em;
+    padding: 3px 10px; border-radius: 980px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    margin-left: 8px;
+  }
+  :root[data-theme="day"] .sync-status { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.08); }
+  .sync-status .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ink-faint); transition: background 260ms var(--ease); }
+  .sync-status[data-state="ok"] .dot     { background: var(--green); box-shadow: 0 0 8px rgba(48,209,88,0.5); }
+  .sync-status[data-state="syncing"] .dot { background: var(--content); animation: pulse-dot 1.1s ease-in-out infinite; }
+  .sync-status[data-state="error"] .dot   { background: var(--red); }
+  @keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: 0.28; } }
   .brand { display: flex; align-items: baseline; gap: 14px; }
   .brand .mark {
     font-size: 40px;
@@ -681,6 +734,7 @@
       <div class="sub" id="dateLine">— · Day —/42</div>
     </div>
     <div class="header-right">
+      <button id="syncBtn" class="theme-toggle" title="Cloud sync settings" aria-label="Cloud sync settings">☁</button>
       <button id="themeToggle" class="theme-toggle" title="Toggle day / night" aria-label="Toggle theme">☾</button>
       <div class="day-pill">
         <span>Day</span>
@@ -759,7 +813,10 @@
     </div>
 
     <div class="save-bar">
-      <div class="info">Logging <strong id="todayDateLabel">today</strong> · <span id="todaySaveStatus">unsaved</span></div>
+      <div class="info">
+        Logging <strong id="todayDateLabel">today</strong> · <span id="todaySaveStatus">unsaved</span>
+        <span class="sync-status" id="syncStatus" data-state="none"><span class="dot"></span><span id="syncStatusText">sync off</span></span>
+      </div>
       <div class="row-flex">
         <button class="btn ghost" id="btnClearToday">Clear day</button>
         <button class="btn" id="btnSaveToday">Save day</button>
@@ -855,6 +912,30 @@
 
   <div class="footer">
     Walk-Out · 2026-08-23 → 2026-10-03 · 6 weeks. One day at a time.
+  </div>
+</div>
+
+<!-- ============ SYNC MODAL ============ -->
+<div class="modal-backdrop" id="syncModal" hidden>
+  <div class="modal">
+    <h3>Cloud sync</h3>
+    <p class="modal-sub">Paste your private Gist ID + Personal Access Token to sync this device with your others.</p>
+    <div class="field-mini">
+      <label style="font-size:11px; color:var(--ink-faint); letter-spacing:0.08em; text-transform:uppercase; display:block; margin-bottom:4px;">Gist ID</label>
+      <input type="text" id="syncGistId" placeholder="e.g. abc123def456..." autocomplete="off" spellcheck="false" />
+    </div>
+    <div class="field-mini">
+      <label style="font-size:11px; color:var(--ink-faint); letter-spacing:0.08em; text-transform:uppercase; display:block; margin-bottom:4px;">GitHub Personal Access Token</label>
+      <input type="password" id="syncPat" placeholder="ghp_... or github_pat_..." autocomplete="off" spellcheck="false" />
+    </div>
+    <div class="modal-help">
+      Fine-grained token: Account permissions → <code>Gists: Read and write</code>. Or classic token with <code>gist</code> scope. Stored only in this browser's <code>localStorage</code> — never leaves this device except to hit <code>api.github.com</code>.
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost" id="syncClear">Clear config</button>
+      <button class="btn ghost" id="syncCancel">Cancel</button>
+      <button class="btn" id="syncSave">Save &amp; test</button>
+    </div>
   </div>
 </div>
 
@@ -2467,6 +2548,146 @@ document.getElementById('btnReset').addEventListener('click', () => {
 document.getElementById('prevWeek').addEventListener('click', () => shiftSelectedByDays(-7));
 document.getElementById('nextWeek').addEventListener('click', () => shiftSelectedByDays(7));
 document.getElementById('btnBackToday').addEventListener('click', () => setSelectedDate(todayIso()));
+
+/* ============ CLOUD SYNC (Path 2: GitHub private Gist) ============ */
+const SYNC_GIST_KEY = 'walkout_sync_gist_id';
+const SYNC_PAT_KEY  = 'walkout_sync_pat';
+const SYNC_FILENAME = 'walkout.json';
+let _syncPushTimer = null;
+let _syncBusy = false;
+let _syncSuppressPush = false;
+
+function syncConfig() {
+  try {
+    return {
+      gistId: (localStorage.getItem(SYNC_GIST_KEY) || '').trim(),
+      pat:    (localStorage.getItem(SYNC_PAT_KEY)  || '').trim()
+    };
+  } catch(e) { return { gistId: '', pat: '' }; }
+}
+function syncConfigured() { const c = syncConfig(); return !!(c.gistId && c.pat); }
+function setSyncStatus(state, text) {
+  const el = document.getElementById('syncStatus');
+  if (!el) return;
+  el.dataset.state = state;
+  const t = document.getElementById('syncStatusText');
+  if (t) t.textContent = text;
+}
+function fmtTimeAgo(iso) {
+  const t = new Date(iso).getTime();
+  if (!t) return '';
+  const s = Math.max(0, Math.round((Date.now() - t) / 1000));
+  if (s < 5)   return 'just now';
+  if (s < 60)  return `${s}s ago`;
+  if (s < 3600) return `${Math.round(s/60)}m ago`;
+  return new Date(iso).toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
+}
+async function syncPull() {
+  const { gistId, pat } = syncConfig();
+  if (!gistId || !pat) { setSyncStatus('none', 'sync off'); return; }
+  setSyncStatus('syncing', 'pulling');
+  try {
+    const r = await fetch(`https://api.github.com/gists/${gistId}`, {
+      headers: {
+        'Accept': 'application/vnd.github+json',
+        'Authorization': `Bearer ${pat}`,
+        'X-GitHub-Api-Version': '2022-11-28'
+      },
+      cache: 'no-store'
+    });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const gist = await r.json();
+    const file = gist.files && gist.files[SYNC_FILENAME];
+    if (!file || !file.content) { setSyncStatus('ok', 'synced (remote empty)'); return; }
+    const remote = JSON.parse(file.content);
+    const localTs  = STATE.updatedAt || '';
+    const remoteTs = remote.updatedAt || '';
+    if (remoteTs && remoteTs > localTs) {
+      STATE = remote;
+      _syncSuppressPush = true;
+      saveAll(STATE); // writes to localStorage without re-pushing
+      _syncSuppressPush = false;
+      try { renderHeader(); renderToday(); renderWeek(); renderMission(); } catch(e) {}
+      setSyncStatus('ok', `pulled ${fmtTimeAgo(remoteTs)}`);
+    } else {
+      setSyncStatus('ok', `in sync`);
+    }
+  } catch (e) {
+    setSyncStatus('error', `pull failed: ${e.message}`);
+  }
+}
+async function syncPush() {
+  const { gistId, pat } = syncConfig();
+  if (!gistId || !pat) return;
+  if (_syncBusy) { schedulePush(); return; }
+  _syncBusy = true;
+  setSyncStatus('syncing', 'pushing');
+  try {
+    const body = { files: { [SYNC_FILENAME]: { content: JSON.stringify(STATE, null, 2) } } };
+    const r = await fetch(`https://api.github.com/gists/${gistId}`, {
+      method: 'PATCH',
+      headers: {
+        'Accept': 'application/vnd.github+json',
+        'Authorization': `Bearer ${pat}`,
+        'X-GitHub-Api-Version': '2022-11-28',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    setSyncStatus('ok', `synced ${new Date().toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'})}`);
+  } catch (e) {
+    setSyncStatus('error', `push failed: ${e.message}`);
+  } finally {
+    _syncBusy = false;
+  }
+}
+function schedulePush() {
+  if (!syncConfigured() || _syncSuppressPush) return;
+  clearTimeout(_syncPushTimer);
+  _syncPushTimer = setTimeout(syncPush, 2000);
+}
+/* Wrap saveAll so every local save schedules a push */
+const _saveAllOrig = saveAll;
+saveAll = function(data) {
+  _saveAllOrig(data);
+  schedulePush();
+};
+
+/* Modal wiring */
+document.getElementById('syncBtn').addEventListener('click', () => {
+  const c = syncConfig();
+  document.getElementById('syncGistId').value = c.gistId;
+  document.getElementById('syncPat').value = c.pat;
+  document.getElementById('syncModal').hidden = false;
+});
+document.getElementById('syncCancel').addEventListener('click', () => {
+  document.getElementById('syncModal').hidden = true;
+});
+document.getElementById('syncClear').addEventListener('click', () => {
+  if (!confirm('Clear sync config on this device? (Data stays on the gist.)')) return;
+  try { localStorage.removeItem(SYNC_GIST_KEY); localStorage.removeItem(SYNC_PAT_KEY); } catch(e) {}
+  document.getElementById('syncGistId').value = '';
+  document.getElementById('syncPat').value = '';
+  setSyncStatus('none', 'sync off');
+});
+document.getElementById('syncSave').addEventListener('click', async () => {
+  const gistId = document.getElementById('syncGistId').value.trim();
+  const pat    = document.getElementById('syncPat').value.trim();
+  if (!gistId || !pat) { alert('Both Gist ID and Token are required.'); return; }
+  try { localStorage.setItem(SYNC_GIST_KEY, gistId); localStorage.setItem(SYNC_PAT_KEY, pat); } catch(e) {}
+  document.getElementById('syncModal').hidden = true;
+  await syncPull();
+  // Seed remote if it was empty
+  syncPush();
+});
+document.getElementById('syncModal').addEventListener('click', (e) => {
+  if (e.target.id === 'syncModal') document.getElementById('syncModal').hidden = true;
+});
+
+/* Initial pull on load */
+if (syncConfigured()) syncPull();
+else setSyncStatus('none', 'sync off');
 
 /* Theme toggle — persists to localStorage under 'walkout_theme'. Default = night. */
 const THEME_KEY = 'walkout_theme';
