@@ -6,15 +6,17 @@
 <title>Walk-Out · 6-Week Tracker</title>
 <style>
   :root {
-    --bg: #000;
-    --bg-2: #1a1a1c;
-    --surface: #1d1d1f;
-    --surface-2: #2c2c2e;
-    --line: rgba(255,255,255,0.08);
-    --line-2: rgba(255,255,255,0.16);
-    --ink: #f5f5f7;
-    --ink-dim: #a1a1a6;
-    --ink-faint: #6e6e73;
+    /* Night theme (default) — softened from pure black to a warmer navy-charcoal */
+    --bg: #10131b;
+    --bg-2: #171a24;
+    --surface: #1c2029;
+    --surface-2: #262a35;
+    --surface-3: rgba(255,255,255,0.02);
+    --line: rgba(255,255,255,0.09);
+    --line-2: rgba(255,255,255,0.18);
+    --ink: #eef1f5;
+    --ink-dim: #a8adb6;
+    --ink-faint: #71767f;
     --gold: #ffd60a;
     --green: #30d158;
     --yellow: #ffd60a;
@@ -24,12 +26,75 @@
     --network: #30d158;
     --job: #bf5af2;
     --accent: #2997ff;
+    --ring-track: rgba(255,255,255,0.1);
+    --tint-hi: rgba(255,255,255,0.045);
+    --tint-lo: rgba(255,255,255,0.01);
+    --inset-shadow: rgba(255,255,255,0.06);
+    --card-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    --glow-bg-blue: rgba(10, 132, 255, 0.10);
+    --glow-bg-orange: rgba(255, 107, 61, 0.08);
     --ease: cubic-bezier(0.4, 0, 0.2, 1);
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-    --shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 20px 50px rgba(0,0,0,0.5);
+    --shadow: 0 1px 0 var(--inset-shadow) inset, var(--card-shadow);
     --radius: 18px;
     --radius-sm: 12px;
     --radius-lg: 22px;
+  }
+
+  /* Day-theme overrides for surfaces that used white-tint gradients — need dark-tint on light bg */
+  :root[data-theme="day"] nav.tabs,
+  :root[data-theme="day"] .day-pill,
+  :root[data-theme="day"] .page-toc,
+  :root[data-theme="day"] .save-bar {
+    background: rgba(255,255,255,0.7);
+    border-color: rgba(0,0,0,0.08);
+  }
+  :root[data-theme="day"] nav.tabs button.active { background: rgba(0,0,0,0.06); box-shadow: 0 1px 0 rgba(0,0,0,0.02) inset, 0 4px 12px rgba(0,0,0,0.05); }
+  :root[data-theme="day"] .day-strip-day { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.08); }
+  :root[data-theme="day"] .day-strip-day:hover { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.15); }
+  :root[data-theme="day"] .day-strip-nav { background: #fff; border-color: rgba(0,0,0,0.08); }
+  :root[data-theme="day"] .ex-details { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.08); }
+  :root[data-theme="day"] .field-mini input,
+  :root[data-theme="day"] .set-log-form input,
+  :root[data-theme="day"] .entry-form input {
+    background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.1); color: var(--ink);
+  }
+  :root[data-theme="day"] .set-row,
+  :root[data-theme="day"] .set-row.entry-row { background: #fff; border-color: rgba(0,0,0,0.06); }
+  :root[data-theme="day"] .set-history { background: rgba(0,113,227,0.06); border-color: rgba(0,113,227,0.18); color: var(--ink-dim); }
+  :root[data-theme="day"] .set-list:empty::after { color: var(--ink-faint); }
+  :root[data-theme="day"] .grid-toggle:hover { border-color: var(--fitness); }
+  :root[data-theme="day"] .brand .mark { background: linear-gradient(180deg, #1d1d1f 0%, #545862 130%); -webkit-background-clip: text; background-clip: text; }
+  :root[data-theme="day"] .content-day-hint { background: rgba(0,113,227,0.08); border-color: rgba(0,113,227,0.22); }
+
+  /* Day theme — warm off-white, gentle depth, easy midday reading */
+  :root[data-theme="day"] {
+    --bg: #f4f5f7;
+    --bg-2: #eceef2;
+    --surface: #ffffff;
+    --surface-2: #f6f7f9;
+    --surface-3: rgba(0,0,0,0.02);
+    --line: rgba(0,0,0,0.08);
+    --line-2: rgba(0,0,0,0.16);
+    --ink: #1d1d1f;
+    --ink-dim: #545862;
+    --ink-faint: #86868b;
+    --gold: #d19a00;
+    --green: #22a54b;
+    --yellow: #c78900;
+    --red: #e5352c;
+    --fitness: #e35a2b;
+    --content: #0071e3;
+    --network: #22a54b;
+    --job: #9b4dd7;
+    --accent: #0071e3;
+    --ring-track: rgba(0,0,0,0.08);
+    --tint-hi: rgba(0,0,0,0.02);
+    --tint-lo: rgba(0,0,0,0.006);
+    --inset-shadow: rgba(255,255,255,0.6);
+    --card-shadow: 0 6px 22px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+    --glow-bg-blue: rgba(0, 113, 227, 0.08);
+    --glow-bg-orange: rgba(227, 90, 43, 0.07);
   }
 
   * { box-sizing: border-box; }
@@ -37,8 +102,8 @@
   html { scroll-behavior: smooth; }
   body {
     background:
-      radial-gradient(1400px 700px at 82% -10%, rgba(10, 132, 255, 0.10), transparent 62%),
-      radial-gradient(1100px 600px at -12% 88%, rgba(255, 107, 61, 0.08), transparent 62%),
+      radial-gradient(1400px 700px at 82% -10%, var(--glow-bg-blue), transparent 62%),
+      radial-gradient(1100px 600px at -12% 88%, var(--glow-bg-orange), transparent 62%),
       var(--bg);
     color: var(--ink);
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", Roboto, sans-serif;
@@ -48,6 +113,7 @@
     min-height: 100vh;
     line-height: 1.47;
     letter-spacing: -0.003em;
+    transition: background-color 500ms var(--ease), color 400ms var(--ease);
   }
 
   ::selection { background: rgba(10,132,255,0.35); color: #fff; }
@@ -55,6 +121,25 @@
   .wrap { max-width: 1240px; margin: 0 auto; padding: 40px 24px 96px; }
 
   header.top { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  .header-right { display: inline-flex; align-items: center; gap: 12px; }
+  .theme-toggle {
+    appearance: none;
+    background: rgba(255,255,255,0.06);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    width: 40px; height: 40px;
+    border-radius: 980px;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    display: inline-flex; align-items: center; justify-content: center;
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    transition: background 300ms var(--ease), transform 200ms var(--ease), border-color 300ms var(--ease);
+  }
+  :root[data-theme="day"] .theme-toggle { background: rgba(0,0,0,0.04); }
+  .theme-toggle:hover { transform: translateY(-1px) rotate(-8deg); border-color: var(--line-2); }
+  .theme-toggle:active { transform: translateY(0) scale(0.96); }
   .brand { display: flex; align-items: baseline; gap: 14px; }
   .brand .mark {
     font-size: 40px;
@@ -396,7 +481,7 @@
   }
   .ex-deck summary { list-style: none; padding: 18px 12px 14px; cursor: pointer; text-align: center; }
   .ex-deck summary::-webkit-details-marker { display: none; }
-  .ex-tile { display: flex; flex-direction: column; align-items: center; gap: 6px; transition: transform 400ms var(--ease-out); }
+  .ex-tile { display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 128px; justify-content: center; transition: transform 400ms var(--ease-out); }
   .ex-deck summary:hover .ex-tile { transform: scale(1.04); }
   .ex-deck summary:active .ex-tile { transform: scale(0.98); }
   .ex-tile .ring-svg-container { display: flex; align-items: center; justify-content: center; }
@@ -595,13 +680,16 @@
       </div>
       <div class="sub" id="dateLine">— · Day —/42</div>
     </div>
-    <div class="day-pill">
-      <span>Day</span>
-      <span class="num" id="dayNum">—</span>
-      <span class="sep">/</span>
-      <span>42</span>
-      <span class="sep">·</span>
-      <span id="weekLine">Week —</span>
+    <div class="header-right">
+      <button id="themeToggle" class="theme-toggle" title="Toggle day / night" aria-label="Toggle theme">☾</button>
+      <div class="day-pill">
+        <span>Day</span>
+        <span class="num" id="dayNum">—</span>
+        <span class="sep">/</span>
+        <span>42</span>
+        <span class="sep">·</span>
+        <span id="weekLine">Week —</span>
+      </div>
     </div>
   </header>
 
@@ -624,22 +712,22 @@
     </div>
 
     <nav class="page-toc" aria-label="Jump to section">
-      <a href="#sec-workout"  class="toc-workout">Workout</a>
-      <a href="#sec-fitness"  class="toc-fitness">Fitness</a>
+      <a href="#sec-workout"  class="toc-workout">Weights</a>
+      <a href="#sec-fitness"  class="toc-fitness">Calisthenics</a>
       <a href="#sec-content"  class="toc-content">Content</a>
       <a href="#sec-network"  class="toc-network">Network</a>
       <a href="#sec-job"      class="toc-job">Job</a>
     </nav>
 
     <div id="sec-workout" class="toc-scroll-target card pillar-fitness">
-      <h2><span class="accent"></span> Today's workout</h2>
+      <h2><span class="accent"></span> Weight training</h2>
       <div class="lede" id="workoutLede">—</div>
       <div id="workoutCard"></div>
     </div>
 
     <div id="sec-fitness" class="toc-scroll-target card pillar-fitness" style="margin-top:18px;">
-      <h2><span class="accent"></span> Fitness</h2>
-      <div class="lede">Calisthenics floor · session · body signals. Click any tile to log.</div>
+      <h2><span class="accent"></span> Calisthenics</h2>
+      <div class="lede">Bodyweight sets, session type, sleep, weight, sauna, protein. Click any tile to log.</div>
       <div class="ex-grid" id="fitnessGrid"></div>
     </div>
 
@@ -1935,7 +2023,8 @@ function makeRingSvg(pct, color, size = 64) {
   const cx = size / 2, cy = size / 2;
   const track = document.createElementNS(ns, 'circle');
   track.setAttribute('cx', cx); track.setAttribute('cy', cy); track.setAttribute('r', r);
-  track.setAttribute('fill', 'none'); track.setAttribute('stroke', '#1f2a36'); track.setAttribute('stroke-width', 6);
+  const trackColor = (getComputedStyle(document.documentElement).getPropertyValue('--ring-track') || '').trim() || 'rgba(255,255,255,0.1)';
+  track.setAttribute('fill', 'none'); track.setAttribute('stroke', trackColor); track.setAttribute('stroke-width', 6);
   svg.appendChild(track);
   const arc = document.createElementNS(ns, 'circle');
   arc.setAttribute('cx', cx); arc.setAttribute('cy', cy); arc.setAttribute('r', r);
@@ -2378,6 +2467,28 @@ document.getElementById('btnReset').addEventListener('click', () => {
 document.getElementById('prevWeek').addEventListener('click', () => shiftSelectedByDays(-7));
 document.getElementById('nextWeek').addEventListener('click', () => shiftSelectedByDays(7));
 document.getElementById('btnBackToday').addEventListener('click', () => setSelectedDate(todayIso()));
+
+/* Theme toggle — persists to localStorage under 'walkout_theme'. Default = night. */
+const THEME_KEY = 'walkout_theme';
+function applyTheme(name) {
+  if (name === 'day') document.documentElement.setAttribute('data-theme', 'day');
+  else document.documentElement.removeAttribute('data-theme');
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.innerHTML = name === 'day' ? '☾' : '☀︎';
+  // Re-render rings so their SVG track picks up the new --ring-track color
+  try { renderToday(); renderWeek(); renderMission(); } catch(e) {}
+}
+(function initTheme() {
+  let saved = null;
+  try { saved = localStorage.getItem(THEME_KEY); } catch(e) {}
+  applyTheme(saved || 'night');
+})();
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const cur = document.documentElement.getAttribute('data-theme') === 'day' ? 'day' : 'night';
+  const next = cur === 'day' ? 'night' : 'day';
+  try { localStorage.setItem(THEME_KEY, next); } catch(e) {}
+  applyTheme(next);
+});
 
 renderHeader(); renderToday(); renderWeek(); renderMission();
 </script>
