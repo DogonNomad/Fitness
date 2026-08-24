@@ -6,89 +6,137 @@
 <title>Walk-Out · 6-Week Tracker</title>
 <style>
   :root {
-    --bg: #07090d;
-    --bg-2: #0d1218;
-    --surface: #11171f;
-    --surface-2: #161e28;
-    --line: #1f2a36;
-    --line-2: #2a3a4d;
-    --ink: #e6edf3;
-    --ink-dim: #9aa6b2;
-    --ink-faint: #5d6b7b;
-    --gold: #f5c451;
-    --green: #4ade80;
-    --yellow: #fbbf24;
-    --red: #f87171;
-    --fitness: #ff7a59;
-    --content: #5aa9ff;
-    --network: #4ade80;
-    --job: #c084fc;
-    --shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 12px 30px rgba(0,0,0,0.35);
+    --bg: #000;
+    --bg-2: #1a1a1c;
+    --surface: #1d1d1f;
+    --surface-2: #2c2c2e;
+    --line: rgba(255,255,255,0.08);
+    --line-2: rgba(255,255,255,0.16);
+    --ink: #f5f5f7;
+    --ink-dim: #a1a1a6;
+    --ink-faint: #6e6e73;
+    --gold: #ffd60a;
+    --green: #30d158;
+    --yellow: #ffd60a;
+    --red: #ff453a;
+    --fitness: #ff6b3d;
+    --content: #0a84ff;
+    --network: #30d158;
+    --job: #bf5af2;
+    --accent: #2997ff;
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 20px 50px rgba(0,0,0,0.5);
+    --radius: 18px;
+    --radius-sm: 12px;
+    --radius-lg: 22px;
   }
 
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
   body {
     background:
-      radial-gradient(1200px 600px at 80% -10%, rgba(90, 169, 255, 0.07), transparent 60%),
-      radial-gradient(900px 500px at -10% 80%, rgba(255, 122, 89, 0.05), transparent 60%),
+      radial-gradient(1400px 700px at 82% -10%, rgba(10, 132, 255, 0.10), transparent 62%),
+      radial-gradient(1100px 600px at -12% 88%, rgba(255, 107, 61, 0.08), transparent 62%),
       var(--bg);
     color: var(--ink);
-    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
-    font-feature-settings: "ss01", "cv11";
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Segoe UI", Roboto, sans-serif;
+    font-feature-settings: "ss01", "cv11", "ss02";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
-    line-height: 1.5;
+    line-height: 1.47;
+    letter-spacing: -0.003em;
   }
 
-  .wrap { max-width: 1240px; margin: 0 auto; padding: 28px 24px 96px; }
+  ::selection { background: rgba(10,132,255,0.35); color: #fff; }
+
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 40px 24px 96px; }
 
   header.top { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
   .brand { display: flex; align-items: baseline; gap: 14px; }
   .brand .mark {
-    font-family: ui-serif, Georgia, "Times New Roman", serif;
-    font-size: 28px; letter-spacing: 0.02em; font-weight: 600;
+    font-size: 40px;
+    letter-spacing: -0.028em;
+    font-weight: 700;
+    line-height: 1.05;
+    background: linear-gradient(180deg, #f5f5f7 0%, #a1a1a6 130%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
-  .brand .mark .dim { color: var(--ink-faint); }
-  .brand .sub { font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-faint); }
+  .brand .mark .dim { color: var(--ink-faint); -webkit-text-fill-color: var(--ink-faint); font-weight: 300; }
+  .brand .sub { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); font-weight: 500; margin-top: 6px; }
   .day-pill {
     display: inline-flex; align-items: center; gap: 10px;
-    background: linear-gradient(180deg, rgba(245, 196, 81, 0.12), rgba(245, 196, 81, 0.04));
-    border: 1px solid rgba(245, 196, 81, 0.35);
-    padding: 8px 14px; border-radius: 999px;
-    font-size: 13px; letter-spacing: 0.04em;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 10px 18px; border-radius: 980px;
+    font-size: 13px; letter-spacing: -0.01em; font-weight: 500;
+    box-shadow: 0 0 40px rgba(255,214,10,0.12);
   }
-  .day-pill .num { font-weight: 700; color: var(--gold); font-size: 16px; }
-  .day-pill .sep { color: var(--ink-faint); }
+  .day-pill .num { font-weight: 600; color: var(--gold); font-size: 17px; letter-spacing: -0.01em; }
+  .day-pill .sep { color: var(--ink-faint); opacity: 0.5; }
 
   nav.tabs {
-    margin: 22px 0 24px;
-    display: inline-flex; gap: 4px;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    padding: 4px; border-radius: 10px;
+    margin: 28px 0 28px;
+    display: inline-flex; gap: 2px;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 4px; border-radius: 980px;
   }
   nav.tabs button {
     appearance: none; background: transparent; border: 0; color: var(--ink-dim);
-    font: inherit; padding: 8px 16px; border-radius: 7px; cursor: pointer;
-    letter-spacing: 0.04em; font-size: 13px;
-    transition: background 120ms ease, color 120ms ease;
+    font: inherit; padding: 9px 20px; border-radius: 980px; cursor: pointer;
+    letter-spacing: -0.005em; font-size: 13px; font-weight: 500;
+    transition: background 300ms var(--ease), color 300ms var(--ease), transform 200ms var(--ease);
   }
   nav.tabs button:hover { color: var(--ink); }
-  nav.tabs button.active { background: var(--surface-2); color: var(--ink); box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset; }
+  nav.tabs button:active { transform: scale(0.97); }
+  nav.tabs button.active {
+    background: rgba(255,255,255,0.12);
+    color: var(--ink);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.1) inset, 0 8px 24px rgba(0,0,0,0.3);
+  }
 
-  .view { display: none; animation: fade 200ms ease; }
+  .view { display: none; animation: fade 500ms var(--ease-out); }
   .view.show { display: block; }
-  @keyframes fade { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: none; } }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
   .card {
-    background: var(--surface); border: 1px solid var(--line);
-    border-radius: 14px; padding: 20px 22px; box-shadow: var(--shadow);
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.008)) , var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 24px 26px;
+    box-shadow: var(--shadow);
+    transition: transform 400ms var(--ease-out), border-color 300ms var(--ease);
   }
-  .card + .card { margin-top: 18px; }
-  .card h2 { margin: 0 0 4px; font-size: 18px; font-weight: 600; letter-spacing: 0.01em; display: flex; align-items: center; gap: 10px; }
-  .card h2 .accent { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
-  .card h3 { margin: 18px 0 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-faint); }
-  .card .lede { color: var(--ink-dim); font-size: 13px; margin-bottom: 6px; }
+  .card + .card { margin-top: 20px; }
+  .card h2 {
+    margin: 0 0 6px;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.018em;
+    display: flex; align-items: center; gap: 12px;
+    color: var(--ink);
+  }
+  .card h2 .accent {
+    width: 8px; height: 24px; border-radius: 4px;
+    display: inline-block;
+    box-shadow: 0 0 16px currentColor;
+    opacity: 0.9;
+  }
+  .card h3 {
+    margin: 20px 0 10px;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .card .lede { color: var(--ink-dim); font-size: 14px; margin-bottom: 8px; letter-spacing: -0.005em; }
   .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
   .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
   .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
@@ -97,26 +145,58 @@
   .field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
   .field label { font-size: 12px; color: var(--ink-dim); letter-spacing: 0.02em; }
   .field input[type="number"], .field input[type="text"], .field textarea, .field select {
-    background: var(--bg-2); border: 1px solid var(--line); color: var(--ink);
-    padding: 8px 10px; border-radius: 7px; font: inherit; font-size: 14px;
-    outline: none; transition: border-color 120ms ease, background 120ms ease;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--ink);
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font: inherit;
+    font-size: 14px;
+    letter-spacing: -0.005em;
+    outline: none;
+    transition: border-color 260ms var(--ease), background 260ms var(--ease), box-shadow 260ms var(--ease);
   }
-  .field textarea { resize: vertical; min-height: 64px; }
-  .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--line-2); background: #0c1219; }
+  .field textarea { resize: vertical; min-height: 80px; }
+  .field input:focus, .field textarea:focus, .field select:focus {
+    border-color: var(--accent);
+    background: rgba(255,255,255,0.06);
+    box-shadow: 0 0 0 4px rgba(41,151,255,0.15);
+  }
   .check { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-dim); cursor: pointer; user-select: none; }
   .check input { accent-color: var(--gold); }
   .row-flex { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
   button.btn {
-    appearance: none; background: var(--gold); color: #0a0a0a; border: 0;
-    padding: 9px 16px; border-radius: 7px; font: inherit; font-weight: 600; font-size: 13px;
-    letter-spacing: 0.04em; cursor: pointer;
-    transition: filter 120ms ease, transform 120ms ease;
+    appearance: none;
+    background: var(--accent);
+    color: #fff;
+    border: 0;
+    padding: 11px 22px;
+    border-radius: 980px;
+    font: inherit; font-weight: 500; font-size: 14px;
+    letter-spacing: -0.005em;
+    cursor: pointer;
+    transition: background 260ms var(--ease), transform 200ms var(--ease), box-shadow 260ms var(--ease);
+    box-shadow: 0 4px 14px rgba(41,151,255,0.32);
   }
-  button.btn:hover { filter: brightness(1.06); }
-  button.btn:active { transform: translateY(1px); }
-  button.btn.ghost { background: transparent; color: var(--ink-dim); border: 1px solid var(--line); }
-  button.btn.ghost:hover { color: var(--ink); border-color: var(--line-2); }
+  button.btn:hover {
+    background: #147ce5;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(41,151,255,0.44);
+  }
+  button.btn:active { transform: translateY(0) scale(0.98); box-shadow: 0 2px 8px rgba(41,151,255,0.28); }
+  button.btn.ghost {
+    background: rgba(255,255,255,0.05);
+    color: var(--ink);
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: none;
+  }
+  button.btn.ghost:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.2);
+    color: var(--ink);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
 
   .stat { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
   .stat .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.16em; color: var(--ink-faint); }
@@ -135,30 +215,46 @@
   .pillar-network h2 .accent { background: var(--network); }
   .pillar-job h2 .accent { background: var(--job); }
 
+  /* Content day-of-week posting hint */
+  .content-day-hint {
+    display: inline-block;
+    padding: 6px 14px;
+    margin: 8px 0 14px;
+    background: rgba(10,132,255,0.10);
+    border: 1px solid rgba(10,132,255,0.25);
+    border-radius: 980px;
+    color: var(--content);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+  }
+
   /* Page TOC (chips scroll to sections within TODAY) */
-  html { scroll-behavior: smooth; }
   .page-toc {
     display: flex; gap: 6px; flex-wrap: wrap;
-    margin-bottom: 12px;
-    padding: 6px 8px;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 8px;
+    margin-bottom: 16px;
+    padding: 6px;
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 980px;
   }
   .page-toc a {
-    padding: 5px 10px;
-    border: 1px solid var(--line);
-    border-radius: 5px;
-    background: var(--bg-2);
+    padding: 7px 14px;
+    border: 1px solid transparent;
+    border-radius: 980px;
+    background: transparent;
     color: var(--ink-dim);
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
     text-decoration: none;
     white-space: nowrap;
-    transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+    transition: color 260ms var(--ease), background 260ms var(--ease), transform 200ms var(--ease);
   }
-  .page-toc a:hover { background: var(--surface-2); color: var(--ink); border-color: var(--line-2); }
+  .page-toc a:hover { background: rgba(255,255,255,0.08); color: var(--ink); }
+  .page-toc a:active { transform: scale(0.96); }
   .page-toc a.toc-fitness:hover { border-color: var(--fitness); color: var(--fitness); }
   .page-toc a.toc-content:hover { border-color: var(--content); color: var(--content); }
   .page-toc a.toc-network:hover { border-color: var(--network); color: var(--network); }
@@ -205,15 +301,21 @@
     display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;
   }
   .day-strip-day {
-    background: var(--bg-2); border: 1px solid var(--line); border-radius: 8px;
-    padding: 8px 4px 6px; text-align: center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 10px 4px 8px; text-align: center;
     cursor: pointer; position: relative;
-    transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
+    transition: background 300ms var(--ease), border-color 300ms var(--ease), transform 300ms var(--ease-out), box-shadow 300ms var(--ease);
   }
-  .day-strip-day:hover { border-color: var(--line-2); transform: translateY(-1px); }
-  .day-strip-day.today { border-color: var(--gold); }
-  .day-strip-day.selected { background: var(--surface-2); border-color: var(--fitness); box-shadow: 0 0 0 1px rgba(255,122,89,0.2) inset; }
-  .day-strip-day.today.selected { border-color: var(--fitness); box-shadow: 0 0 0 1px rgba(245,196,81,0.35) inset; }
+  .day-strip-day:hover { border-color: rgba(255,255,255,0.16); transform: translateY(-2px); background: rgba(255,255,255,0.07); }
+  .day-strip-day.today { border-color: rgba(255,214,10,0.5); }
+  .day-strip-day.selected {
+    background: rgba(255,107,61,0.14);
+    border-color: var(--fitness);
+    box-shadow: 0 0 24px rgba(255,107,61,0.22);
+  }
+  .day-strip-day.today.selected { border-color: var(--fitness); box-shadow: 0 0 24px rgba(255,214,10,0.25); }
   .day-strip-day.out-of-mission { opacity: 0.45; }
   .day-strip-day .dow {
     font-weight: 600; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
@@ -253,18 +355,18 @@
 
   /* Today's workout card */
   .workout-card {
-    background: linear-gradient(180deg, rgba(255,122,89,0.08), rgba(255,122,89,0.02));
-    border: 1px solid rgba(255,122,89,0.35);
-    border-radius: 12px;
-    padding: 16px 18px;
-    margin-top: 6px;
+    background: linear-gradient(180deg, rgba(255,107,61,0.10), rgba(255,107,61,0.02));
+    border: 1px solid rgba(255,107,61,0.28);
+    border-radius: 16px;
+    padding: 20px 22px;
+    margin-top: 10px;
   }
   .workout-card.rest {
-    background: linear-gradient(180deg, rgba(90,169,255,0.06), rgba(90,169,255,0.02));
-    border-color: rgba(90,169,255,0.28);
+    background: linear-gradient(180deg, rgba(10,132,255,0.08), rgba(10,132,255,0.02));
+    border-color: rgba(10,132,255,0.24);
   }
-  .workout-card .title { font-size: 14px; font-weight: 600; letter-spacing: 0.02em; color: var(--ink); margin-bottom: 4px; }
-  .workout-card .sub { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fitness); margin-bottom: 12px; }
+  .workout-card .title { font-size: 17px; font-weight: 600; letter-spacing: -0.015em; color: var(--ink); margin-bottom: 6px; }
+  .workout-card .sub { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fitness); margin-bottom: 14px; font-weight: 600; }
   .workout-card.rest .sub { color: var(--content); }
   .workout-list { display: flex; flex-direction: column; gap: 6px; }
   .ex-grid {
@@ -276,18 +378,27 @@
   }
   @media (max-width: 720px) { .ex-grid { grid-template-columns: repeat(2, 1fr); } }
   .ex-deck {
-    background: var(--surface-2);
+    background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.01)) , var(--surface-2);
     border: 1px solid var(--line);
-    border-radius: 12px;
+    border-radius: var(--radius-sm);
     overflow: hidden;
-    transition: border-color 120ms ease;
+    transition: border-color 300ms var(--ease), transform 400ms var(--ease-out), box-shadow 300ms var(--ease);
   }
-  .ex-deck[data-done="true"] { border-color: rgba(74,222,128,0.4); }
-  .ex-deck[open] { grid-column: 1 / -1; }
-  .ex-deck summary { list-style: none; padding: 14px 10px 12px; cursor: pointer; text-align: center; }
+  .ex-deck:hover { border-color: rgba(255,255,255,0.16); box-shadow: 0 12px 32px rgba(0,0,0,0.4); }
+  .ex-deck[data-done="true"] {
+    border-color: rgba(48,209,88,0.35);
+    box-shadow: 0 0 32px rgba(48,209,88,0.1);
+  }
+  .ex-deck[open] {
+    grid-column: 1 / -1;
+    background: var(--surface-2);
+    border-color: rgba(255,255,255,0.18);
+  }
+  .ex-deck summary { list-style: none; padding: 18px 12px 14px; cursor: pointer; text-align: center; }
   .ex-deck summary::-webkit-details-marker { display: none; }
-  .ex-tile { display: flex; flex-direction: column; align-items: center; gap: 4px; transition: transform 120ms ease; }
-  .ex-deck summary:hover .ex-tile { transform: scale(1.03); }
+  .ex-tile { display: flex; flex-direction: column; align-items: center; gap: 6px; transition: transform 400ms var(--ease-out); }
+  .ex-deck summary:hover .ex-tile { transform: scale(1.04); }
+  .ex-deck summary:active .ex-tile { transform: scale(0.98); }
   .ex-tile .ring-svg-container { display: flex; align-items: center; justify-content: center; }
   .ex-tile .ring-svg-container svg { display: block; }
   .ex-tile .sets-label { font-size: 12px; color: var(--ink-dim); font-variant-numeric: tabular-nums; margin-top: 4px; }
@@ -322,25 +433,47 @@
     display: flex; align-items: center; justify-content: center;
   }
   .set-row .set-delete:hover { color: var(--red); border-color: rgba(248,113,113,0.4); }
-  .set-log-form { display: grid; grid-template-columns: 1fr 1fr auto; gap: 6px; margin-bottom: 10px; }
+  .set-log-form { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; margin-bottom: 12px; }
   .set-log-form input {
-    background: var(--bg); border: 1px solid var(--line); color: var(--ink);
-    padding: 8px 10px; border-radius: 5px; font: inherit; font-size: 13px; outline: none;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--ink);
+    padding: 10px 14px; border-radius: 10px; font: inherit; font-size: 14px; outline: none;
+    letter-spacing: -0.005em;
+    transition: border-color 260ms var(--ease), background 260ms var(--ease), box-shadow 260ms var(--ease);
   }
-  .set-log-form input:focus { border-color: var(--fitness); background: #0c1219; }
+  .set-log-form input:focus {
+    border-color: var(--fitness); background: rgba(255,107,61,0.06);
+    box-shadow: 0 0 0 4px rgba(255,107,61,0.15);
+  }
   .set-log-form button {
-    appearance: none; background: var(--fitness); color: #0a0a0a; border: 0;
-    padding: 8px 14px; border-radius: 5px; font: inherit; font-weight: 600; font-size: 12px;
-    letter-spacing: 0.04em; cursor: pointer; white-space: nowrap;
+    appearance: none; background: var(--fitness); color: #fff; border: 0;
+    padding: 10px 18px; border-radius: 980px; font: inherit; font-weight: 500; font-size: 13px;
+    letter-spacing: -0.005em; cursor: pointer; white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(255,107,61,0.32);
+    transition: background 260ms var(--ease), transform 200ms var(--ease), box-shadow 260ms var(--ease);
   }
-  .set-log-form button:hover { filter: brightness(1.08); }
-  .set-log-form button:active { transform: translateY(1px); }
+  .set-log-form button:hover { background: #ff8863; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(255,107,61,0.42); }
+  .set-log-form button:active { transform: translateY(0) scale(0.97); }
   .note-row { margin-top: 4px; }
   .note-row label { font-size: 10px; color: var(--ink-faint); letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 3px; }
   .note-row input {
     width: 100%; background: var(--bg); border: 1px solid var(--line); color: var(--ink);
     padding: 6px 8px; border-radius: 5px; font: inherit; font-size: 13px; outline: none;
   }
+  /* Entry-form (Content title / Network name+company / Job outreach) */
+  .entry-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-bottom: 10px; }
+  .entry-form .field-mini input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(41,151,255,0.15); }
+  .entry-log-btn {
+    appearance: none; background: var(--accent); color: #fff; border: 0;
+    padding: 10px 18px; border-radius: 980px; font: inherit; font-weight: 500; font-size: 13px;
+    letter-spacing: -0.005em; cursor: pointer; white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(41,151,255,0.32);
+    transition: background 260ms var(--ease), transform 200ms var(--ease), box-shadow 260ms var(--ease);
+  }
+  .entry-log-btn:hover { background: #147ce5; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(41,151,255,0.42); }
+  .entry-log-btn:active { transform: translateY(0) scale(0.98); }
+  .entry-row .entry-detail { font-variant-numeric: normal; color: var(--ink); font-size: 12.5px; letter-spacing: -0.005em; }
   .session-progress { margin-top: 14px; padding: 10px 12px; background: rgba(255,122,89,0.06); border: 1px solid rgba(255,122,89,0.22); border-radius: 8px; }
   .progress-bar { height: 6px; background: var(--bg-2); border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
   .progress-fill { height: 100%; background: linear-gradient(90deg, var(--fitness), var(--gold)); transition: width 200ms ease; }
@@ -408,15 +541,30 @@
   .spark-card .head .now { font-size: 22px; font-weight: 700; }
   .spark-card svg { width: 100%; height: 64px; display: block; }
 
-  .save-bar { position: sticky; bottom: 16px; z-index: 10; margin-top: 18px; padding: 10px 14px; background: rgba(11, 17, 24, 0.85); backdrop-filter: blur(10px); border: 1px solid var(--line-2); border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
-  .save-bar .info { font-size: 12px; color: var(--ink-dim); }
-  .save-bar .info .saved { color: var(--green); }
+  .save-bar {
+    position: sticky; bottom: 16px; z-index: 10; margin-top: 24px;
+    padding: 14px 20px;
+    background: rgba(29, 29, 31, 0.72);
+    backdrop-filter: saturate(200%) blur(30px);
+    -webkit-backdrop-filter: saturate(200%) blur(30px);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 980px;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .save-bar .info { font-size: 13px; color: var(--ink-dim); letter-spacing: -0.005em; }
+  .save-bar .info .saved { color: var(--green); font-weight: 500; }
 
   .footer { margin-top: 32px; color: var(--ink-faint); font-size: 11px; letter-spacing: 0.06em; }
 
   .scoreboard { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 4px; }
   @media (max-width: 720px) { .scoreboard { grid-template-columns: repeat(2, 1fr); } }
-  .scoretile { background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 14px 14px 12px; }
+  .scoretile {
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.008)) , var(--surface-2);
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 18px 18px 16px;
+    transition: transform 400ms var(--ease-out), border-color 300ms var(--ease);
+  }
+  .scoretile:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.14); }
   .scoretile .top { display: flex; justify-content: space-between; align-items: center; }
   .scoretile .pillar-name { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-faint); }
   .scoretile .grade { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; }
@@ -497,7 +645,8 @@
 
     <div id="sec-content" class="toc-scroll-target card pillar-content" style="margin-top:18px;">
       <h2><span class="accent"></span> Content</h2>
-      <div class="lede">Short-form is a counting problem. Ship and log.</div>
+      <div class="lede">Weekly targets: 2+ long-form · 3+ reels · 1+ carousel.</div>
+      <div class="content-day-hint" id="contentDayHint">—</div>
       <div class="ex-grid" id="contentGrid"></div>
     </div>
 
@@ -553,10 +702,8 @@
 
     <div class="card pillar-content" style="margin-top:18px;">
       <h2><span class="accent"></span> Content — cadence</h2>
-      <div class="lede">13 short-form per week (5 IG · 5 TikTok · 3 YT Shorts) · 0.5 long-form per week.</div>
+      <div class="lede">6 posts per week: 2+ long-form (3+ min) · 3+ reels (≤30s) · 1+ carousel.</div>
       <div class="cadence" id="cadenceChart"></div>
-      <h3>Behind the camera</h3>
-      <div class="grid-4" id="contentSecondaryStats"></div>
     </div>
 
     <div class="card pillar-network" style="margin-top:18px;">
@@ -568,7 +715,7 @@
 
     <div class="card pillar-job" style="margin-top:18px;">
       <h2><span class="accent"></span> Job hunt — funnel</h2>
-      <div class="lede">Active loops by stage (latest snapshot this week).</div>
+      <div class="lede">Applications sent, outreach touches, and offers this week.</div>
       <div class="funnel" id="funnelChart"></div>
       <h3>Volume this week</h3>
       <div class="grid-4" id="jobVolumeStats"></div>
@@ -633,7 +780,21 @@ const CAL_TARGETS = { pushups: 500, mountedCrunches: 250, heelTaps: 250, plankMi
 const CAL_LABELS = { pushups: 'Pushups', mountedCrunches: 'Mt. crunches', heelTaps: 'Heel taps', plankMinutes: 'Plank (min)', kneeRaises: 'Knee raises' };
 const CAL_KEYS = ['pushups', 'mountedCrunches', 'heelTaps', 'plankMinutes', 'kneeRaises'];
 
-const CONTENT_TARGETS = { igReels: 5, tiktok: 5, ytShorts: 3, ytLong: 0.5, shortFormTotal: 13 };
+// Weekly content targets by FORMAT (not platform).
+// Minimums; going over is fine.
+const CONTENT_TARGETS = { longForm: 2, reels: 3, carousels: 1 };
+
+// Daily posting rhythm — appears as a hint under the Content section.
+// Keyed by JS getDay() index (0=Sun ... 6=Sat)
+const CONTENT_SCHEDULE = {
+  0: 'Sunday · rest / batch-shoot for the week',
+  1: 'Monday · 1 long-form video + 1 reel',
+  2: 'Tuesday · 1 reel + 1 carousel',
+  3: "Wednesday · 1 carousel (teaser for next Monday's long-form)",
+  4: 'Thursday · catch-up · edit / cut day',
+  5: 'Friday · engagement block + shoot-list prep',
+  6: 'Saturday · rest / off'
+};
 
 const SESSION_TARGET = 5; // 5 gym days per week (Sun/Mon/Wed/Thu/Fri)
 const APPS_TARGET = 6;
@@ -738,30 +899,34 @@ const PILLAR_METRICS = {
     { key: 'proteinHit',      label: 'Protein ≥205g', target: 1,     input: 'check' }
   ],
   content: [
-    { key: 'igReels',    label: 'IG Reels',    target: 1,   input: 'number' },
-    { key: 'tiktok',     label: 'TikTok',      target: 1,   input: 'number' },
-    { key: 'ytShorts',   label: 'YT Shorts',   target: 0.5, input: 'number' },
-    { key: 'ytLong',     label: 'YT Long',     target: 0.1, input: 'number', step: 0.5 },
-    { key: 'clips',      label: 'Clips',       target: null, input: 'number' },
-    { key: 'bestReach',  label: 'Best reach',  target: null, input: 'number' },
-    { key: 'shootDay',   label: 'Shoot day',   target: 1,   input: 'check' },
-    { key: 'editBlock',  label: 'Edit block',  target: 1,   input: 'check' },
-    { key: 'engageBlock',label: 'Engage 20m',  target: 1,   input: 'check' }
+    { key: 'longForm',   label: 'Long-form (3+ min)', target: CONTENT_TARGETS.longForm,  scope: 'week', input: 'entries',
+        fields: [ { key: 'title', label: 'Title', type: 'text', placeholder: 'e.g. "The physics of a freedive descent"' } ] },
+    { key: 'reels',      label: 'Reels (≤30s)',       target: CONTENT_TARGETS.reels,     scope: 'week', input: 'entries',
+        fields: [ { key: 'title', label: 'Title', type: 'text', placeholder: 'e.g. "Ears hurt at 3m — here\'s why"' } ] },
+    { key: 'carousels',  label: 'Carousels',          target: CONTENT_TARGETS.carousels, scope: 'week', input: 'entries',
+        fields: [ { key: 'title', label: 'Title', type: 'text', placeholder: 'e.g. "3-slide equalization primer"' } ] },
   ],
   network: [
-    { key: 'peopleSeen', label: 'People IRL',  target: 1,   input: 'text', placeholder: 'Pablo, Daniela, Mateo' },
+    { key: 'peopleSeen', label: 'People IRL',  target: 1,   input: 'entries',
+        fields: [
+          { key: 'name',    label: 'Name',    type: 'text', placeholder: 'e.g. Pablo' },
+          { key: 'company', label: 'Company / context', type: 'text', placeholder: 'e.g. Rappi, or gym Sabaneta' },
+          { key: 'notes',   label: 'Notes on the interaction', type: 'text', placeholder: 'quality, topic, follow-up' }
+        ] },
     { key: 'dms',        label: 'Warm DMs',    target: 0.5, input: 'number' },
-    { key: 'scenes',     label: 'Scenes',      target: 0.3, input: 'number' },
     { key: 'intros',     label: 'New intros',  target: null, input: 'number' }
   ],
   job: [
     { key: 'apps',         label: 'Applications', target: 1,   input: 'number' },
-    { key: 'outreach',     label: 'Outreach DMs', target: 2,   input: 'number' },
-    { key: 'companies',    label: 'Deep-dives',   target: 0.2, input: 'number' },
+    { key: 'outreach',     label: 'Outreach',     target: 2,   input: 'entries',
+        fields: [
+          { key: 'contact', label: 'Sent to',  type: 'text', placeholder: 'e.g. Alice Chen' },
+          { key: 'company', label: 'Company',  type: 'text', placeholder: 'e.g. Datadog' },
+          { key: 'role',    label: 'Role',     type: 'text', placeholder: 'e.g. Sr Product Security Eng' },
+          { key: 'salary',  label: 'Comp band', type: 'text', placeholder: 'e.g. $190-240K USD' },
+          { key: 'notes',   label: 'Notes',    type: 'text', placeholder: 'channel, hook, next step' }
+        ] },
     { key: 'interviewHrs', label: 'Interview hrs',target: null,input: 'number', step: 0.25 },
-    { key: 'loopScreen',   label: 'Screen loops', target: null,input: 'number' },
-    { key: 'loopTech',     label: 'Tech loops',   target: null,input: 'number' },
-    { key: 'loopOnsite',   label: 'Onsite loops', target: null,input: 'number' },
     { key: 'loopOffer',    label: 'Offers',       target: null,input: 'number' }
   ]
 };
@@ -1146,15 +1311,73 @@ function deleteCaliSet(key, idx) {
 
 function pillarMetricValue(metric, dayData) {
   if (metric.input === 'sets') return caliTotalFromDay(dayData || {}, metric.key);
-  const raw = dayData ? dayData[metric.key] : undefined;
-  if (metric.key === 'peopleSeen') {
-    if (!raw) return 0;
-    return String(raw).split(',').map(s => s.trim()).filter(Boolean).length;
+  if (metric.input === 'entries') {
+    if (metric.scope === 'week') return weeklyTotalForKey(metric.key);
+    const arr = (dayData && dayData.entries && dayData.entries[metric.key]) || [];
+    if (arr.length) return arr.length;
+    // legacy: if previously stored as string (peopleSeen) or count, count that
+    const legacy = dayData && dayData[metric.key];
+    if (typeof legacy === 'string' && legacy) return legacy.split(',').map(s => s.trim()).filter(Boolean).length;
+    const n = Number(legacy);
+    return Number.isFinite(n) ? n : 0;
   }
+  if (metric.scope === 'week') return weeklyTotalForKey(metric.key);
+  const raw = dayData ? dayData[metric.key] : undefined;
   if (metric.input === 'check') return raw ? 1 : 0;
   if (metric.input === 'select') return raw ? 1 : 0;
   const n = Number(raw);
   return Number.isFinite(n) ? n : 0;
+}
+
+/* ---------- Entry helpers (per-entry logging with structured fields) ---------- */
+function entriesFromDay(day, key) {
+  return (day && day.entries && Array.isArray(day.entries[key])) ? day.entries[key] : [];
+}
+function logEntry(key, entry) {
+  const iso = activeDate();
+  const day = STATE.days[iso] || {};
+  day.entries = day.entries || {};
+  if (!Array.isArray(day.entries[key])) day.entries[key] = [];
+  day.entries[key].push(entry);
+  day[key] = day.entries[key].length; // keep top-level count in sync for weekly aggregation
+  day.savedAt = new Date().toISOString();
+  STATE.days[iso] = day;
+  saveAll(STATE);
+  updateSavedLabel(iso);
+  renderDayStrip();
+}
+function deleteEntry(key, idx) {
+  const iso = activeDate();
+  const day = STATE.days[iso];
+  if (!day || !day.entries || !Array.isArray(day.entries[key])) return;
+  day.entries[key].splice(idx, 1);
+  day[key] = day.entries[key].length;
+  day.savedAt = new Date().toISOString();
+  saveAll(STATE);
+  updateSavedLabel(iso);
+  renderDayStrip();
+}
+
+/* Sum a key across the week containing activeDate.
+   Falls back to Sun-Sat calendar week when outside mission bounds. */
+function weeklyTotalForKey(key) {
+  const iso = activeDate();
+  let start, end;
+  const wk = weekForDate(iso);
+  if (wk) { start = wk.startDate; end = wk.endDate; }
+  else {
+    const d = parseIso(iso);
+    const dow = d.getDay();
+    const sun = new Date(d); sun.setDate(d.getDate() - dow);
+    const sat = new Date(sun); sat.setDate(sun.getDate() + 6);
+    start = `${sun.getFullYear()}-${String(sun.getMonth()+1).padStart(2,'0')}-${String(sun.getDate()).padStart(2,'0')}`;
+    end   = `${sat.getFullYear()}-${String(sat.getMonth()+1).padStart(2,'0')}-${String(sat.getDate()).padStart(2,'0')}`;
+  }
+  let total = 0;
+  for (const dayIso in STATE.days) {
+    if (dayIso >= start && dayIso <= end) total += Number(STATE.days[dayIso][key]) || 0;
+  }
+  return total;
 }
 function pillarMetricPct(metric, value) {
   if (metric.target && metric.target > 0) return Math.min(150, Math.round((value / metric.target) * 100));
@@ -1176,12 +1399,21 @@ function pillarMetricLabel(metric, value, raw) {
   if (metric.target == null) return raw ? (raw + unit) : '—';
   const disp = Math.round(value * 10) / 10;
   const tgt = Number.isInteger(metric.target) ? metric.target : Math.round(metric.target * 10) / 10;
-  return `${disp} / ${tgt}${unit}`;
+  const scopeSuffix = metric.scope === 'week' ? ' this week' : '';
+  return `${disp} / ${tgt}${unit}${scopeSuffix}`;
 }
 
 function renderPillarGrids() {
   const iso = activeDate();
   const dayData = STATE.days[iso] || {};
+
+  // Content day-of-week hint
+  const hintEl = document.getElementById('contentDayHint');
+  if (hintEl) {
+    const dow = parseIso(iso).getDay();
+    hintEl.textContent = CONTENT_SCHEDULE[dow] || '';
+  }
+
   ['fitness', 'content', 'network', 'job'].forEach(pillar => {
     const grid = document.getElementById(pillar + 'Grid');
     if (!grid) return;
@@ -1267,6 +1499,7 @@ function renderPillarTile(pillar, metric, dayData) {
 
 function createPillarInput(pillar, metric, currentRaw) {
   if (metric.input === 'sets') return createSetsPillarInput(pillar, metric);
+  if (metric.input === 'entries') return createEntriesPillarInput(pillar, metric);
 
   const wrap = document.createElement('div');
   wrap.className = 'note-row';
@@ -1421,6 +1654,108 @@ function createSetsPillarInput(pillar, metric) {
   wrap.appendChild(logForm);
 
   return wrap;
+}
+
+/* ---------- Entry-based pillar input (structured per-entry logging) ---------- */
+function createEntriesPillarInput(pillar, metric) {
+  const wrap = document.createElement('div');
+  wrap.className = 'note-row';
+
+  const iso = activeDate();
+  const day = STATE.days[iso] || {};
+  const entries = entriesFromDay(day, metric.key);
+  const scopeStr = metric.scope === 'week' ? 'this week' : 'today';
+
+  const lbl = document.createElement('label');
+  lbl.textContent = `${metric.label} · target ${metric.target ?? '—'} ${scopeStr}`;
+  wrap.appendChild(lbl);
+
+  // Hint counter
+  const hint = document.createElement('div');
+  hint.style.cssText = 'font-size:11px; color:var(--ink-faint); margin:4px 0 10px; letter-spacing:0.02em;';
+  const updateHint = () => {
+    const dayNow = STATE.days[activeDate()] || {};
+    const arr = entriesFromDay(dayNow, metric.key);
+    hint.textContent = arr.length ? `${arr.length} logged ${scopeStr === 'this week' ? 'today' : 'today'}` : 'None logged today';
+  };
+  updateHint();
+  wrap.appendChild(hint);
+
+  // Existing entries (today's entries only — weekly aggregation shows in the ring)
+  const list = document.createElement('div');
+  list.className = 'set-list entry-list';
+  entries.forEach((e, i) => list.appendChild(renderEntryRow(metric, e, i, updateHint)));
+  wrap.appendChild(list);
+
+  // New entry form
+  const form = document.createElement('div');
+  form.className = 'entry-form';
+  const fieldInputs = {};
+  metric.fields.forEach(f => {
+    const row = document.createElement('div');
+    row.className = 'field-mini';
+    const l = document.createElement('label'); l.textContent = f.label;
+    const inp = document.createElement('input');
+    inp.type = f.type || 'text';
+    inp.placeholder = f.placeholder || '';
+    fieldInputs[f.key] = inp;
+    row.appendChild(l); row.appendChild(inp);
+    form.appendChild(row);
+  });
+  wrap.appendChild(form);
+
+  const logBtn = document.createElement('button');
+  logBtn.type = 'button';
+  logBtn.className = 'entry-log-btn';
+  logBtn.textContent = '+ Log entry';
+  const submit = () => {
+    const entry = {};
+    let anyValue = false;
+    metric.fields.forEach(f => {
+      const v = (fieldInputs[f.key].value || '').trim();
+      if (v) anyValue = true;
+      entry[f.key] = v;
+    });
+    if (!anyValue) { fieldInputs[metric.fields[0].key].focus(); return; }
+    logEntry(metric.key, entry);
+    const arr = STATE.days[activeDate()].entries[metric.key];
+    list.appendChild(renderEntryRow(metric, entry, arr.length - 1, updateHint));
+    metric.fields.forEach(f => { fieldInputs[f.key].value = ''; });
+    fieldInputs[metric.fields[0].key].focus();
+    updatePillarTile(metric.key);
+    updateHint();
+  };
+  logBtn.addEventListener('click', submit);
+  Object.values(fieldInputs).forEach(inp => {
+    inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); });
+  });
+  wrap.appendChild(logBtn);
+
+  return wrap;
+}
+
+function renderEntryRow(metric, entry, idx, onChange) {
+  const row = document.createElement('div');
+  row.className = 'set-row entry-row';
+  const num = document.createElement('span'); num.className = 'set-num'; num.textContent = '#' + (idx + 1);
+  const det = document.createElement('span'); det.className = 'set-detail entry-detail';
+  const parts = metric.fields.map(f => entry[f.key]).filter(Boolean);
+  det.textContent = parts.length ? parts.join(' · ') : '—';
+  const del = document.createElement('button');
+  del.className = 'set-delete'; del.type = 'button'; del.textContent = '×'; del.title = 'Delete entry';
+  del.addEventListener('click', () => {
+    const parent = row.parentElement;
+    const i = Array.from(parent.children).indexOf(row);
+    deleteEntry(metric.key, i);
+    row.remove();
+    Array.from(parent.children).forEach((r, k) => {
+      const n = r.querySelector('.set-num'); if (n) n.textContent = '#' + (k + 1);
+    });
+    updatePillarTile(metric.key);
+    if (typeof onChange === 'function') onChange();
+  });
+  row.appendChild(num); row.appendChild(det); row.appendChild(del);
+  return row;
 }
 
 function renderCaliSetRow(key, s, idx, repLabel, onChange) {
@@ -1665,11 +2000,24 @@ function aggregateWeek(week) {
 
   const peopleMap = {};
   days.forEach(d => {
-    (d.peopleSeen || '').split(',').map(s => s.trim()).filter(Boolean).forEach(n => {
-      const k = n.toLowerCase();
-      peopleMap[k] = peopleMap[k] || { name: n, count: 0 };
-      peopleMap[k].count += 1;
-    });
+    // New format: entries array with { name, company, notes }
+    const arr = (d.entries && Array.isArray(d.entries.peopleSeen)) ? d.entries.peopleSeen : null;
+    if (arr) {
+      arr.forEach(e => {
+        const name = (e.name || '').trim();
+        if (!name) return;
+        const k = name.toLowerCase();
+        peopleMap[k] = peopleMap[k] || { name, company: e.company || '', count: 0 };
+        peopleMap[k].count += 1;
+      });
+    } else if (typeof d.peopleSeen === 'string') {
+      // Legacy: comma-separated string
+      d.peopleSeen.split(',').map(s => s.trim()).filter(Boolean).forEach(n => {
+        const k = n.toLowerCase();
+        peopleMap[k] = peopleMap[k] || { name: n, count: 0 };
+        peopleMap[k].count += 1;
+      });
+    }
   });
 
   const proteinHitDays = days.filter(d => d.proteinHit).length;
@@ -1692,8 +2040,7 @@ function aggregateWeek(week) {
     gymCount, cardioCount, sessionsTotal: gymCount + cardioCount,
     proteinHitDays, saunaMin, saunaDays,
     avgSleep, closingWeight, weightsCount: weights.length,
-    igReels: sum('igReels'), tiktok: sum('tiktok'), ytShorts: sum('ytShorts'), ytLong: sum('ytLong'),
-    shortFormTotal: sum('igReels') + sum('tiktok') + sum('ytShorts'),
+    longForm: sum('longForm'), reels: sum('reels'), carousels: sum('carousels'),
     clips: sum('clips'), bestReach: Math.max(0, ...days.map(d => Number(d.bestReach) || 0)),
     shootDays, editBlocks, engageBlocks,
     people: Object.values(peopleMap).sort((a,b) => b.count - a.count),
@@ -1730,12 +2077,16 @@ function renderWeek() {
 
   const scoreboard = document.getElementById('weekScoreboard');
   scoreboard.innerHTML = '';
+  const contentShipped = (agg.longForm || 0) + (agg.reels || 0) + (agg.carousels || 0);
+  const contentTarget = CONTENT_TARGETS.longForm + CONTENT_TARGETS.reels + CONTENT_TARGETS.carousels;
+  const prevContentShipped = prevAgg ? ((prevAgg.longForm || 0) + (prevAgg.reels || 0) + (prevAgg.carousels || 0)) : null;
+
   const fG = gradeFor(agg.gymCount, SESSION_TARGET, prevAgg ? prevAgg.gymCount : null);
-  const cG = gradeFor(agg.shortFormTotal, CONTENT_TARGETS.shortFormTotal, prevAgg ? prevAgg.shortFormTotal : null);
+  const cG = gradeFor(contentShipped, contentTarget, prevContentShipped);
   const nG = gradeFor(agg.people.length, PEOPLE_SEEN_TARGET, prevAgg ? prevAgg.people.length : null);
   const jG = gradeFor(agg.apps, APPS_TARGET, prevAgg ? prevAgg.apps : null);
   scoreboard.appendChild(scoretile('Fitness', `${agg.gymCount}`, `/ ${SESSION_TARGET} gym days`, fG, 'fitness'));
-  scoreboard.appendChild(scoretile('Content', `${agg.shortFormTotal}`, `/ ${CONTENT_TARGETS.shortFormTotal} short-form`, cG, 'content'));
+  scoreboard.appendChild(scoretile('Content', `${contentShipped}`, `/ ${contentTarget} posts`, cG, 'content'));
   scoreboard.appendChild(scoretile('Network', `${agg.people.length}`, `people seen IRL`, nG, 'network'));
   scoreboard.appendChild(scoretile('Job', `${agg.apps}`, `/ ${APPS_TARGET} apps shipped`, jG, 'job'));
 
@@ -1771,18 +2122,12 @@ function renderWeek() {
 
   const cad = document.getElementById('cadenceChart');
   cad.innerHTML = '';
-  cad.appendChild(cadenceRow('IG Reels', agg.igReels, CONTENT_TARGETS.igReels));
-  cad.appendChild(cadenceRow('TikTok', agg.tiktok, CONTENT_TARGETS.tiktok));
-  cad.appendChild(cadenceRow('YT Shorts', agg.ytShorts, CONTENT_TARGETS.ytShorts));
-  cad.appendChild(cadenceRow('YT Long-form', agg.ytLong, CONTENT_TARGETS.ytLong));
-  cad.appendChild(cadenceRow('Total short-form', agg.shortFormTotal, CONTENT_TARGETS.shortFormTotal));
+  cad.appendChild(cadenceRow('Long-form (3+ min)', agg.longForm, CONTENT_TARGETS.longForm));
+  cad.appendChild(cadenceRow('Reels (≤30s)', agg.reels, CONTENT_TARGETS.reels));
+  cad.appendChild(cadenceRow('Carousels', agg.carousels, CONTENT_TARGETS.carousels));
+  cad.appendChild(cadenceRow('Total posts', contentShipped, contentTarget));
 
-  const cstats = document.getElementById('contentSecondaryStats');
-  cstats.innerHTML = '';
-  cstats.appendChild(stat('Clips captured', agg.clips, 'fuel for next week'));
-  cstats.appendChild(stat('Best reach', agg.bestReach || '—', 'top post this week'));
-  cstats.appendChild(stat('Shoot days', agg.shootDays, ''));
-  cstats.appendChild(stat('Engagement blocks', agg.engageBlocks, '20-min, distinct days'));
+  // Secondary content stats removed — Clips / Best reach / Shoot / Edit / Engage tiles retired.
 
   const peopleGrid = document.getElementById('peopleGrid');
   peopleGrid.innerHTML = '';
@@ -1802,12 +2147,13 @@ function renderWeek() {
   nstats.innerHTML = '';
   nstats.appendChild(stat('Distinct people', agg.people.length, `target ${PEOPLE_SEEN_TARGET}+`));
   nstats.appendChild(stat('Seen 2+ times', recCount, ''));
-  nstats.appendChild(stat('Scenes attended', agg.scenes, `target ${SCENES_TARGET}`));
   nstats.appendChild(stat('Warm DMs', agg.dms, `target ${DMS_TARGET}`));
+  nstats.appendChild(stat('New intros', agg.intros, ''));
 
   const funnel = document.getElementById('funnelChart');
   funnel.innerHTML = '';
-  [{lbl:'Apps',val:agg.apps},{lbl:'Screen',val:agg.loopScreen},{lbl:'Tech',val:agg.loopTech},{lbl:'Onsite',val:agg.loopOnsite},{lbl:'Offer',val:agg.loopOffer}].forEach(s => {
+  funnel.style.gridTemplateColumns = 'repeat(3, 1fr)';
+  [{lbl:'Applications',val:agg.apps},{lbl:'Outreach',val:agg.outreach},{lbl:'Offers',val:agg.loopOffer}].forEach(s => {
     const el = document.createElement('div'); el.className = 'stage';
     el.innerHTML = `<div class="stage-lbl">${s.lbl}</div><div class="stage-val">${s.val}</div>`;
     funnel.appendChild(el);
@@ -1816,9 +2162,9 @@ function renderWeek() {
   const jvol = document.getElementById('jobVolumeStats');
   jvol.innerHTML = '';
   jvol.appendChild(stat('Apps shipped', agg.apps, `target ${APPS_TARGET}`));
-  jvol.appendChild(stat('Outreach DMs', agg.outreach, ''));
-  jvol.appendChild(stat('Deep-dives', agg.companies, 'target 1+'));
+  jvol.appendChild(stat('Outreach', agg.outreach, 'target 2/day'));
   jvol.appendChild(stat('Interview hrs', agg.interviewHrs, 'prep + live'));
+  jvol.appendChild(stat('Offers', agg.loopOffer, ''));
 
   const sunday = document.getElementById('sundayPanel');
   const isSat = (new Date()).getDay() === 6 && iso >= wk.startDate && iso <= wk.endDate;
@@ -1907,14 +2253,15 @@ function renderMission() {
   const allDays = Object.keys(STATE.days).filter(iso => iso >= MISSION_START && iso <= MISSION_END);
   const totalLogged = allDays.length;
   const totalGym = allDays.reduce((a, iso) => a + (STATE.days[iso].sessionType === 'gym' ? 1 : 0), 0);
-  const totalShortForm = allDays.reduce((a, iso) => {
+  const totalContent = allDays.reduce((a, iso) => {
     const d = STATE.days[iso];
-    return a + (Number(d.igReels) || 0) + (Number(d.tiktok) || 0) + (Number(d.ytShorts) || 0);
+    return a + (Number(d.longForm) || 0) + (Number(d.reels) || 0) + (Number(d.carousels) || 0);
   }, 0);
+  const contentWeeklyTarget = CONTENT_TARGETS.longForm + CONTENT_TARGETS.reels + CONTENT_TARGETS.carousels;
   const totalApps = allDays.reduce((a, iso) => a + (Number(STATE.days[iso].apps) || 0), 0);
   summary.appendChild(stat('Days logged', `${totalLogged}/${day}`, `${day - totalLogged} unlogged`));
   summary.appendChild(stat('Gym sessions', totalGym, `target ${SESSION_TARGET * 6} = 30`));
-  summary.appendChild(stat('Short-form total', totalShortForm, `target ${CONTENT_TARGETS.shortFormTotal * 6} = ${CONTENT_TARGETS.shortFormTotal * 6}`));
+  summary.appendChild(stat('Posts total', totalContent, `target ${contentWeeklyTarget * 6} = ${contentWeeklyTarget * 6}`));
   summary.appendChild(stat('Apps total', totalApps, `target ${APPS_TARGET * 6} = ${APPS_TARGET * 6}`));
 
   const tg = document.getElementById('templateGrid');
@@ -1938,11 +2285,14 @@ function renderMission() {
   const sparkGrid = document.getElementById('sparkGrid');
   sparkGrid.innerHTML = '';
   const fitnessSeries = WEEKS.map(w => aggregateWeek(w).gymCount);
-  const contentSeries = WEEKS.map(w => aggregateWeek(w).shortFormTotal);
+  const contentSeries = WEEKS.map(w => {
+    const a = aggregateWeek(w);
+    return (a.longForm || 0) + (a.reels || 0) + (a.carousels || 0);
+  });
   const networkSeries = WEEKS.map(w => aggregateWeek(w).people.length);
   const jobSeries = WEEKS.map(w => aggregateWeek(w).apps);
   sparkGrid.appendChild(sparkCard('Fitness — gym days/wk', fitnessSeries, SESSION_TARGET, getPillarVar('fitness')));
-  sparkGrid.appendChild(sparkCard('Content — short-form/wk', contentSeries, CONTENT_TARGETS.shortFormTotal, getPillarVar('content')));
+  sparkGrid.appendChild(sparkCard('Content — posts/wk', contentSeries, contentWeeklyTarget, getPillarVar('content')));
   sparkGrid.appendChild(sparkCard('Network — people IRL/wk', networkSeries, PEOPLE_SEEN_TARGET, getPillarVar('network')));
   sparkGrid.appendChild(sparkCard('Job — apps/wk', jobSeries, APPS_TARGET, getPillarVar('job')));
 }
