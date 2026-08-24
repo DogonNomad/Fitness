@@ -135,6 +135,122 @@
   .pillar-network h2 .accent { background: var(--network); }
   .pillar-job h2 .accent { background: var(--job); }
 
+  /* Page TOC (chips scroll to sections within TODAY) */
+  html { scroll-behavior: smooth; }
+  .page-toc {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    margin-bottom: 12px;
+    padding: 6px 8px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+  .page-toc a {
+    padding: 5px 10px;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    background: var(--bg-2);
+    color: var(--ink-dim);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+  }
+  .page-toc a:hover { background: var(--surface-2); color: var(--ink); border-color: var(--line-2); }
+  .page-toc a.toc-fitness:hover { border-color: var(--fitness); color: var(--fitness); }
+  .page-toc a.toc-content:hover { border-color: var(--content); color: var(--content); }
+  .page-toc a.toc-network:hover { border-color: var(--network); color: var(--network); }
+  .page-toc a.toc-job:hover     { border-color: var(--job); color: var(--job); }
+  .toc-scroll-target { scroll-margin-top: 12px; }
+
+  /* Collapsible grid: hide tiles past the 4th until expanded */
+  .ex-grid.collapsible.collapsed > .ex-deck:nth-child(n+5) { display: none; }
+  .grid-toggle {
+    margin-top: 10px;
+    background: transparent;
+    border: 1px dashed var(--line-2);
+    color: var(--ink-dim);
+    padding: 7px 12px;
+    border-radius: 6px;
+    font: inherit;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    width: 100%;
+    transition: color 120ms ease, border-color 120ms ease;
+  }
+  .grid-toggle:hover { color: var(--ink); border-color: var(--fitness); }
+
+  /* Day strip navigation */
+  .day-strip-wrap {
+    display: grid;
+    grid-template-columns: 32px 1fr 32px;
+    gap: 6px;
+    align-items: stretch;
+    margin-bottom: 14px;
+  }
+  .day-strip-nav {
+    appearance: none;
+    background: var(--surface); border: 1px solid var(--line);
+    color: var(--ink-dim); border-radius: 8px; cursor: pointer;
+    font-size: 16px; font: inherit; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: color 120ms ease, border-color 120ms ease;
+  }
+  .day-strip-nav:hover { color: var(--ink); border-color: var(--line-2); }
+  .day-strip {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;
+  }
+  .day-strip-day {
+    background: var(--bg-2); border: 1px solid var(--line); border-radius: 8px;
+    padding: 8px 4px 6px; text-align: center;
+    cursor: pointer; position: relative;
+    transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
+  }
+  .day-strip-day:hover { border-color: var(--line-2); transform: translateY(-1px); }
+  .day-strip-day.today { border-color: var(--gold); }
+  .day-strip-day.selected { background: var(--surface-2); border-color: var(--fitness); box-shadow: 0 0 0 1px rgba(255,122,89,0.2) inset; }
+  .day-strip-day.today.selected { border-color: var(--fitness); box-shadow: 0 0 0 1px rgba(245,196,81,0.35) inset; }
+  .day-strip-day.out-of-mission { opacity: 0.45; }
+  .day-strip-day .dow {
+    font-weight: 600; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .day-strip-day.today .dow { color: var(--gold); }
+  .day-strip-day .date-num {
+    font-size: 16px; font-weight: 700; margin-top: 2px; color: var(--ink);
+    line-height: 1;
+  }
+  .day-strip-day .type-tag {
+    font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
+    margin-top: 4px; color: var(--fitness); font-weight: 600;
+  }
+  .day-strip-day.rest .type-tag { color: var(--content); }
+  .day-strip-day .saved-dot {
+    position: absolute; top: 4px; right: 4px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+  }
+  .day-strip-meta {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; color: var(--ink-faint); letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+  .day-strip-meta .back-today {
+    appearance: none; background: transparent; border: 1px solid var(--line);
+    color: var(--ink-dim); padding: 3px 8px; border-radius: 4px; font: inherit;
+    font-size: 11px; cursor: pointer;
+  }
+  .day-strip-meta .back-today:hover { color: var(--gold); border-color: rgba(245,196,81,0.4); }
+  .day-strip-meta .back-today.hidden { visibility: hidden; }
+  @media (max-width: 720px) {
+    .day-strip-day .type-tag { display: none; }
+    .day-strip-day { padding: 6px 2px; }
+    .day-strip-day .date-num { font-size: 14px; }
+  }
+
   /* Today's workout card */
   .workout-card {
     background: linear-gradient(180deg, rgba(255,122,89,0.08), rgba(255,122,89,0.02));
@@ -151,15 +267,84 @@
   .workout-card .sub { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fitness); margin-bottom: 12px; }
   .workout-card.rest .sub { color: var(--content); }
   .workout-list { display: flex; flex-direction: column; gap: 6px; }
-  .workout-list .ex {
-    display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; align-items: center;
-    padding: 8px 10px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 7px;
+  .ex-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+    align-items: start;
+    margin: 8px 0 4px;
+  }
+  @media (max-width: 720px) { .ex-grid { grid-template-columns: repeat(2, 1fr); } }
+  .ex-deck {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 120ms ease;
+  }
+  .ex-deck[data-done="true"] { border-color: rgba(74,222,128,0.4); }
+  .ex-deck[open] { grid-column: 1 / -1; }
+  .ex-deck summary { list-style: none; padding: 14px 10px 12px; cursor: pointer; text-align: center; }
+  .ex-deck summary::-webkit-details-marker { display: none; }
+  .ex-tile { display: flex; flex-direction: column; align-items: center; gap: 4px; transition: transform 120ms ease; }
+  .ex-deck summary:hover .ex-tile { transform: scale(1.03); }
+  .ex-tile .ring-svg-container { display: flex; align-items: center; justify-content: center; }
+  .ex-tile .ring-svg-container svg { display: block; }
+  .ex-tile .sets-label { font-size: 12px; color: var(--ink-dim); font-variant-numeric: tabular-nums; margin-top: 4px; }
+  .ex-tile .ex-label { font-size: 10px; color: var(--ink-faint); letter-spacing: 0.14em; text-transform: uppercase; line-height: 1.35; padding: 0 4px; }
+  .ex-tile .ex-target-inline { opacity: 0.75; }
+  .ex-details { padding: 14px; border-top: 1px solid var(--line); background: rgba(0,0,0,0.2); text-align: left; }
+  .ex-fields { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 8px; }
+  .field-mini { display: flex; flex-direction: column; gap: 3px; }
+  .field-mini label { font-size: 10px; color: var(--ink-faint); letter-spacing: 0.08em; text-transform: uppercase; }
+  .field-mini input {
+    background: var(--bg); border: 1px solid var(--line); color: var(--ink);
+    padding: 6px 8px; border-radius: 5px; font: inherit; font-size: 13px; outline: none;
+    transition: border-color 120ms ease;
+  }
+  .field-mini input:focus { border-color: var(--fitness); background: #0c1219; }
+  .set-history { padding: 8px 10px; background: rgba(90,169,255,0.06); border: 1px solid rgba(90,169,255,0.22); border-radius: 6px; font-size: 12px; color: var(--ink-dim); margin: 10px 0 12px; }
+  .set-history div + div { margin-top: 3px; }
+  .set-history strong { color: var(--ink); font-weight: 600; }
+  .set-history .empty { color: var(--ink-faint); font-style: italic; }
+  .set-list { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+  .set-list:empty::after { content: 'No sets logged yet this session.'; display: block; padding: 8px; color: var(--ink-faint); font-size: 12px; text-align: center; font-style: italic; }
+  .set-row {
+    display: grid; grid-template-columns: 60px 1fr auto; gap: 8px; align-items: center;
+    padding: 7px 10px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px;
     font-size: 13px;
   }
-  .workout-list .ex input[type="checkbox"] { accent-color: var(--fitness); width: 16px; height: 16px; }
-  .workout-list .ex .name { color: var(--ink); }
-  .workout-list .ex.done .name { color: var(--ink-faint); text-decoration: line-through; }
-  .workout-list .ex .target { color: var(--ink-faint); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .set-row .set-num { color: var(--fitness); font-weight: 700; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .set-row .set-detail { color: var(--ink); font-variant-numeric: tabular-nums; }
+  .set-row .set-delete {
+    appearance: none; background: transparent; border: 1px solid var(--line); color: var(--ink-faint);
+    width: 22px; height: 22px; border-radius: 4px; cursor: pointer; font-size: 14px; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .set-row .set-delete:hover { color: var(--red); border-color: rgba(248,113,113,0.4); }
+  .set-log-form { display: grid; grid-template-columns: 1fr 1fr auto; gap: 6px; margin-bottom: 10px; }
+  .set-log-form input {
+    background: var(--bg); border: 1px solid var(--line); color: var(--ink);
+    padding: 8px 10px; border-radius: 5px; font: inherit; font-size: 13px; outline: none;
+  }
+  .set-log-form input:focus { border-color: var(--fitness); background: #0c1219; }
+  .set-log-form button {
+    appearance: none; background: var(--fitness); color: #0a0a0a; border: 0;
+    padding: 8px 14px; border-radius: 5px; font: inherit; font-weight: 600; font-size: 12px;
+    letter-spacing: 0.04em; cursor: pointer; white-space: nowrap;
+  }
+  .set-log-form button:hover { filter: brightness(1.08); }
+  .set-log-form button:active { transform: translateY(1px); }
+  .note-row { margin-top: 4px; }
+  .note-row label { font-size: 10px; color: var(--ink-faint); letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 3px; }
+  .note-row input {
+    width: 100%; background: var(--bg); border: 1px solid var(--line); color: var(--ink);
+    padding: 6px 8px; border-radius: 5px; font: inherit; font-size: 13px; outline: none;
+  }
+  .session-progress { margin-top: 14px; padding: 10px 12px; background: rgba(255,122,89,0.06); border: 1px solid rgba(255,122,89,0.22); border-radius: 8px; }
+  .progress-bar { height: 6px; background: var(--bg-2); border-radius: 3px; overflow: hidden; margin-bottom: 8px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--fitness), var(--gold)); transition: width 200ms ease; }
+  .progress-stats { font-size: 12px; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
   .workout-card .footer-line { margin-top: 12px; font-size: 12px; color: var(--ink-dim); }
   .rest-note { color: var(--ink-dim); font-size: 13px; line-height: 1.6; }
   .rest-note ul { margin: 8px 0 0; padding-left: 18px; }
@@ -280,111 +465,52 @@
 
   <section id="view-today" class="view show">
 
-    <div class="card pillar-fitness">
+    <div class="day-strip-meta">
+      <span id="dayStripLabel">—</span>
+      <button class="back-today hidden" id="btnBackToday">← Today</button>
+    </div>
+    <div class="day-strip-wrap">
+      <button class="day-strip-nav" id="prevWeek" title="Previous week">‹</button>
+      <div class="day-strip" id="dayStrip"></div>
+      <button class="day-strip-nav" id="nextWeek" title="Next week">›</button>
+    </div>
+
+    <nav class="page-toc" aria-label="Jump to section">
+      <a href="#sec-workout"  class="toc-workout">Workout</a>
+      <a href="#sec-fitness"  class="toc-fitness">Fitness</a>
+      <a href="#sec-content"  class="toc-content">Content</a>
+      <a href="#sec-network"  class="toc-network">Network</a>
+      <a href="#sec-job"      class="toc-job">Job</a>
+    </nav>
+
+    <div id="sec-workout" class="toc-scroll-target card pillar-fitness">
       <h2><span class="accent"></span> Today's workout</h2>
       <div class="lede" id="workoutLede">—</div>
       <div id="workoutCard"></div>
     </div>
 
-    <div class="card" style="margin-top:18px;">
-      <h2>Calisthenics — pace today</h2>
-      <div class="lede">Daily floor is 1/7 of the weekly target. Going over is fine.</div>
-      <div class="ring-grid" id="todayRings"></div>
+    <div id="sec-fitness" class="toc-scroll-target card pillar-fitness" style="margin-top:18px;">
+      <h2><span class="accent"></span> Fitness</h2>
+      <div class="lede">Calisthenics floor · session · body signals. Click any tile to log.</div>
+      <div class="ex-grid" id="fitnessGrid"></div>
     </div>
 
-    <div class="grid-2" style="margin-top:18px;">
+    <div id="sec-content" class="toc-scroll-target card pillar-content" style="margin-top:18px;">
+      <h2><span class="accent"></span> Content</h2>
+      <div class="lede">Short-form is a counting problem. Ship and log.</div>
+      <div class="ex-grid" id="contentGrid"></div>
+    </div>
 
-      <div class="card pillar-fitness">
-        <h2><span class="accent"></span> Fitness — inputs</h2>
-        <div class="lede">Calisthenics floor + session + body signals.</div>
+    <div id="sec-network" class="toc-scroll-target card pillar-network" style="margin-top:18px;">
+      <h2><span class="accent"></span> Network</h2>
+      <div class="lede">In-person counts. DMs are kindling, not fire.</div>
+      <div class="ex-grid" id="networkGrid"></div>
+    </div>
 
-        <h3>Calisthenics</h3>
-        <div class="grid-2">
-          <div class="field"><label>Pushups</label><input type="number" min="0" id="t_pushups" /></div>
-          <div class="field"><label>Mounted crunches</label><input type="number" min="0" id="t_mountedCrunches" /></div>
-          <div class="field"><label>Heel taps</label><input type="number" min="0" id="t_heelTaps" /></div>
-          <div class="field"><label>Plank (min)</label><input type="number" min="0" step="0.5" id="t_plankMinutes" /></div>
-        </div>
-
-        <h3>Session &amp; body</h3>
-        <div class="grid-2">
-          <div class="field">
-            <label>Session type today</label>
-            <select id="t_sessionType">
-              <option value="">— none —</option>
-              <option value="gym">Gym (per template)</option>
-              <option value="cardio">Cardio (Zone 2)</option>
-              <option value="interval">Cardio (VO₂ interval)</option>
-              <option value="dive">Dive / freedive</option>
-              <option value="active-rest">Active rest / mobility</option>
-            </select>
-          </div>
-          <div class="field"><label>Sleep last night (hrs)</label><input type="number" min="0" max="14" step="0.1" id="t_sleepHours" /></div>
-          <div class="field"><label>Bodyweight AM (kg)</label><input type="number" min="0" step="0.1" id="t_weightKg" /></div>
-          <div class="field"><label>Sauna (min)</label><input type="number" min="0" id="t_steamMin" /></div>
-        </div>
-        <div class="row-flex" style="margin-top:6px;">
-          <label class="check"><input type="checkbox" id="t_proteinHit"> Protein ≥ 205g today</label>
-          <label class="check"><input type="checkbox" id="t_steamRoom"> Sauna used</label>
-        </div>
-      </div>
-
-      <div class="card pillar-content">
-        <h2><span class="accent"></span> Content</h2>
-        <div class="lede">Short-form is a counting problem. Ship and log.</div>
-        <h3>Posts shipped</h3>
-        <div class="grid-2">
-          <div class="field"><label>IG Reels</label><input type="number" min="0" id="t_igReels" /></div>
-          <div class="field"><label>TikTok</label><input type="number" min="0" id="t_tiktok" /></div>
-          <div class="field"><label>YT Shorts</label><input type="number" min="0" id="t_ytShorts" /></div>
-          <div class="field"><label>YT Long-form</label><input type="number" min="0" id="t_ytLong" /></div>
-        </div>
-        <h3>Engine</h3>
-        <div class="grid-2">
-          <div class="field"><label>Footage clips captured</label><input type="number" min="0" id="t_clips" /></div>
-          <div class="field"><label>Best post reach</label><input type="number" min="0" id="t_bestReach" /></div>
-        </div>
-        <div class="row-flex" style="margin-top:6px;">
-          <label class="check"><input type="checkbox" id="t_shootDay"> Shoot day</label>
-          <label class="check"><input type="checkbox" id="t_editBlock"> Batch-edit block done</label>
-          <label class="check"><input type="checkbox" id="t_engageBlock"> 20-min engagement block</label>
-        </div>
-      </div>
-
-      <div class="card pillar-network">
-        <h2><span class="accent"></span> Network</h2>
-        <div class="lede">In-person counts. DMs are kindling, not fire.</div>
-        <h3>People seen IRL today</h3>
-        <div class="field">
-          <label>Names (comma-separated)</label>
-          <input type="text" id="t_peopleSeen" placeholder="e.g. Pablo, Daniela, Mateo" />
-        </div>
-        <h3>Outbound</h3>
-        <div class="grid-2">
-          <div class="field"><label>Warm DMs sent</label><input type="number" min="0" id="t_dms" /></div>
-          <div class="field"><label>Recurring scenes attended</label><input type="number" min="0" id="t_scenes" /></div>
-          <div class="field"><label>New intros made</label><input type="number" min="0" id="t_intros" /></div>
-        </div>
-      </div>
-
-      <div class="card pillar-job">
-        <h2><span class="accent"></span> Job hunt</h2>
-        <div class="lede">Pipeline lives or dies on weekly volume + active loops.</div>
-        <h3>Outbound today</h3>
-        <div class="grid-2">
-          <div class="field"><label>Applications sent</label><input type="number" min="0" id="t_apps" /></div>
-          <div class="field"><label>Outreach DMs sent</label><input type="number" min="0" id="t_outreach" /></div>
-          <div class="field"><label>Companies deep-dived</label><input type="number" min="0" id="t_companies" /></div>
-          <div class="field"><label>Interview hours logged</label><input type="number" min="0" step="0.25" id="t_interviewHrs" /></div>
-        </div>
-        <h3>Active loops (current state)</h3>
-        <div class="grid-4">
-          <div class="field"><label>Screen</label><input type="number" min="0" id="t_loopScreen" /></div>
-          <div class="field"><label>Tech</label><input type="number" min="0" id="t_loopTech" /></div>
-          <div class="field"><label>Onsite</label><input type="number" min="0" id="t_loopOnsite" /></div>
-          <div class="field"><label>Offer</label><input type="number" min="0" id="t_loopOffer" /></div>
-        </div>
-      </div>
+    <div id="sec-job" class="toc-scroll-target card pillar-job" style="margin-top:18px;">
+      <h2><span class="accent"></span> Job hunt</h2>
+      <div class="lede">Pipeline lives or dies on weekly volume + active loops.</div>
+      <div class="ex-grid" id="jobGrid"></div>
     </div>
 
     <div class="card" style="margin-top:18px;">
@@ -503,9 +629,9 @@ const MISSION_START = '2026-08-23'; // Sun, Day 1
 const MISSION_END   = '2026-10-03'; // Sat, Day 42
 const MISSION_DAYS  = 42;
 
-const CAL_TARGETS = { pushups: 500, mountedCrunches: 250, heelTaps: 250, plankMinutes: 50 };
-const CAL_LABELS = { pushups: 'Pushups', mountedCrunches: 'Mt. crunches', heelTaps: 'Heel taps', plankMinutes: 'Plank (min)' };
-const CAL_KEYS = ['pushups', 'mountedCrunches', 'heelTaps', 'plankMinutes'];
+const CAL_TARGETS = { pushups: 500, mountedCrunches: 250, heelTaps: 250, plankMinutes: 50, kneeRaises: 250 };
+const CAL_LABELS = { pushups: 'Pushups', mountedCrunches: 'Mt. crunches', heelTaps: 'Heel taps', plankMinutes: 'Plank (min)', kneeRaises: 'Knee raises' };
+const CAL_KEYS = ['pushups', 'mountedCrunches', 'heelTaps', 'plankMinutes', 'kneeRaises'];
 
 const CONTENT_TARGETS = { igReels: 5, tiktok: 5, ytShorts: 3, ytLong: 0.5, shortFormTotal: 13 };
 
@@ -587,6 +713,59 @@ const MILESTONES = [
 
 const STORAGE_KEY = 'walkout_v4';
 
+/* Daily-target ring-tile metrics per pillar.
+   target: daily-equivalent target (weekly / 7 or a natural daily target). null = log-only.
+   input: 'number' | 'check' | 'select' | 'text'  */
+const PILLAR_METRICS = {
+  fitness: [
+    { key: 'pushups',         label: 'Pushups',       target: Math.round(CAL_TARGETS.pushups/7),         input: 'sets', repLabel: 'reps' },
+    { key: 'mountedCrunches', label: 'Mt. crunches',  target: Math.round(CAL_TARGETS.mountedCrunches/7), input: 'sets', repLabel: 'reps' },
+    { key: 'heelTaps',        label: 'Heel taps',     target: Math.round(CAL_TARGETS.heelTaps/7),        input: 'sets', repLabel: 'reps' },
+    { key: 'plankMinutes',    label: 'Plank',         target: Math.round(CAL_TARGETS.plankMinutes/7*10)/10, unit: 'min', input: 'sets', repLabel: 'min', repStep: 0.5 },
+    { key: 'kneeRaises',      label: 'Knee raises',   target: Math.round(CAL_TARGETS.kneeRaises/7),      input: 'sets', repLabel: 'reps' },
+    { key: 'sessionType',     label: 'Session',       target: null,  input: 'select',
+        options: [
+          {v:'',              t:'— none —'},
+          {v:'gym',           t:'Gym (per template)'},
+          {v:'cardio',        t:'Cardio (Zone 2)'},
+          {v:'interval',      t:'Cardio (VO₂ interval)'},
+          {v:'dive',          t:'Dive / freedive'},
+          {v:'active-rest',   t:'Active rest / mobility'}
+        ] },
+    { key: 'sleepHours',      label: 'Sleep',         target: 7,     unit: 'hrs', input: 'number', step: 0.1 },
+    { key: 'weightKg',        label: 'Bodyweight',    target: null,  unit: 'kg',  input: 'number', step: 0.1 },
+    { key: 'steamMin',        label: 'Sauna',         target: 15,    unit: 'min', input: 'number' },
+    { key: 'proteinHit',      label: 'Protein ≥205g', target: 1,     input: 'check' }
+  ],
+  content: [
+    { key: 'igReels',    label: 'IG Reels',    target: 1,   input: 'number' },
+    { key: 'tiktok',     label: 'TikTok',      target: 1,   input: 'number' },
+    { key: 'ytShorts',   label: 'YT Shorts',   target: 0.5, input: 'number' },
+    { key: 'ytLong',     label: 'YT Long',     target: 0.1, input: 'number', step: 0.5 },
+    { key: 'clips',      label: 'Clips',       target: null, input: 'number' },
+    { key: 'bestReach',  label: 'Best reach',  target: null, input: 'number' },
+    { key: 'shootDay',   label: 'Shoot day',   target: 1,   input: 'check' },
+    { key: 'editBlock',  label: 'Edit block',  target: 1,   input: 'check' },
+    { key: 'engageBlock',label: 'Engage 20m',  target: 1,   input: 'check' }
+  ],
+  network: [
+    { key: 'peopleSeen', label: 'People IRL',  target: 1,   input: 'text', placeholder: 'Pablo, Daniela, Mateo' },
+    { key: 'dms',        label: 'Warm DMs',    target: 0.5, input: 'number' },
+    { key: 'scenes',     label: 'Scenes',      target: 0.3, input: 'number' },
+    { key: 'intros',     label: 'New intros',  target: null, input: 'number' }
+  ],
+  job: [
+    { key: 'apps',         label: 'Applications', target: 1,   input: 'number' },
+    { key: 'outreach',     label: 'Outreach DMs', target: 2,   input: 'number' },
+    { key: 'companies',    label: 'Deep-dives',   target: 0.2, input: 'number' },
+    { key: 'interviewHrs', label: 'Interview hrs',target: null,input: 'number', step: 0.25 },
+    { key: 'loopScreen',   label: 'Screen loops', target: null,input: 'number' },
+    { key: 'loopTech',     label: 'Tech loops',   target: null,input: 'number' },
+    { key: 'loopOnsite',   label: 'Onsite loops', target: null,input: 'number' },
+    { key: 'loopOffer',    label: 'Offers',       target: null,input: 'number' }
+  ]
+};
+
 /* DATE HELPERS */
 function todayIso() {
   const d = new Date();
@@ -616,6 +795,76 @@ function saveAll(data) {
 }
 let STATE = loadAll();
 
+/* Selected-day state — drives what the TODAY tab displays.
+   Defaults to real today; day-strip lets the user peek at other days. */
+let selectedDate = null;
+function activeDate() { return selectedDate || todayIso(); }
+function setSelectedDate(iso) {
+  selectedDate = (iso === todayIso()) ? null : iso;
+  renderHeader();
+  renderToday();
+  updateBackTodayButton();
+}
+function shiftSelectedByDays(delta) {
+  const cur = parseIso(activeDate());
+  cur.setDate(cur.getDate() + delta);
+  const iso = `${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,'0')}-${String(cur.getDate()).padStart(2,'0')}`;
+  setSelectedDate(iso);
+}
+function updateBackTodayButton() {
+  const btn = document.getElementById('btnBackToday');
+  if (!btn) return;
+  btn.classList.toggle('hidden', activeDate() === todayIso());
+}
+function renderDayStrip() {
+  const strip = document.getElementById('dayStrip');
+  const label = document.getElementById('dayStripLabel');
+  if (!strip) return;
+  strip.innerHTML = '';
+  const today = todayIso();
+  const sel = parseIso(activeDate());
+  const dow = sel.getDay();
+  const sunDate = new Date(sel);
+  sunDate.setDate(sel.getDate() - dow);
+
+  const days = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(sunDate);
+    d.setDate(sunDate.getDate() + i);
+    const iso = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    days.push({ iso, d, dow: i });
+    const tpl = WORKOUT_TEMPLATE[i];
+    const isToday = iso === today;
+    const isSelected = iso === activeDate();
+    const inMission = iso >= MISSION_START && iso <= MISSION_END;
+    const hasData = !!STATE.days[iso];
+
+    const el = document.createElement('div');
+    el.className = 'day-strip-day'
+      + (isToday ? ' today' : '')
+      + (isSelected ? ' selected' : '')
+      + (tpl.type === 'rest' ? ' rest' : '')
+      + (inMission ? '' : ' out-of-mission');
+    el.innerHTML =
+      `<div class="dow">${DAY_NAMES[i]}</div>` +
+      `<div class="date-num">${d.getDate()}</div>` +
+      `<div class="type-tag">${tpl.type === 'rest' ? 'REST' : 'GYM'}</div>` +
+      (hasData ? '<div class="saved-dot" title="Day has data"></div>' : '');
+    el.addEventListener('click', () => setSelectedDate(iso));
+    strip.appendChild(el);
+  }
+
+  // Week label (e.g., "Aug 23 — 29 · Mission Week 1")
+  const first = days[0].d, last = days[6].d;
+  const firstMonth = first.toLocaleDateString('en-US', { month: 'short' });
+  const lastMonth  = last.toLocaleDateString('en-US', { month: 'short' });
+  const range = firstMonth === lastMonth
+    ? `${firstMonth} ${first.getDate()} – ${last.getDate()}`
+    : `${firstMonth} ${first.getDate()} – ${lastMonth} ${last.getDate()}`;
+  const wk = weekForDate(days[0].iso) || weekForDate(days[6].iso);
+  label.textContent = wk ? `${range} · Mission Week ${wk.num}` : `${range}`;
+}
+
 /* FORM <-> DAY OBJECT */
 const TODAY_FIELDS = {
   pushups: 'number', mountedCrunches: 'number', heelTaps: 'number', plankMinutes: 'number',
@@ -639,9 +888,12 @@ function readForm() {
     else if (t === 'string' || t === 'select') out[k] = el.value.trim();
     else if (t === 'check') out[k] = !!el.checked;
   });
-  // exercisesDone — array of exercise names checked
-  const done = Array.from(document.querySelectorAll('.workout-list .ex input:checked')).map(el => el.dataset.name);
-  out.exercisesDone = done;
+  // Exercise data is auto-persisted per set (via Log set button) and per meta change (checkbox blur, note blur).
+  // Preserve whatever is already on STATE.days[activeDate] so Save day doesn't clobber the running session log.
+  const iso = activeDate();
+  if (STATE.days[iso] && STATE.days[iso].exercises) {
+    out.exercises = STATE.days[iso].exercises;
+  }
   return out;
 }
 function writeForm(d) {
@@ -657,21 +909,24 @@ function writeForm(d) {
 
 /* TODAY VIEW */
 function renderToday() {
-  const iso = todayIso();
+  const iso = activeDate();
+  const today = todayIso();
   const day = missionDayFor(iso);
   const wk = weekForDate(iso);
   document.getElementById('todayDateLabel').textContent = fmtFull(iso);
 
   const workoutLede = document.getElementById('workoutLede');
-  if (day < 1) workoutLede.textContent = `Mission starts ${fmtFull(MISSION_START)} (in ${1-day} days). Use today to prep.`;
-  else if (day > MISSION_DAYS) workoutLede.textContent = `Mission complete ${fmtFull(MISSION_END)}. You can still log.`;
-  else workoutLede.textContent = `Day ${day} · Week ${wk ? wk.num : '—'} · ${fmtFull(iso)}`;
+  const dayPrefix = iso === today ? '' : (iso > today ? 'Preview · ' : 'Past · ');
+  if (day < 1) workoutLede.textContent = `${dayPrefix}Mission starts ${fmtFull(MISSION_START)} (in ${1-day} days).`;
+  else if (day > MISSION_DAYS) workoutLede.textContent = `${dayPrefix}After mission end (${fmtFull(MISSION_END)}).`;
+  else workoutLede.textContent = `${dayPrefix}Day ${day} · Week ${wk ? wk.num : '—'} · ${fmtFull(iso)}`;
 
   const existing = STATE.days[iso];
-  writeForm(existing || {});
   renderWorkoutCard(iso, existing || {});
-  renderTodayRings(existing || readForm());
+  renderPillarGrids();
   updateSavedLabel(iso);
+  renderDayStrip();
+  updateBackTodayButton();
 }
 
 function renderWorkoutCard(iso, dayData) {
@@ -694,38 +949,623 @@ function renderWorkoutCard(iso, dayData) {
       '<ul><li>Sleep 8+ hrs</li><li>Zone 2 walk or light dive if desired</li><li>Mobility &amp; hip openers, 10–15 min</li><li>Sauna optional</li></ul>';
     card.appendChild(rn);
   } else {
+    // Migrate legacy formats: exercisesDone array → exercises object; scalar sets → sets array
+    let exData = dayData.exercises || {};
+    if (dayData.exercisesDone && !dayData.exercises) {
+      dayData.exercisesDone.forEach(n => { exData[n] = { done: true, sets: [], note: '' }; });
+    }
+    Object.keys(exData).forEach(n => {
+      const e = exData[n];
+      if (typeof e.sets === 'number') {
+        const arr = [];
+        for (let i = 0; i < e.sets; i++) arr.push({ weight: e.weight || null, reps: e.reps || null });
+        e.sets = arr;
+        delete e.weight; delete e.reps;
+      }
+      if (!Array.isArray(e.sets)) e.sets = [];
+    });
+    dayData.exercises = exData;
+
     const list = document.createElement('div');
-    list.className = 'workout-list';
-    const done = new Set(dayData.exercisesDone || []);
+    list.className = 'ex-grid';
     tpl.exercises.forEach(ex => {
-      const row = document.createElement('div');
-      row.className = 'ex' + (done.has(ex.name) ? ' done' : '');
-      const cb = document.createElement('input');
-      cb.type = 'checkbox'; cb.dataset.name = ex.name;
-      cb.checked = done.has(ex.name);
-      cb.addEventListener('change', () => {
-        row.classList.toggle('done', cb.checked);
+      const prev = exData[ex.name] || { done: false, sets: [], note: '' };
+      const targetSets = parseTargetSets(ex.target);
+      const doneSets = prev.sets ? prev.sets.length : 0;
+      const pct = targetSets ? Math.min(150, Math.round((doneSets / targetSets) * 100)) : 0;
+
+      const deck = document.createElement('details');
+      deck.className = 'ex-deck';
+      deck.dataset.name = ex.name;
+      deck.dataset.targetSets = targetSets;
+      deck.dataset.done = doneSets >= targetSets ? 'true' : 'false';
+
+      // Summary — ring tile flashcard
+      const summary = document.createElement('summary');
+      const tile = document.createElement('div');
+      tile.className = 'ex-tile';
+      const svgContainer = document.createElement('div');
+      svgContainer.className = 'ring-svg-container';
+      svgContainer.appendChild(makeRingSvg(pct, getPillarVar('fitness'), 76));
+      const setsLbl = document.createElement('div');
+      setsLbl.className = 'sets-label';
+      setsLbl.textContent = `${doneSets} / ${targetSets} sets`;
+      const exLbl = document.createElement('div');
+      exLbl.className = 'ex-label';
+      exLbl.innerHTML = `${escapeHtml(ex.name)} <span class="ex-target-inline">· ${escapeHtml(ex.target)}</span>`;
+      tile.appendChild(svgContainer);
+      tile.appendChild(setsLbl);
+      tile.appendChild(exLbl);
+      summary.appendChild(tile);
+      deck.appendChild(summary);
+
+      // Details body
+      const details = document.createElement('div');
+      details.className = 'ex-details';
+
+      // Progression history
+      const hist = document.createElement('div');
+      hist.className = 'set-history';
+      const last = findLastLog(ex.name, iso);
+      const best = findBestSet(ex.name);
+      if (last) {
+        const setsStr = last.sets.map(s => `${s.weight || 'BW'}×${s.reps}`).join(', ');
+        hist.innerHTML = `<div><strong>Last session (${fmtShort(last.iso)}):</strong> ${setsStr}</div>`;
+      } else {
+        hist.innerHTML = `<div class="empty">No prior sessions logged for this exercise.</div>`;
+      }
+      if (best) {
+        const bLine = document.createElement('div');
+        bLine.innerHTML = `<strong>Best set:</strong> ${best.weight || 'BW'} lbs × ${best.reps} reps · ${fmtShort(best.iso)}`;
+        hist.appendChild(bLine);
+      }
+      details.appendChild(hist);
+
+      // Set list (already-logged sets this session)
+      const setList = document.createElement('div');
+      setList.className = 'set-list';
+      prev.sets.forEach((s, i) => setList.appendChild(renderSetRow(ex.name, s, i)));
+      details.appendChild(setList);
+
+      // Log-new-set form
+      const logForm = document.createElement('div');
+      logForm.className = 'set-log-form';
+      const wIn = document.createElement('input');
+      wIn.type = 'number'; wIn.min = '0'; wIn.step = '0.5'; wIn.placeholder = 'Weight (lbs)';
+      const rIn = document.createElement('input');
+      rIn.type = 'number'; rIn.min = '0'; rIn.placeholder = 'Reps';
+      const logBtn = document.createElement('button');
+      logBtn.type = 'button'; logBtn.textContent = '+ Log set';
+      logBtn.addEventListener('click', () => {
+        const reps = Number(rIn.value);
+        if (!reps || reps <= 0) { rIn.focus(); return; }
+        const weight = wIn.value === '' ? null : Number(wIn.value);
+        logSet(ex.name, weight, reps);
+        // Append to DOM
+        const idx = (STATE.days[iso].exercises[ex.name].sets.length - 1);
+        setList.appendChild(renderSetRow(ex.name, { weight, reps }, idx));
+        rIn.value = ''; rIn.focus();
+        // keep weight sticky for repeated logs
+        updateExerciseRing(ex.name);
         updateWorkoutFooter();
       });
-      const n = document.createElement('span'); n.className = 'name'; n.textContent = ex.name;
-      const t = document.createElement('span'); t.className = 'target'; t.textContent = ex.target;
-      row.appendChild(cb); row.appendChild(n); row.appendChild(t);
-      list.appendChild(row);
+      // Enter in reps triggers log
+      rIn.addEventListener('keydown', (e) => { if (e.key === 'Enter') logBtn.click(); });
+      logForm.appendChild(wIn); logForm.appendChild(rIn); logForm.appendChild(logBtn);
+      details.appendChild(logForm);
+
+      // Notes
+      const nRow = document.createElement('div');
+      nRow.className = 'note-row';
+      const nLbl = document.createElement('label'); nLbl.textContent = 'Notes';
+      const nInp = document.createElement('input');
+      nInp.type = 'text'; nInp.dataset.field = 'note';
+      nInp.placeholder = 'form cue, tempo, PR flag';
+      if (prev.note) nInp.value = prev.note;
+      nInp.addEventListener('blur', () => persistExerciseMeta(ex.name, { note: nInp.value.trim() }));
+      nRow.appendChild(nLbl); nRow.appendChild(nInp);
+      details.appendChild(nRow);
+
+      deck.appendChild(details);
+      list.appendChild(deck);
     });
     card.appendChild(list);
-    const foot = document.createElement('div');
-    foot.className = 'footer-line'; foot.id = 'workoutFooter';
-    card.appendChild(foot);
+    makeCollapsibleGrid(list);
+
+    const prog = document.createElement('div');
+    prog.className = 'session-progress';
+    prog.innerHTML = '<div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div><div class="progress-stats" id="progressStats">0/0 done</div>';
+    card.appendChild(prog);
   }
   root.appendChild(card);
-  updateWorkoutFooter();
+  // populate footer AFTER card is in DOM so selectors resolve
+  setTimeout(updateWorkoutFooter, 0);
 }
 function updateWorkoutFooter() {
-  const foot = document.getElementById('workoutFooter');
-  if (!foot) return;
-  const total = document.querySelectorAll('.workout-list .ex').length;
-  const done = document.querySelectorAll('.workout-list .ex input:checked').length;
-  foot.textContent = `${done}/${total} exercises done`;
+  const decks = document.querySelectorAll('.ex-deck');
+  if (!decks.length) return;
+  const iso = activeDate();
+  const exData = (STATE.days[iso] && STATE.days[iso].exercises) || {};
+  const total = decks.length;
+  let done = 0, totalSets = 0, totalVolume = 0;
+  decks.forEach(deck => {
+    const name = deck.dataset.name;
+    const target = Number(deck.dataset.targetSets) || 3;
+    const e = exData[name];
+    const cnt = e && Array.isArray(e.sets) ? e.sets.length : 0;
+    if (cnt >= target) done++;
+    totalSets += cnt;
+    if (e && Array.isArray(e.sets)) {
+      e.sets.forEach(s => { totalVolume += (Number(s.weight) || 0) * (Number(s.reps) || 0); });
+    }
+  });
+  const bar = document.getElementById('progressFill');
+  if (bar) bar.style.width = total ? ((done / total) * 100) + '%' : '0%';
+  const stats = document.getElementById('progressStats');
+  if (stats) stats.textContent = `${done}/${total} done · ${totalSets} working sets · ${totalVolume.toLocaleString()} lbs total volume`;
+}
+
+/* ---------- Pillar dashboard tiles (ring-tile format for all pillar metrics) ---------- */
+
+/* ---------- Calisthenics per-set helpers (sets stored under day.calisthenics[key]) ---------- */
+function caliSetsFromDay(day, key) {
+  return (day && day.calisthenics && Array.isArray(day.calisthenics[key])) ? day.calisthenics[key] : [];
+}
+function caliTotalFromDay(day, key) {
+  if (!day) return 0;
+  const arr = caliSetsFromDay(day, key);
+  if (arr.length) return arr.reduce((a, s) => a + (Number(s.reps) || 0), 0);
+  // Backward compat: pre-sets days that had a scalar total
+  const n = Number(day[key]);
+  return Number.isFinite(n) && n > 0 ? n : 0;
+}
+function logCaliSet(key, reps) {
+  const iso = activeDate();
+  const day = STATE.days[iso] || {};
+  day.calisthenics = day.calisthenics || {};
+  if (!Array.isArray(day.calisthenics[key])) day.calisthenics[key] = [];
+  day.calisthenics[key].push({ reps: Number(reps) });
+  day[key] = caliTotalFromDay(day, key); // keep top-level total for aggregation compatibility
+  day.savedAt = new Date().toISOString();
+  STATE.days[iso] = day;
+  saveAll(STATE);
+  updateSavedLabel(iso);
+  renderDayStrip();
+}
+function deleteCaliSet(key, idx) {
+  const iso = activeDate();
+  const day = STATE.days[iso];
+  if (!day || !day.calisthenics || !Array.isArray(day.calisthenics[key])) return;
+  day.calisthenics[key].splice(idx, 1);
+  day[key] = caliTotalFromDay(day, key);
+  day.savedAt = new Date().toISOString();
+  saveAll(STATE);
+  updateSavedLabel(iso);
+  renderDayStrip();
+}
+
+function pillarMetricValue(metric, dayData) {
+  if (metric.input === 'sets') return caliTotalFromDay(dayData || {}, metric.key);
+  const raw = dayData ? dayData[metric.key] : undefined;
+  if (metric.key === 'peopleSeen') {
+    if (!raw) return 0;
+    return String(raw).split(',').map(s => s.trim()).filter(Boolean).length;
+  }
+  if (metric.input === 'check') return raw ? 1 : 0;
+  if (metric.input === 'select') return raw ? 1 : 0;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : 0;
+}
+function pillarMetricPct(metric, value) {
+  if (metric.target && metric.target > 0) return Math.min(150, Math.round((value / metric.target) * 100));
+  return value > 0 ? 100 : 0;
+}
+function pillarMetricLabel(metric, value, raw) {
+  const unit = metric.unit ? ' ' + metric.unit : '';
+  if (metric.input === 'check') return value ? '✓ Done' : '—';
+  if (metric.input === 'select') return raw ? String(raw).replace(/-/g, ' ').toUpperCase() : '—';
+  if (metric.input === 'sets') {
+    const disp = Math.round(value * 10) / 10;
+    if (metric.target == null) return `${disp}${unit}`;
+    const tgt = Number.isInteger(metric.target) ? metric.target : Math.round(metric.target * 10) / 10;
+    return `${disp} / ${tgt}${unit}`;
+  }
+  if (metric.key === 'peopleSeen') {
+    return metric.target ? `${value} / ${metric.target}` : (value ? `${value} seen` : '—');
+  }
+  if (metric.target == null) return raw ? (raw + unit) : '—';
+  const disp = Math.round(value * 10) / 10;
+  const tgt = Number.isInteger(metric.target) ? metric.target : Math.round(metric.target * 10) / 10;
+  return `${disp} / ${tgt}${unit}`;
+}
+
+function renderPillarGrids() {
+  const iso = activeDate();
+  const dayData = STATE.days[iso] || {};
+  ['fitness', 'content', 'network', 'job'].forEach(pillar => {
+    const grid = document.getElementById(pillar + 'Grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    // Remove any prior toggle button hanging around
+    const nextEl = grid.nextElementSibling;
+    if (nextEl && nextEl.classList && nextEl.classList.contains('grid-toggle')) nextEl.remove();
+    PILLAR_METRICS[pillar].forEach(metric => {
+      grid.appendChild(renderPillarTile(pillar, metric, dayData));
+    });
+    makeCollapsibleGrid(grid);
+  });
+}
+
+/* Collapsible grid — show first 4 tiles, hide the rest behind a "Show N more" toggle.
+   Auto-expands if any hidden tile has logged data for the active day. */
+function makeCollapsibleGrid(grid, opts) {
+  if (!grid) return;
+  const showN = (opts && opts.showN) || 4;
+  const kids = Array.from(grid.children);
+  if (kids.length <= showN) {
+    grid.classList.remove('collapsible', 'collapsed');
+    return;
+  }
+  grid.classList.add('collapsible');
+  // Auto-expand if any hidden tile already has data (data-done="true")
+  const hasHiddenData = kids.slice(showN).some(el => el.dataset && el.dataset.done === 'true');
+  if (hasHiddenData) grid.classList.remove('collapsed');
+  else grid.classList.add('collapsed');
+
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'grid-toggle';
+  const updateBtn = () => {
+    const hiddenCount = kids.length - showN;
+    if (grid.classList.contains('collapsed')) btn.textContent = `Show ${hiddenCount} more ▾`;
+    else btn.textContent = 'Show fewer ▴';
+  };
+  updateBtn();
+  btn.addEventListener('click', () => {
+    grid.classList.toggle('collapsed');
+    updateBtn();
+  });
+  grid.parentNode.insertBefore(btn, grid.nextSibling);
+}
+
+function renderPillarTile(pillar, metric, dayData) {
+  const raw = dayData[metric.key];
+  const value = pillarMetricValue(metric, dayData);
+  const pct = pillarMetricPct(metric, value);
+  const displayVal = pillarMetricLabel(metric, value, raw);
+
+  const deck = document.createElement('details');
+  deck.className = 'ex-deck pillar-tile';
+  deck.dataset.metric = metric.key;
+  deck.dataset.pillar = pillar;
+  deck.dataset.done = ((metric.target && value >= metric.target) || (!metric.target && value > 0)) ? 'true' : 'false';
+
+  const summary = document.createElement('summary');
+  const tile = document.createElement('div');
+  tile.className = 'ex-tile';
+  const svgContainer = document.createElement('div');
+  svgContainer.className = 'ring-svg-container';
+  svgContainer.appendChild(makeRingSvg(pct, getPillarVar(pillar), 76));
+  const valLbl = document.createElement('div');
+  valLbl.className = 'sets-label';
+  valLbl.textContent = displayVal;
+  const nameLbl = document.createElement('div');
+  nameLbl.className = 'ex-label';
+  nameLbl.textContent = metric.label;
+  tile.appendChild(svgContainer);
+  tile.appendChild(valLbl);
+  tile.appendChild(nameLbl);
+  summary.appendChild(tile);
+  deck.appendChild(summary);
+
+  const details = document.createElement('div');
+  details.className = 'ex-details';
+  details.appendChild(createPillarInput(pillar, metric, raw));
+  deck.appendChild(details);
+  return deck;
+}
+
+function createPillarInput(pillar, metric, currentRaw) {
+  if (metric.input === 'sets') return createSetsPillarInput(pillar, metric);
+
+  const wrap = document.createElement('div');
+  wrap.className = 'note-row';
+  const lbl = document.createElement('label');
+  const tgtStr = metric.target != null ? ` · daily target ${metric.target}${metric.unit ? ' ' + metric.unit : ''}` : ' · log only';
+  lbl.textContent = metric.label + tgtStr;
+  wrap.appendChild(lbl);
+
+  const persist = (v) => {
+    persistPillarMetric(metric.key, v);
+    updatePillarTile(metric.key);
+  };
+
+  if (metric.input === 'check') {
+    const toggleWrap = document.createElement('label');
+    toggleWrap.style.display = 'inline-flex';
+    toggleWrap.style.alignItems = 'center';
+    toggleWrap.style.gap = '8px';
+    toggleWrap.style.cursor = 'pointer';
+    toggleWrap.style.marginTop = '4px';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = !!currentRaw;
+    cb.style.accentColor = 'var(--' + pillar + ')';
+    cb.style.width = '18px';
+    cb.style.height = '18px';
+    cb.addEventListener('change', () => persist(cb.checked));
+    const span = document.createElement('span');
+    span.textContent = cb.checked ? 'Completed' : 'Mark as done';
+    span.style.fontSize = '13px';
+    span.style.color = 'var(--ink-dim)';
+    cb.addEventListener('change', () => { span.textContent = cb.checked ? 'Completed' : 'Mark as done'; });
+    toggleWrap.appendChild(cb);
+    toggleWrap.appendChild(span);
+    wrap.appendChild(toggleWrap);
+  } else if (metric.input === 'select') {
+    const sel = document.createElement('select');
+    metric.options.forEach(opt => {
+      const o = document.createElement('option');
+      o.value = opt.v; o.textContent = opt.t;
+      if ((currentRaw || '') === opt.v) o.selected = true;
+      sel.appendChild(o);
+    });
+    sel.addEventListener('change', () => persist(sel.value));
+    wrap.appendChild(sel);
+  } else if (metric.input === 'text') {
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.placeholder = metric.placeholder || '';
+    if (currentRaw) inp.value = currentRaw;
+    inp.addEventListener('blur', () => persist(inp.value.trim()));
+    inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') inp.blur(); });
+    wrap.appendChild(inp);
+  } else {
+    const inp = document.createElement('input');
+    inp.type = 'number';
+    inp.min = '0';
+    if (metric.step) inp.step = metric.step;
+    if (currentRaw !== undefined && currentRaw !== null && currentRaw !== '') inp.value = currentRaw;
+    inp.addEventListener('blur', () => persist(inp.value === '' ? null : Number(inp.value)));
+    inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') inp.blur(); });
+    wrap.appendChild(inp);
+  }
+  return wrap;
+}
+
+function persistPillarMetric(key, value) {
+  const iso = activeDate();
+  const day = STATE.days[iso] || {};
+  day[key] = value;
+  day.savedAt = new Date().toISOString();
+  STATE.days[iso] = day;
+  saveAll(STATE);
+  updateSavedLabel(iso);
+  renderDayStrip();
+}
+
+function updatePillarTile(metricKey) {
+  const iso = activeDate();
+  const dayData = STATE.days[iso] || {};
+  const deck = document.querySelector(`.pillar-tile[data-metric="${CSS.escape(metricKey)}"]`);
+  if (!deck) return;
+  const pillar = deck.dataset.pillar;
+  const metric = PILLAR_METRICS[pillar].find(m => m.key === metricKey);
+  if (!metric) return;
+  const raw = dayData[metric.key];
+  const value = pillarMetricValue(metric, dayData);
+  const pct = pillarMetricPct(metric, value);
+
+  const container = deck.querySelector('.ring-svg-container');
+  if (container) {
+    container.innerHTML = '';
+    container.appendChild(makeRingSvg(pct, getPillarVar(pillar), 76));
+  }
+  const valLbl = deck.querySelector('.sets-label');
+  if (valLbl) valLbl.textContent = pillarMetricLabel(metric, value, raw);
+  deck.dataset.done = ((metric.target && value >= metric.target) || (!metric.target && value > 0)) ? 'true' : 'false';
+}
+
+/* Per-set logger UI for calisthenics tiles (reps only, no weight) */
+function createSetsPillarInput(pillar, metric) {
+  const wrap = document.createElement('div');
+  wrap.className = 'note-row';
+
+  const lbl = document.createElement('label');
+  const tgtStr = metric.target != null ? ` · daily target ${metric.target}${metric.unit ? ' ' + metric.unit : ''}` : '';
+  lbl.textContent = `${metric.label} · per-set log${tgtStr}`;
+  wrap.appendChild(lbl);
+
+  const iso = activeDate();
+  const day = STATE.days[iso] || {};
+  const sets = caliSetsFromDay(day, metric.key);
+  const repLabel = metric.repLabel || 'reps';
+
+  const hint = document.createElement('div');
+  hint.style.cssText = 'font-size:11px; color:var(--ink-faint); margin:4px 0 8px; letter-spacing:0.06em;';
+  const updateHint = () => {
+    const curSets = caliSetsFromDay(STATE.days[activeDate()] || {}, metric.key);
+    const curTotal = curSets.reduce((a, s) => a + (Number(s.reps) || 0), 0);
+    hint.textContent = `${curSets.length} set${curSets.length === 1 ? '' : 's'} logged · ${Math.round(curTotal*10)/10} total ${repLabel}`;
+  };
+  updateHint();
+  wrap.appendChild(hint);
+
+  const setList = document.createElement('div');
+  setList.className = 'set-list';
+  sets.forEach((s, i) => setList.appendChild(renderCaliSetRow(metric.key, s, i, repLabel, updateHint)));
+  wrap.appendChild(setList);
+
+  const logForm = document.createElement('div');
+  logForm.className = 'set-log-form';
+  logForm.style.gridTemplateColumns = '1fr auto';
+  const rIn = document.createElement('input');
+  rIn.type = 'number'; rIn.min = '0'; rIn.placeholder = repLabel;
+  if (metric.repStep) rIn.step = metric.repStep;
+  const logBtn = document.createElement('button');
+  logBtn.type = 'button'; logBtn.textContent = '+ Log set';
+  logBtn.addEventListener('click', () => {
+    const r = Number(rIn.value);
+    if (!r || r <= 0) { rIn.focus(); return; }
+    logCaliSet(metric.key, r);
+    const arr = STATE.days[activeDate()].calisthenics[metric.key];
+    const idx = arr.length - 1;
+    setList.appendChild(renderCaliSetRow(metric.key, { reps: r }, idx, repLabel, updateHint));
+    rIn.value = ''; rIn.focus();
+    updatePillarTile(metric.key);
+    updateHint();
+  });
+  rIn.addEventListener('keydown', (e) => { if (e.key === 'Enter') logBtn.click(); });
+  logForm.appendChild(rIn);
+  logForm.appendChild(logBtn);
+  wrap.appendChild(logForm);
+
+  return wrap;
+}
+
+function renderCaliSetRow(key, s, idx, repLabel, onChange) {
+  const row = document.createElement('div');
+  row.className = 'set-row';
+  const num = document.createElement('span'); num.className = 'set-num'; num.textContent = 'Set ' + (idx + 1);
+  const det = document.createElement('span'); det.className = 'set-detail';
+  det.textContent = `${s.reps} ${repLabel}`;
+  const del = document.createElement('button');
+  del.className = 'set-delete'; del.type = 'button'; del.textContent = '×'; del.title = 'Delete set';
+  del.addEventListener('click', () => {
+    const parent = row.parentElement;
+    const i = Array.from(parent.children).indexOf(row);
+    deleteCaliSet(key, i);
+    row.remove();
+    Array.from(parent.children).forEach((r, k) => {
+      const n = r.querySelector('.set-num'); if (n) n.textContent = 'Set ' + (k + 1);
+    });
+    updatePillarTile(key);
+    if (typeof onChange === 'function') onChange();
+  });
+  row.appendChild(num); row.appendChild(det); row.appendChild(del);
+  return row;
+}
+
+/* Parse target sets from template target string, e.g. "3x8" → 3, "max reps × 3 sets" → 3, "20 min" → 1 */
+function parseTargetSets(target) {
+  if (!target) return 3;
+  let m = target.match(/^(\d+)\s*x\s*\d+/i);
+  if (m) return Number(m[1]);
+  m = target.match(/[×x]\s*(\d+)\s*sets?/i);
+  if (m) return Number(m[1]);
+  if (/\d+\s*min/i.test(target)) return 1;
+  if (/failure|to\s*failure|core\s*work/i.test(target)) return 1;
+  return 3;
+}
+
+/* Refresh a single exercise's ring + sets label after set change */
+function updateExerciseRing(exName) {
+  const iso = activeDate();
+  const deck = document.querySelector(`.ex-deck[data-name="${CSS.escape(exName)}"]`);
+  if (!deck) return;
+  const target = Number(deck.dataset.targetSets) || 3;
+  const ex = (STATE.days[iso] && STATE.days[iso].exercises && STATE.days[iso].exercises[exName]) || { sets: [] };
+  const done = Array.isArray(ex.sets) ? ex.sets.length : 0;
+  const pct = target ? Math.min(150, Math.round((done / target) * 100)) : 0;
+
+  const container = deck.querySelector('.ring-svg-container');
+  if (container) {
+    container.innerHTML = '';
+    container.appendChild(makeRingSvg(pct, getPillarVar('fitness'), 76));
+  }
+  const setsLabel = deck.querySelector('.sets-label');
+  if (setsLabel) setsLabel.textContent = `${done} / ${target} sets`;
+  deck.dataset.done = done >= target ? 'true' : 'false';
+}
+
+/* Per-set logging helpers */
+function ensureDay(iso) {
+  const day = STATE.days[iso] || {};
+  day.exercises = day.exercises || {};
+  STATE.days[iso] = day;
+  return day;
+}
+function ensureExercise(iso, name) {
+  const day = ensureDay(iso);
+  if (!day.exercises[name]) day.exercises[name] = { done: false, sets: [], note: '' };
+  if (!Array.isArray(day.exercises[name].sets)) day.exercises[name].sets = [];
+  return day.exercises[name];
+}
+function logSet(name, weight, reps) {
+  const iso = activeDate();
+  const ex = ensureExercise(iso, name);
+  ex.sets.push({ weight: weight == null || weight === '' ? null : Number(weight), reps: Number(reps) });
+  STATE.days[iso].savedAt = new Date().toISOString();
+  saveAll(STATE);
+  updateSavedLabel(iso);
+  renderDayStrip();
+}
+function deleteSet(name, idx) {
+  const iso = activeDate();
+  const ex = ensureExercise(iso, name);
+  ex.sets.splice(idx, 1);
+  STATE.days[iso].savedAt = new Date().toISOString();
+  saveAll(STATE);
+  updateSavedLabel(iso);
+  renderDayStrip();
+}
+function persistExerciseMeta(name, patch) {
+  const iso = activeDate();
+  const ex = ensureExercise(iso, name);
+  Object.assign(ex, patch);
+  STATE.days[iso].savedAt = new Date().toISOString();
+  saveAll(STATE);
+  updateSavedLabel(iso);
+  renderDayStrip();
+}
+function renderSetRow(exName, s, idx) {
+  const row = document.createElement('div');
+  row.className = 'set-row';
+  const num = document.createElement('span'); num.className = 'set-num'; num.textContent = 'Set ' + (idx + 1);
+  const det = document.createElement('span'); det.className = 'set-detail';
+  const wStr = (s.weight === null || s.weight === undefined || s.weight === '') ? 'BW' : (s.weight + ' lbs');
+  det.textContent = `${wStr} × ${s.reps} reps`;
+  const del = document.createElement('button');
+  del.className = 'set-delete'; del.type = 'button'; del.textContent = '×'; del.title = 'Delete set';
+  del.addEventListener('click', () => {
+    // find current index of this row in its parent (may shift after prior deletes)
+    const parent = row.parentElement;
+    const i = Array.from(parent.children).indexOf(row);
+    deleteSet(exName, i);
+    row.remove();
+    // renumber remaining
+    Array.from(parent.children).forEach((r, k) => {
+      const n = r.querySelector('.set-num'); if (n) n.textContent = 'Set ' + (k + 1);
+    });
+    updateExerciseRing(exName);
+    updateWorkoutFooter();
+  });
+  row.appendChild(num); row.appendChild(det); row.appendChild(del);
+  return row;
+}
+function findLastLog(exName, beforeIso) {
+  const dates = Object.keys(STATE.days).filter(iso => iso < beforeIso).sort().reverse();
+  for (const iso of dates) {
+    const ex = STATE.days[iso].exercises && STATE.days[iso].exercises[exName];
+    if (ex && Array.isArray(ex.sets) && ex.sets.length) return { iso, sets: ex.sets };
+  }
+  return null;
+}
+function findBestSet(exName) {
+  let best = null;
+  Object.keys(STATE.days).forEach(iso => {
+    const ex = STATE.days[iso].exercises && STATE.days[iso].exercises[exName];
+    if (!ex || !Array.isArray(ex.sets)) return;
+    ex.sets.forEach(s => {
+      const vol = (Number(s.weight) || 0) * (Number(s.reps) || 0);
+      if (!best || vol > best.vol) best = { vol, weight: s.weight, reps: s.reps, iso };
+    });
+  });
+  return best;
+}
+function fmtShort(iso) {
+  const d = parseIso(iso);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 function renderTodayRings(d) {
@@ -785,26 +1625,26 @@ function updateSavedLabel(iso) {
 }
 
 document.getElementById('btnSaveToday').addEventListener('click', () => {
-  const iso = todayIso();
-  const d = readForm();
-  d.savedAt = new Date().toISOString();
-  STATE.days[iso] = d;
+  // Pillar tiles + workout sets auto-save on change. This button just stamps a timestamp
+  // and refreshes the week/mission aggregations.
+  const iso = activeDate();
+  const day = STATE.days[iso] || {};
+  day.savedAt = new Date().toISOString();
+  STATE.days[iso] = day;
   saveAll(STATE);
   updateSavedLabel(iso);
-  renderTodayRings(d);
-  renderWeek(); renderMission();
+  renderWeek(); renderMission(); renderDayStrip();
   const btn = document.getElementById('btnSaveToday');
   const t = btn.textContent; btn.textContent = '✓ Saved';
   setTimeout(() => btn.textContent = t, 900);
 });
 document.getElementById('btnClearToday').addEventListener('click', () => {
-  if (!confirm('Clear today\'s entries from this browser?')) return;
-  const iso = todayIso();
+  const iso = activeDate();
+  if (!confirm(`Clear entries for ${fmtFull(iso)}?`)) return;
   delete STATE.days[iso]; saveAll(STATE);
-  writeForm({}); renderWorkoutCard(iso, {}); renderTodayRings({}); updateSavedLabel(iso);
-});
-['t_pushups','t_mountedCrunches','t_heelTaps','t_plankMinutes'].forEach(id => {
-  document.getElementById(id).addEventListener('input', () => renderTodayRings(readForm()));
+  renderWorkoutCard(iso, {});
+  renderPillarGrids();
+  updateSavedLabel(iso); renderDayStrip();
 });
 
 /* WEEK VIEW */
@@ -1138,7 +1978,7 @@ function sparkCard(title, series, target, color) {
 }
 
 function renderHeader() {
-  const iso = todayIso();
+  const iso = activeDate();
   const day = missionDayFor(iso);
   const wk = weekForDate(iso);
   document.getElementById('dayNum').textContent = (day < 1 || day > MISSION_DAYS) ? '—' : day;
@@ -1184,6 +2024,10 @@ document.getElementById('btnReset').addEventListener('click', () => {
   STATE = loadAll();
   renderHeader(); renderToday(); renderWeek(); renderMission();
 });
+
+document.getElementById('prevWeek').addEventListener('click', () => shiftSelectedByDays(-7));
+document.getElementById('nextWeek').addEventListener('click', () => shiftSelectedByDays(7));
+document.getElementById('btnBackToday').addEventListener('click', () => setSelectedDate(todayIso()));
 
 renderHeader(); renderToday(); renderWeek(); renderMission();
 </script>
