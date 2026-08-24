@@ -22,6 +22,7 @@
     --yellow: #ffd60a;
     --red: #ff453a;
     --fitness: #ff6b3d;
+    --recovery: #2dd4bf;
     --content: #0a84ff;
     --network: #30d158;
     --job: #bf5af2;
@@ -84,6 +85,7 @@
     --yellow: #c78900;
     --red: #e5352c;
     --fitness: #e35a2b;
+    --recovery: #0d9488;
     --content: #0071e3;
     --network: #22a54b;
     --job: #9b4dd7;
@@ -348,10 +350,39 @@
   .chip.yellow { color: var(--yellow); border-color: rgba(251, 191, 36, 0.4); }
   .chip.red { color: var(--red); border-color: rgba(248, 113, 113, 0.4); }
 
-  .pillar-fitness h2 .accent { background: var(--fitness); }
-  .pillar-content h2 .accent { background: var(--content); }
-  .pillar-network h2 .accent { background: var(--network); }
-  .pillar-job h2 .accent { background: var(--job); }
+  .pillar-fitness h2 .accent  { background: var(--fitness); }
+  .pillar-recovery h2 .accent { background: var(--recovery); }
+  .pillar-content h2 .accent  { background: var(--content); }
+  .pillar-network h2 .accent  { background: var(--network); }
+  .pillar-job h2 .accent      { background: var(--job); }
+
+  /* Per-pillar gradient card backgrounds — each dashboard gets its own hue tint */
+  .card.pillar-fitness {
+    background: linear-gradient(180deg, rgba(255,107,61,0.08), rgba(255,107,61,0.01)), var(--surface);
+    border-color: rgba(255,107,61,0.20);
+  }
+  .card.pillar-recovery {
+    background: linear-gradient(180deg, rgba(45,212,191,0.09), rgba(45,212,191,0.01)), var(--surface);
+    border-color: rgba(45,212,191,0.22);
+  }
+  .card.pillar-content {
+    background: linear-gradient(180deg, rgba(10,132,255,0.08), rgba(10,132,255,0.01)), var(--surface);
+    border-color: rgba(10,132,255,0.20);
+  }
+  .card.pillar-network {
+    background: linear-gradient(180deg, rgba(48,209,88,0.08), rgba(48,209,88,0.01)), var(--surface);
+    border-color: rgba(48,209,88,0.20);
+  }
+  .card.pillar-job {
+    background: linear-gradient(180deg, rgba(191,90,242,0.08), rgba(191,90,242,0.01)), var(--surface);
+    border-color: rgba(191,90,242,0.22);
+  }
+  /* Day theme: keep the same tints — 8% alpha reads as a subtle wash on white */
+  :root[data-theme="day"] .card.pillar-fitness  { background: linear-gradient(180deg, rgba(227,90,43,0.08), rgba(227,90,43,0.01)), var(--surface); border-color: rgba(227,90,43,0.22); }
+  :root[data-theme="day"] .card.pillar-recovery { background: linear-gradient(180deg, rgba(13,148,136,0.08), rgba(13,148,136,0.01)), var(--surface); border-color: rgba(13,148,136,0.22); }
+  :root[data-theme="day"] .card.pillar-content  { background: linear-gradient(180deg, rgba(0,113,227,0.08), rgba(0,113,227,0.01)), var(--surface); border-color: rgba(0,113,227,0.22); }
+  :root[data-theme="day"] .card.pillar-network  { background: linear-gradient(180deg, rgba(34,165,75,0.08), rgba(34,165,75,0.01)), var(--surface); border-color: rgba(34,165,75,0.22); }
+  :root[data-theme="day"] .card.pillar-job      { background: linear-gradient(180deg, rgba(155,77,215,0.08), rgba(155,77,215,0.01)), var(--surface); border-color: rgba(155,77,215,0.22); }
 
   /* Content day-of-week posting hint */
   .content-day-hint {
@@ -393,10 +424,11 @@
   }
   .page-toc a:hover { background: rgba(255,255,255,0.08); color: var(--ink); }
   .page-toc a:active { transform: scale(0.96); }
-  .page-toc a.toc-fitness:hover { border-color: var(--fitness); color: var(--fitness); }
-  .page-toc a.toc-content:hover { border-color: var(--content); color: var(--content); }
-  .page-toc a.toc-network:hover { border-color: var(--network); color: var(--network); }
-  .page-toc a.toc-job:hover     { border-color: var(--job); color: var(--job); }
+  .page-toc a.toc-fitness:hover  { border-color: var(--fitness); color: var(--fitness); }
+  .page-toc a.toc-recovery:hover { border-color: var(--recovery); color: var(--recovery); }
+  .page-toc a.toc-content:hover  { border-color: var(--content); color: var(--content); }
+  .page-toc a.toc-network:hover  { border-color: var(--network); color: var(--network); }
+  .page-toc a.toc-job:hover      { border-color: var(--job); color: var(--job); }
   .toc-scroll-target { scroll-margin-top: 12px; }
 
   /* Collapsible grid: hide tiles past the 4th until expanded */
@@ -815,6 +847,7 @@
     <nav class="page-toc" aria-label="Jump to section">
       <a href="#sec-workout"  class="toc-workout">Weights</a>
       <a href="#sec-fitness"  class="toc-fitness">Calisthenics</a>
+      <a href="#sec-recovery" class="toc-recovery">Recovery</a>
       <a href="#sec-content"  class="toc-content">Content</a>
       <a href="#sec-network"  class="toc-network">Network</a>
       <a href="#sec-job"      class="toc-job">Job</a>
@@ -828,8 +861,14 @@
 
     <div id="sec-fitness" class="toc-scroll-target card pillar-fitness" style="margin-top:18px;">
       <h2><span class="accent"></span> Calisthenics</h2>
-      <div class="lede">Bodyweight sets, session type, sleep, weight, sauna, protein. Click any tile to log.</div>
+      <div class="lede">Bodyweight sets. Tap any tile to log.</div>
       <div class="ex-grid" id="fitnessGrid"></div>
+    </div>
+
+    <div id="sec-recovery" class="toc-scroll-target card pillar-recovery" style="margin-top:18px;">
+      <h2><span class="accent"></span> Body &amp; Recovery</h2>
+      <div class="lede">Sleep, weight, sauna, cold plunge, protein, session type. Log the daily signals.</div>
+      <div class="ex-grid" id="recoveryGrid"></div>
     </div>
 
     <div id="sec-content" class="toc-scroll-target card pillar-content" style="margin-top:18px;">
@@ -994,7 +1033,7 @@ const MISSION_END   = '2026-10-03'; // Sat, Day 42
 const MISSION_DAYS  = 42;
 
 const CAL_TARGETS = { pushups: 500, mountedCrunches: 250, heelTaps: 250, plankMinutes: 50, kneeRaises: 250 };
-const CAL_LABELS = { pushups: 'Pushups', mountedCrunches: 'Mt. crunches', heelTaps: 'Heel taps', plankMinutes: 'Plank (min)', kneeRaises: 'Knee raises' };
+const CAL_LABELS = { pushups: 'Pushups', mountedCrunches: 'Crunches', heelTaps: 'Heel taps', plankMinutes: 'Plank (min)', kneeRaises: 'Knee raises' };
 const CAL_KEYS = ['pushups', 'mountedCrunches', 'heelTaps', 'plankMinutes', 'kneeRaises'];
 
 // Weekly content targets by FORMAT (not platform).
@@ -1097,23 +1136,26 @@ const STORAGE_KEY = 'walkout_v4';
 const PILLAR_METRICS = {
   fitness: [
     { key: 'pushups',         label: 'Pushups',       target: Math.round(CAL_TARGETS.pushups/7),         input: 'sets', repLabel: 'reps' },
-    { key: 'mountedCrunches', label: 'Mt. crunches',  target: Math.round(CAL_TARGETS.mountedCrunches/7), input: 'sets', repLabel: 'reps' },
+    { key: 'mountedCrunches', label: 'Crunches',      target: Math.round(CAL_TARGETS.mountedCrunches/7), input: 'sets', repLabel: 'reps' },
     { key: 'heelTaps',        label: 'Heel taps',     target: Math.round(CAL_TARGETS.heelTaps/7),        input: 'sets', repLabel: 'reps' },
     { key: 'plankMinutes',    label: 'Plank',         target: Math.round(CAL_TARGETS.plankMinutes/7*10)/10, unit: 'min', input: 'sets', repLabel: 'min', repStep: 0.5 },
-    { key: 'kneeRaises',      label: 'Knee raises',   target: Math.round(CAL_TARGETS.kneeRaises/7),      input: 'sets', repLabel: 'reps' },
-    { key: 'sessionType',     label: 'Session',       target: null,  input: 'select',
+    { key: 'kneeRaises',      label: 'Knee raises',   target: Math.round(CAL_TARGETS.kneeRaises/7),      input: 'sets', repLabel: 'reps' }
+  ],
+  recovery: [
+    { key: 'sleepHours', label: 'Sleep',         target: 7,    unit: 'hrs', input: 'number', step: 0.1 },
+    { key: 'weightKg',   label: 'Bodyweight',    target: null, unit: 'kg',  input: 'number', step: 0.1 },
+    { key: 'steamMin',   label: 'Sauna',         target: 15,   unit: 'min', input: 'number' },
+    { key: 'coldPlunge', label: 'Cold plunge',   target: 3,    unit: 'min', input: 'number', step: 0.5 },
+    { key: 'proteinHit', label: 'Protein ≥205g', target: 1,                 input: 'check' },
+    { key: 'sessionType', label: 'Session', target: null, input: 'select',
         options: [
-          {v:'',              t:'— none —'},
-          {v:'gym',           t:'Gym (per template)'},
-          {v:'cardio',        t:'Cardio (Zone 2)'},
-          {v:'interval',      t:'Cardio (VO₂ interval)'},
-          {v:'dive',          t:'Dive / freedive'},
-          {v:'active-rest',   t:'Active rest / mobility'}
-        ] },
-    { key: 'sleepHours',      label: 'Sleep',         target: 7,     unit: 'hrs', input: 'number', step: 0.1 },
-    { key: 'weightKg',        label: 'Bodyweight',    target: null,  unit: 'kg',  input: 'number', step: 0.1 },
-    { key: 'steamMin',        label: 'Sauna',         target: 15,    unit: 'min', input: 'number' },
-    { key: 'proteinHit',      label: 'Protein ≥205g', target: 1,     input: 'check' }
+          {v:'',            t:'— none —'},
+          {v:'gym',         t:'Gym (per template)'},
+          {v:'cardio',      t:'Cardio (Zone 2)'},
+          {v:'interval',    t:'Cardio (VO₂ interval)'},
+          {v:'dive',        t:'Dive / freedive'},
+          {v:'active-rest', t:'Active rest / mobility'}
+        ] }
   ],
   content: [
     { key: 'longForm',   label: 'Long-form (3+ min)', target: CONTENT_TARGETS.longForm,  scope: 'week', input: 'entries',
@@ -1631,7 +1673,7 @@ function renderPillarGrids() {
     hintEl.textContent = CONTENT_SCHEDULE[dow] || '';
   }
 
-  ['fitness', 'content', 'network', 'job'].forEach(pillar => {
+  ['fitness', 'recovery', 'content', 'network', 'job'].forEach(pillar => {
     const grid = document.getElementById(pillar + 'Grid');
     if (!grid) return;
     grid.innerHTML = '';
