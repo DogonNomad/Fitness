@@ -838,6 +838,20 @@
 
   .ring-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 4px 0 4px; }
   @media (max-width: 720px) { .ring-grid { grid-template-columns: repeat(2, 1fr); } }
+  /* Week-tab per-day breakdown (shown inside expanded pillar tile) */
+  .week-breakdown .wk-bd { display: flex; flex-direction: column; gap: 4px; }
+  .week-breakdown .wk-bd-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 10px; background: rgba(255,255,255,0.04);
+    border: 1px solid var(--line); border-radius: 6px; font-size: 12px;
+  }
+  :root[data-theme="day"] .week-breakdown .wk-bd-row { background: rgba(0,0,0,0.03); }
+  .week-breakdown .wk-bd-day { color: var(--ink-dim); letter-spacing: 0.02em; }
+  .week-breakdown .wk-bd-val { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .week-breakdown .wk-bd-empty {
+    padding: 10px; text-align: center; color: var(--ink-faint);
+    font-size: 12px; font-style: italic;
+  }
   .ring-tile { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
   .ring-tile svg { display: block; }
   .ring-tile .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-faint); }
@@ -1141,44 +1155,28 @@
       <div class="scoreboard" id="weekScoreboard"></div>
     </div>
 
-    <details class="card pillar-fitness collapsible-week" style="margin-top:18px;">
-      <summary>
-        <span class="accent-wrap"><span class="accent"></span></span>
-        <span class="collapse-h">Fitness — calisthenics floor</span>
-        <span class="chev">▾</span>
-      </summary>
-      <div class="collapsible-body">
-        <div class="lede">Cumulative this week vs weekly target. Tap a ring to see per-day breakdown.</div>
-        <div class="cal-ring-row" id="calRings"></div>
+    <div class="card pillar-fitness" style="margin-top:18px;">
+      <h2><span class="accent"></span> Fitness — calisthenics floor</h2>
+      <div class="lede">Weekly totals vs weekly target. Tap any tile for per-day breakdown.</div>
+      <div class="ex-grid" id="weekFitnessGrid"></div>
+    </div>
 
-        <h3>Gym sessions — 5/week target</h3>
-        <div class="sessions-row" id="sessionsRow"></div>
-        <div class="small-help" id="sessionsHelp">— sessions logged this week</div>
-
-        <h3>Body &amp; habits</h3>
-        <div class="grid-4" id="fitnessBodyStats"></div>
-      </div>
-    </details>
+    <div class="card pillar-recovery" style="margin-top:18px;">
+      <h2><span class="accent"></span> Body &amp; Recovery</h2>
+      <div class="lede">Sleep, cold, creatine, sauna — the recovery signals for the week.</div>
+      <div class="ex-grid" id="weekRecoveryGrid"></div>
+    </div>
 
     <div class="card pillar-content" style="margin-top:18px;">
       <h2><span class="accent"></span> Content — cadence</h2>
       <div class="lede">6 posts per week: 2+ long-form (3+ min) · 3+ reels (≤30s) · 1+ carousel.</div>
-      <div class="cadence" id="cadenceChart"></div>
+      <div class="ex-grid" id="weekContentGrid"></div>
     </div>
 
-    <div class="card pillar-network" style="margin-top:18px;">
-      <h2><span class="accent"></span> Network — in-person heatmap</h2>
-      <div class="lede">Distinct people seen this week. Bordered = seen 2+ times.</div>
-      <div class="people-grid" id="peopleGrid"></div>
-      <div class="grid-4" style="margin-top:14px;" id="networkSecondaryStats"></div>
-    </div>
-
-    <div class="card pillar-job" style="margin-top:18px;">
-      <h2><span class="accent"></span> Job hunt — funnel</h2>
-      <div class="lede">Applications sent, outreach touches, and offers this week.</div>
-      <div class="funnel" id="funnelChart"></div>
-      <h3>Volume this week</h3>
-      <div class="grid-4" id="jobVolumeStats"></div>
+    <div class="card pillar-career" style="margin-top:18px;">
+      <h2><span class="accent"></span> People &amp; Career</h2>
+      <div class="lede">IRL contacts and the job pipeline this week.</div>
+      <div class="ex-grid" id="weekCareerGrid"></div>
     </div>
 
     <div class="card" id="sundayPanel" style="margin-top:18px; display:none;">
@@ -2882,107 +2880,7 @@ function renderWeek() {
   scoreboard.appendChild(scoretile('Network', `${agg.people.length}`, `people seen IRL`, nG, 'network'));
   scoreboard.appendChild(scoretile('Job', `${agg.apps}`, `/ ${APPS_TARGET} apps shipped`, jG, 'job'));
 
-  const calRings = document.getElementById('calRings');
-  calRings.innerHTML = '';
-  CAL_KEYS.forEach(f => {
-    const val = agg[f], target = CAL_TARGETS[f];
-    const pct = target ? Math.min(150, Math.round((val / target) * 100)) : 0;
-    const tile = document.createElement('details'); tile.className = 'cal-ring';
-    const sum = document.createElement('summary');
-    sum.appendChild(makeRingSvg(pct, getPillarVar('fitness'), 92));
-    const lbl = document.createElement('div'); lbl.className = 'lbl'; lbl.textContent = CAL_LABELS[f];
-    const num = document.createElement('div'); num.className = 'num'; num.textContent = `${Math.round(val * 10) / 10} / ${target}`;
-    sum.appendChild(lbl); sum.appendChild(num);
-    tile.appendChild(sum);
-    // Per-day breakdown — tap ring to see which days you logged what
-    const bd = document.createElement('div');
-    bd.className = 'cal-breakdown';
-    const rowsWithData = agg.days
-      .map(d => ({ iso: d.iso, val: Number(d[f]) || 0 }))
-      .filter(r => r.val > 0)
-      .sort((a,b) => a.iso.localeCompare(b.iso));
-    if (rowsWithData.length === 0) {
-      const em = document.createElement('div'); em.className = 'cbd-empty';
-      em.textContent = 'No logs yet this week.';
-      bd.appendChild(em);
-    } else {
-      rowsWithData.forEach(r => {
-        const row = document.createElement('div'); row.className = 'cbd-row';
-        const day = document.createElement('span'); day.className = 'cbd-day';
-        day.textContent = parseIso(r.iso).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-        const v = document.createElement('span'); v.className = 'cbd-val';
-        const unit = (f === 'plankMinutes') ? ' min' : '';
-        v.textContent = (Math.round(r.val * 10) / 10) + unit;
-        row.appendChild(day); row.appendChild(v);
-        bd.appendChild(row);
-      });
-    }
-    tile.appendChild(bd);
-    calRings.appendChild(tile);
-  });
-
-  const sessRow = document.getElementById('sessionsRow');
-  sessRow.innerHTML = '';
-  for (let i = 0; i < SESSION_TARGET; i++) {
-    const sq = document.createElement('div');
-    sq.className = 'sess-square' + (i < agg.gymCount ? ' done' : '');
-    sq.textContent = i < agg.gymCount ? '✓' : 'G';
-    sessRow.appendChild(sq);
-  }
-  document.getElementById('sessionsHelp').innerHTML = `${agg.gymCount}/${SESSION_TARGET} gym sessions · ${agg.cardioCount} standalone cardio`;
-
-  const fbody = document.getElementById('fitnessBodyStats');
-  fbody.innerHTML = '';
-  fbody.appendChild(stat('Avg sleep', agg.avgSleep ? (Math.round(agg.avgSleep*10)/10)+' h' : '—', `${agg.sleepsOnTarget}/7 ≥ 7h`));
-  fbody.appendChild(stat('Closing weight', agg.closingWeight ? agg.closingWeight.toFixed(1)+' '+agg.closingWeightUnit : '—', `${agg.weightsCount} entries`));
-  fbody.appendChild(stat('Creatine ≥5g', `${agg.creatineDays}/7`, 'target ≥5'));
-  fbody.appendChild(stat('Sauna days', agg.saunaDays, `${agg.saunaMin} min total`));
-
-  const cad = document.getElementById('cadenceChart');
-  cad.innerHTML = '';
-  cad.appendChild(cadenceRow('Long-form (3+ min)', agg.longForm, CONTENT_TARGETS.longForm));
-  cad.appendChild(cadenceRow('Reels (≤30s)', agg.reels, CONTENT_TARGETS.reels));
-  cad.appendChild(cadenceRow('Carousels', agg.carousels, CONTENT_TARGETS.carousels));
-  cad.appendChild(cadenceRow('Total posts', contentShipped, contentTarget));
-
-  // Secondary content stats removed — Clips / Best reach / Shoot / Edit / Engage tiles retired.
-
-  const peopleGrid = document.getElementById('peopleGrid');
-  peopleGrid.innerHTML = '';
-  if (agg.people.length === 0) {
-    const em = document.createElement('div'); em.className = 'small-help'; em.textContent = 'No one logged yet this week.';
-    peopleGrid.appendChild(em);
-  } else {
-    agg.people.forEach(p => {
-      const el = document.createElement('div');
-      el.className = 'person' + (p.count >= 2 ? ' recurring' : '');
-      el.innerHTML = `<span class="name">${escapeHtml(p.name)}</span><span class="count">×${p.count}</span>`;
-      peopleGrid.appendChild(el);
-    });
-  }
-  const recCount = agg.people.filter(p => p.count >= 2).length;
-  const nstats = document.getElementById('networkSecondaryStats');
-  nstats.innerHTML = '';
-  nstats.appendChild(stat('Distinct people', agg.people.length, `target ${PEOPLE_SEEN_TARGET}+`));
-  nstats.appendChild(stat('Seen 2+ times', recCount, ''));
-  nstats.appendChild(stat('Warm DMs', agg.dms, `target ${DMS_TARGET}`));
-  nstats.appendChild(stat('New intros', agg.intros, ''));
-
-  const funnel = document.getElementById('funnelChart');
-  funnel.innerHTML = '';
-  funnel.style.gridTemplateColumns = 'repeat(3, 1fr)';
-  [{lbl:'Applications',val:agg.apps},{lbl:'Outreach',val:agg.outreach},{lbl:'Offers',val:agg.loopOffer}].forEach(s => {
-    const el = document.createElement('div'); el.className = 'stage';
-    el.innerHTML = `<div class="stage-lbl">${s.lbl}</div><div class="stage-val">${s.val}</div>`;
-    funnel.appendChild(el);
-  });
-
-  const jvol = document.getElementById('jobVolumeStats');
-  jvol.innerHTML = '';
-  jvol.appendChild(stat('Apps shipped', agg.apps, `target ${APPS_TARGET}`));
-  jvol.appendChild(stat('Outreach', agg.outreach, 'target 2/day'));
-  jvol.appendChild(stat('Interview hrs', agg.interviewHrs, 'prep + live'));
-  jvol.appendChild(stat('Offers', agg.loopOffer, ''));
+  renderWeekPillarGrids(agg, contentShipped, contentTarget);
 
   const sunday = document.getElementById('sundayPanel');
   const isSat = (new Date()).getDay() === 6 && iso >= wk.startDate && iso <= wk.endDate;
@@ -3008,6 +2906,126 @@ function stat(label, value, meta) {
   const el = document.createElement('div'); el.className = 'stat tight';
   el.innerHTML = `<div class="label">${label}</div><div class="value">${value}</div><div class="meta">${meta || ''}</div>`;
   return el;
+}
+
+/* ---------- Week-tab pillar tiles (mirror Today-tab ring-tile format) ---------- */
+function renderWeekPillarGrids(agg, contentShipped, contentTarget) {
+  const specs = {
+    fitness: [
+      { label: 'Pushups',      val: agg.pushups,         target: CAL_TARGETS.pushups,         breakdown: (d) => Number(d.pushups) || 0 },
+      { label: 'Crunches',     val: agg.mountedCrunches, target: CAL_TARGETS.mountedCrunches, breakdown: (d) => Number(d.mountedCrunches) || 0 },
+      { label: 'Heel taps',    val: agg.heelTaps,        target: CAL_TARGETS.heelTaps,        breakdown: (d) => Number(d.heelTaps) || 0 },
+      { label: 'Knee raises',  val: agg.kneeRaises,      target: CAL_TARGETS.kneeRaises,      breakdown: (d) => Number(d.kneeRaises) || 0 },
+      { label: 'Plank',        val: agg.plankMinutes,    target: CAL_TARGETS.plankMinutes,    unit: 'min', breakdown: (d) => Number(d.plankMinutes) || 0 },
+      { label: 'Gym sessions', val: agg.gymCount,        target: SESSION_TARGET,              breakdown: (d) => {
+          const hasT = d.exercises && Object.values(d.exercises).some(ex => Array.isArray(ex.sets) && ex.sets.length > 0);
+          const hasC = Array.isArray(d.customExercises) && d.customExercises.some(ex => Array.isArray(ex.sets) && ex.sets.length > 0);
+          return (hasT || hasC) ? 1 : 0;
+        }, unit: '' },
+    ],
+    recovery: [
+      { label: 'Avg sleep',    val: agg.avgSleep || 0,        target: 7,      unit: 'h',   display: agg.avgSleep ? (Math.round(agg.avgSleep*10)/10)+' / 7 h' : '— / 7 h', breakdown: (d) => Number(d.sleepHours) || 0, breakdownUnit: 'h' },
+      { label: 'Sleeps ≥7h',   val: agg.sleepsOnTarget,       target: 7,      breakdown: (d) => Number(d.sleepHours) >= 7 ? 1 : 0 },
+      { label: 'Cold plunge',  val: agg.coldPlungeMin,        target: 21,     unit: 'min', breakdown: (d) => Number(d.coldPlunge) || 0, breakdownUnit: 'min' },
+      { label: 'Creatine ≥5g', val: agg.creatineDays,         target: 7,      breakdown: (d) => Number(d.creatineG) >= 5 ? 1 : 0 },
+    ],
+    content: [
+      { label: 'Long-form', val: agg.longForm,   target: CONTENT_TARGETS.longForm,  breakdown: (d) => Number(d.longForm) || 0 },
+      { label: 'Reels',     val: agg.reels,      target: CONTENT_TARGETS.reels,     breakdown: (d) => Number(d.reels) || 0 },
+      { label: 'Carousels', val: agg.carousels,  target: CONTENT_TARGETS.carousels, breakdown: (d) => Number(d.carousels) || 0 },
+      { label: 'Total posts', val: contentShipped, target: contentTarget,           breakdown: (d) => (Number(d.longForm)||0)+(Number(d.reels)||0)+(Number(d.carousels)||0) },
+    ],
+    career: [
+      { label: 'People seen',  val: agg.people.length, target: PEOPLE_SEEN_TARGET, breakdown: (d) => {
+          const arr = (d.entries && Array.isArray(d.entries.peopleSeen)) ? d.entries.peopleSeen : null;
+          if (arr) return arr.length;
+          if (typeof d.peopleSeen === 'string') return d.peopleSeen.split(',').map(s=>s.trim()).filter(Boolean).length;
+          return Number(d.peopleSeen) || 0;
+        } },
+      { label: 'Scenes',       val: agg.scenes,    target: SCENES_TARGET, breakdown: (d) => Number(d.scenes) || 0 },
+      { label: 'Apps shipped', val: agg.apps,      target: APPS_TARGET,   breakdown: (d) => Number(d.apps) || 0 },
+      { label: 'Outreach DMs', val: agg.dms,       target: DMS_TARGET,    breakdown: (d) => Number(d.dms) || 0 },
+    ],
+  };
+
+  Object.keys(specs).forEach(pillar => {
+    const grid = document.getElementById('week' + pillar[0].toUpperCase() + pillar.slice(1) + 'Grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    specs[pillar].forEach(sp => grid.appendChild(renderWeekPillarTile(pillar, sp, agg.days)));
+  });
+}
+
+function renderWeekPillarTile(pillar, sp, days) {
+  const val = Number(sp.val) || 0;
+  const pct = sp.target > 0 ? Math.min(150, Math.round((val / sp.target) * 100)) : (val > 0 ? 100 : 0);
+  const done = sp.target > 0 && val >= sp.target;
+
+  const deck = document.createElement('details');
+  deck.className = 'ex-deck pillar-tile';
+  deck.dataset.pillar = pillar;
+  deck.dataset.done = done ? 'true' : 'false';
+
+  const summary = document.createElement('summary');
+  const tile = document.createElement('div');
+  tile.className = 'ex-tile';
+  const svgContainer = document.createElement('div');
+  svgContainer.className = 'ring-svg-container';
+  svgContainer.appendChild(makeRingSvg(pct, getPillarVar(pillar), 76));
+  const valLbl = document.createElement('div');
+  valLbl.className = 'sets-label';
+  if (sp.display) {
+    valLbl.textContent = sp.display;
+  } else {
+    const dv = Number.isInteger(val) ? val : Math.round(val * 10) / 10;
+    const dt = Number.isInteger(sp.target) ? sp.target : Math.round(sp.target * 10) / 10;
+    valLbl.textContent = `${dv} / ${dt}${sp.unit ? ' ' + sp.unit : ''}`;
+  }
+  const nameLbl = document.createElement('div');
+  nameLbl.className = 'ex-label';
+  nameLbl.textContent = sp.label;
+  tile.appendChild(svgContainer);
+  tile.appendChild(valLbl);
+  tile.appendChild(nameLbl);
+  summary.appendChild(tile);
+  deck.appendChild(summary);
+
+  const details = document.createElement('div');
+  details.className = 'ex-details week-breakdown';
+  details.appendChild(buildWeekBreakdown(days, sp));
+  deck.appendChild(details);
+  return deck;
+}
+
+function buildWeekBreakdown(days, sp) {
+  const wrap = document.createElement('div');
+  wrap.className = 'wk-bd';
+  const rows = (days || [])
+    .map(d => ({ iso: d.iso, val: sp.breakdown(d) }))
+    .filter(r => r.val > 0)
+    .sort((a, b) => a.iso.localeCompare(b.iso));
+  if (rows.length === 0) {
+    const em = document.createElement('div');
+    em.className = 'wk-bd-empty';
+    em.textContent = 'No logs yet this week.';
+    wrap.appendChild(em);
+    return wrap;
+  }
+  rows.forEach(r => {
+    const row = document.createElement('div');
+    row.className = 'wk-bd-row';
+    const day = document.createElement('span');
+    day.className = 'wk-bd-day';
+    day.textContent = parseIso(r.iso).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    const v = document.createElement('span');
+    v.className = 'wk-bd-val';
+    const dv = Number.isInteger(r.val) ? r.val : Math.round(r.val * 10) / 10;
+    v.textContent = dv + (sp.breakdownUnit ? ' ' + sp.breakdownUnit : '');
+    row.appendChild(day);
+    row.appendChild(v);
+    wrap.appendChild(row);
+  });
+  return wrap;
 }
 function scoretile(name, value, sub, grade, pillarKey) {
   const el = document.createElement('div'); el.className = 'scoretile';
