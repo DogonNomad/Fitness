@@ -2925,9 +2925,10 @@ function renderWeekPillarGrids(agg, contentShipped, contentTarget) {
     ],
     recovery: [
       { label: 'Avg sleep',    val: agg.avgSleep || 0,        target: 7,      unit: 'h',   display: agg.avgSleep ? (Math.round(agg.avgSleep*10)/10)+' / 7 h' : '— / 7 h', breakdown: (d) => Number(d.sleepHours) || 0, breakdownUnit: 'h' },
-      { label: 'Sleeps ≥7h',   val: agg.sleepsOnTarget,       target: 7,      breakdown: (d) => Number(d.sleepHours) >= 7 ? 1 : 0 },
-      { label: 'Cold plunge',  val: agg.coldPlungeMin,        target: 21,     unit: 'min', breakdown: (d) => Number(d.coldPlunge) || 0, breakdownUnit: 'min' },
+      { label: 'Sleep hours ≥7h', val: agg.sleepsOnTarget,    target: 7,      breakdown: (d) => Number(d.sleepHours) >= 7 ? 1 : 0 },
+      { label: 'Sauna',        val: agg.saunaDays,            target: 3,      breakdown: (d) => d.steamRoom ? 1 : 0 },
       { label: 'Creatine ≥5g', val: agg.creatineDays,         target: 7,      breakdown: (d) => Number(d.creatineG) >= 5 ? 1 : 0 },
+      { label: 'Cold plunge',  val: agg.coldPlungeMin,        target: 21,     unit: 'min', breakdown: (d) => Number(d.coldPlunge) || 0, breakdownUnit: 'min' },
     ],
     content: [
       { label: 'Long-form', val: agg.longForm,   target: CONTENT_TARGETS.longForm,  breakdown: (d) => Number(d.longForm) || 0 },
