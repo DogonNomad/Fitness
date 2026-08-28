@@ -843,8 +843,45 @@
   .ring-tile .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-faint); }
   .ring-tile .val { font-size: 13px; color: var(--ink-dim); }
 
-  .cal-ring-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .cal-ring-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
   @media (max-width: 720px) { .cal-ring-row { grid-template-columns: repeat(2, 1fr); } }
+  /* Collapsible WEEK-tab card — header stays visible, body reveals on click */
+  details.collapsible-week { padding: 20px 24px; }
+  details.collapsible-week summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+    padding: 0; margin: 0;
+    font-size: 18px; font-weight: 600; letter-spacing: -0.015em;
+    color: var(--ink);
+  }
+  details.collapsible-week summary::-webkit-details-marker { display: none; }
+  details.collapsible-week summary .chev {
+    margin-left: auto; font-size: 14px;
+    color: var(--ink-faint); transition: transform 300ms var(--ease);
+  }
+  details.collapsible-week[open] summary .chev { transform: rotate(180deg); }
+  details.collapsible-week .collapsible-body { margin-top: 12px; }
+  /* Per-day breakdown popover inside a cal-ring */
+  details.cal-ring { padding: 14px 10px; }
+  details.cal-ring summary { list-style: none; cursor: pointer; }
+  details.cal-ring summary::-webkit-details-marker { display: none; }
+  details.cal-ring[open] .cal-breakdown { display: block; }
+  .cal-breakdown {
+    display: none;
+    margin-top: 10px; padding: 8px 10px;
+    background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.06);
+    border-radius: 8px;
+    text-align: left; font-size: 12px;
+  }
+  .cal-breakdown .cbd-row {
+    display: flex; justify-content: space-between;
+    padding: 3px 0; border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+  .cal-breakdown .cbd-row:last-child { border-bottom: 0; }
+  .cal-breakdown .cbd-day { color: #545862; font-weight: 500; }
+  .cal-breakdown .cbd-val { color: #1d1d1f; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .cal-breakdown .cbd-empty { color: #86868b; font-style: italic; text-align: center; padding: 6px; }
   .cal-ring { text-align: center; padding: 14px 10px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; }
   .cal-ring .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.16em; color: var(--ink-faint); margin-top: 8px; }
   .cal-ring .num { font-size: 14px; color: var(--ink-dim); margin-top: 2px; }
@@ -1104,18 +1141,24 @@
       <div class="scoreboard" id="weekScoreboard"></div>
     </div>
 
-    <div class="card pillar-fitness" style="margin-top:18px;">
-      <h2><span class="accent"></span> Fitness — calisthenics floor</h2>
-      <div class="lede">Cumulative this week vs weekly target.</div>
-      <div class="cal-ring-row" id="calRings"></div>
+    <details class="card pillar-fitness collapsible-week" style="margin-top:18px;">
+      <summary>
+        <span class="accent-wrap"><span class="accent"></span></span>
+        <span class="collapse-h">Fitness — calisthenics floor</span>
+        <span class="chev">▾</span>
+      </summary>
+      <div class="collapsible-body">
+        <div class="lede">Cumulative this week vs weekly target. Tap a ring to see per-day breakdown.</div>
+        <div class="cal-ring-row" id="calRings"></div>
 
-      <h3>Gym sessions — 5/week target (Sun · Mon · Wed · Thu · Fri)</h3>
-      <div class="sessions-row" id="sessionsRow"></div>
-      <div class="small-help" id="sessionsHelp">— sessions logged this week</div>
+        <h3>Gym sessions — 5/week target</h3>
+        <div class="sessions-row" id="sessionsRow"></div>
+        <div class="small-help" id="sessionsHelp">— sessions logged this week</div>
 
-      <h3>Body &amp; habits</h3>
-      <div class="grid-4" id="fitnessBodyStats"></div>
-    </div>
+        <h3>Body &amp; habits</h3>
+        <div class="grid-4" id="fitnessBodyStats"></div>
+      </div>
+    </details>
 
     <div class="card pillar-content" style="margin-top:18px;">
       <h2><span class="accent"></span> Content — cadence</h2>
@@ -2844,11 +2887,37 @@ function renderWeek() {
   CAL_KEYS.forEach(f => {
     const val = agg[f], target = CAL_TARGETS[f];
     const pct = target ? Math.min(150, Math.round((val / target) * 100)) : 0;
-    const tile = document.createElement('div'); tile.className = 'cal-ring';
-    tile.appendChild(makeRingSvg(pct, getPillarVar('fitness'), 92));
+    const tile = document.createElement('details'); tile.className = 'cal-ring';
+    const sum = document.createElement('summary');
+    sum.appendChild(makeRingSvg(pct, getPillarVar('fitness'), 92));
     const lbl = document.createElement('div'); lbl.className = 'lbl'; lbl.textContent = CAL_LABELS[f];
     const num = document.createElement('div'); num.className = 'num'; num.textContent = `${Math.round(val * 10) / 10} / ${target}`;
-    tile.appendChild(lbl); tile.appendChild(num);
+    sum.appendChild(lbl); sum.appendChild(num);
+    tile.appendChild(sum);
+    // Per-day breakdown — tap ring to see which days you logged what
+    const bd = document.createElement('div');
+    bd.className = 'cal-breakdown';
+    const rowsWithData = agg.days
+      .map(d => ({ iso: d.iso, val: Number(d[f]) || 0 }))
+      .filter(r => r.val > 0)
+      .sort((a,b) => a.iso.localeCompare(b.iso));
+    if (rowsWithData.length === 0) {
+      const em = document.createElement('div'); em.className = 'cbd-empty';
+      em.textContent = 'No logs yet this week.';
+      bd.appendChild(em);
+    } else {
+      rowsWithData.forEach(r => {
+        const row = document.createElement('div'); row.className = 'cbd-row';
+        const day = document.createElement('span'); day.className = 'cbd-day';
+        day.textContent = parseIso(r.iso).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        const v = document.createElement('span'); v.className = 'cbd-val';
+        const unit = (f === 'plankMinutes') ? ' min' : '';
+        v.textContent = (Math.round(r.val * 10) / 10) + unit;
+        row.appendChild(day); row.appendChild(v);
+        bd.appendChild(row);
+      });
+    }
+    tile.appendChild(bd);
     calRings.appendChild(tile);
   });
 
