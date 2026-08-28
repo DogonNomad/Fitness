@@ -348,30 +348,30 @@
   body { padding-left: 148px; transition: padding-left 260ms var(--ease); }
   body.side-collapsed { padding-left: 52px; }
 
-  /* Today freeze zone — calendar strip + sleep banner pin together with same soft gradient fade as header */
+  /* Today freeze zone — calendar strip + sleep banner pin together with soft gradient fade */
   .today-hero {
     position: sticky;
     top: 76px;
     z-index: 50;
-    padding: 10px 24px 22px;
+    padding: 10px 24px 26px;
     margin: -8px -24px 18px;
     background:
-      linear-gradient(180deg, var(--bg) 0%, rgba(18, 22, 32, 0.88) 55%, rgba(18, 22, 32, 0) 100%);
-    backdrop-filter: blur(16px) saturate(1.2);
-    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+      linear-gradient(180deg, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0.18) 55%, rgba(0,0,0,0) 100%);
+    backdrop-filter: blur(18px) saturate(1.25);
+    -webkit-backdrop-filter: blur(18px) saturate(1.25);
     border: 0;
     box-shadow: none;
   }
   :root[data-theme="day"] .today-hero {
     background:
-      linear-gradient(180deg, var(--bg) 0%, rgba(244, 245, 247, 0.9) 55%, rgba(244, 245, 247, 0) 100%);
+      linear-gradient(180deg, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.35) 55%, rgba(255,255,255,0) 100%);
   }
   :root[data-theme="sunset"] .today-hero {
     background:
-      linear-gradient(180deg, rgba(26, 13, 46, 0.82) 0%, rgba(30, 14, 48, 0.7) 55%, rgba(30, 14, 48, 0) 100%);
+      linear-gradient(180deg, rgba(20,8,40,0.42) 0%, rgba(20,8,40,0.22) 55%, rgba(20,8,40,0) 100%);
   }
   @media (max-width: 720px) {
-    .today-hero { top: 68px; margin: -8px -12px 14px; padding: 8px 12px 20px; }
+    .today-hero { top: 68px; margin: -8px -24px 14px; padding: 8px 24px 24px; }
   }
 
   /* Sticky page header — Walk-Out brand + Day pill + toggle buttons pinned at top.
@@ -380,22 +380,25 @@
     position: sticky;
     top: 0;
     z-index: 60;
-    padding: 16px 24px 22px;
+    padding: 16px 24px 26px;
     margin: 0 -24px 8px;
     background:
-      linear-gradient(180deg, var(--bg) 0%, rgba(18, 22, 32, 0.9) 60%, rgba(18, 22, 32, 0) 100%);
-    backdrop-filter: blur(16px) saturate(1.2);
-    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+      linear-gradient(180deg, rgba(0,0,0,0.32) 0%, rgba(0,0,0,0.20) 60%, rgba(0,0,0,0) 100%);
+    backdrop-filter: blur(18px) saturate(1.25);
+    -webkit-backdrop-filter: blur(18px) saturate(1.25);
     border: 0;
     box-shadow: none;
   }
   :root[data-theme="day"] header.top {
     background:
-      linear-gradient(180deg, var(--bg) 0%, rgba(244, 245, 247, 0.92) 60%, rgba(244, 245, 247, 0) 100%);
+      linear-gradient(180deg, rgba(255,255,255,0.70) 0%, rgba(255,255,255,0.40) 60%, rgba(255,255,255,0) 100%);
   }
   :root[data-theme="sunset"] header.top {
     background:
-      linear-gradient(180deg, rgba(26, 13, 46, 0.85) 0%, rgba(30, 14, 48, 0.72) 55%, rgba(30, 14, 48, 0) 100%);
+      linear-gradient(180deg, rgba(20,8,40,0.42) 0%, rgba(20,8,40,0.22) 55%, rgba(20,8,40,0) 100%);
+  }
+  @media (max-width: 720px) {
+    header.top { padding: 12px 24px 22px; margin: 0 -24px 6px; }
   }
 
   /* Mobile: sidebar collapses to fixed bottom tab bar */
