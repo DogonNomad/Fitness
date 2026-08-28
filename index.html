@@ -1183,16 +1183,16 @@
       <div class="scoreboard" id="weekScoreboard"></div>
     </div>
 
-    <div class="card pillar-fitness" style="margin-top:18px;">
-      <h2><span class="accent"></span> Fitness — calisthenics floor</h2>
-      <div class="lede">Weekly totals vs weekly target. Tap any tile for per-day breakdown.</div>
-      <div class="ex-grid" id="weekFitnessGrid"></div>
-    </div>
-
     <div class="card pillar-recovery" style="margin-top:18px;">
       <h2><span class="accent"></span> Body &amp; Recovery</h2>
       <div class="lede">Sleep, cold, creatine, sauna — the recovery signals for the week.</div>
       <div class="ex-grid" id="weekRecoveryGrid"></div>
+    </div>
+
+    <div class="card pillar-fitness" style="margin-top:18px;">
+      <h2><span class="accent"></span> Fitness — calisthenics floor</h2>
+      <div class="lede">Weekly totals vs weekly target. Tap any tile for per-day breakdown.</div>
+      <div class="ex-grid" id="weekFitnessGrid"></div>
     </div>
 
     <div class="card pillar-content" style="margin-top:18px;">
@@ -2843,6 +2843,7 @@ function aggregateWeek(week) {
   const weightsKg  = days.map(d => Number(d.weightKg)).filter(n => n > 0);
   const sleeps     = days.map(d => Number(d.sleepHours)).filter(n => n > 0);
   const avgSleep   = sleeps.length ? (sleeps.reduce((a,b)=>a+b,0) / sleeps.length) : null;
+  const sleepHoursTotal = sleeps.reduce((a,b)=>a+b,0);
   const sleepsOnTarget = days.filter(d => Number(d.sleepHours) >= 7).length;
   const satIso  = week.endDate;
   const satEntry = STATE.days[satIso];
@@ -2857,7 +2858,7 @@ function aggregateWeek(week) {
     plankMinutes: sum('plankMinutes'), kneeRaises: sum('kneeRaises'),
     gymCount, cardioCount, sessionsTotal: gymCount + cardioCount,
     creatineDays, creatineTotal, saunaMin, saunaDays, coldPlungeMin, coldPlungeDays,
-    avgSleep, sleepsOnTarget, closingWeight, closingWeightUnit,
+    avgSleep, sleepHoursTotal, sleepsOnTarget, closingWeight, closingWeightUnit,
     weightsCount: weightsLbs.length || weightsKg.length,
     longForm: sum('longForm'), reels: sum('reels'), carousels: sum('carousels'),
     clips: sum('clips'), bestReach: Math.max(0, ...days.map(d => Number(d.bestReach) || 0)),
@@ -2953,7 +2954,7 @@ function renderWeekPillarGrids(agg, contentShipped, contentTarget) {
         }, unit: '' },
     ],
     recovery: [
-      { label: 'Avg sleep',    val: agg.avgSleep || 0,        target: 7,      unit: 'h',   display: agg.avgSleep ? (Math.round(agg.avgSleep*10)/10)+' / 7 h' : '— / 7 h', breakdown: (d) => Number(d.sleepHours) || 0, breakdownUnit: 'h' },
+      { label: 'Sleep hours',  val: agg.sleepHoursTotal,      target: 49,     unit: 'h',   breakdown: (d) => Number(d.sleepHours) || 0, breakdownUnit: 'h' },
       { label: 'Sleep hours ≥7h', val: agg.sleepsOnTarget,    target: 7,      breakdown: (d) => Number(d.sleepHours) >= 7 ? 1 : 0 },
       { label: 'Sauna',        val: agg.saunaMin,             target: 75,     unit: 'min', breakdown: (d) => Number(d.steamMin) || 0,   breakdownUnit: 'min' },
       { label: 'Creatine',     val: agg.creatineTotal,        target: 35,     unit: 'g',   breakdown: (d) => Number(d.creatineG) || 0,  breakdownUnit: 'g'   },
