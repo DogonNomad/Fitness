@@ -1533,13 +1533,6 @@
         <button class="day-strip-nav" id="nextWeek" title="Next week">›</button>
       </div>
 
-      <!-- Sleep banner -->
-      <div class="sleep-banner">
-        <span class="sleep-label">Last night's sleep</span>
-        <input type="number" id="sleepInput" min="0" max="14" step="0.1" placeholder="hrs" />
-        <span class="sleep-unit">hrs</span>
-        <span class="sleep-status" id="sleepStatus"></span>
-      </div>
     </div>
 
     <div id="sec-fitness" class="toc-scroll-target card pillar-fitness" style="margin-top:18px;">
@@ -1815,6 +1808,7 @@ const PILLAR_METRICS = {
     { key: 'kneeRaises',      label: 'Knee raises',   target: Math.round(CAL_TARGETS.kneeRaises/7),      input: 'sets', repLabel: 'reps' }
   ],
   recovery: [
+    { key: 'sleepHours', label: 'Sleep',       target: 7,    unit: 'h',   input: 'number', step: 0.1 },
     { key: 'weightLbs',  label: 'Bodyweight',  target: null, unit: 'lbs', input: 'number', step: 0.2 },
     { key: 'steamMin',   label: 'Sauna',       target: 15,   unit: 'min', input: 'number' },
     { key: 'coldPlunge', label: 'Cold plunge', target: 3,    unit: 'min', input: 'number', step: 0.5 },
