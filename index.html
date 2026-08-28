@@ -1230,68 +1230,6 @@
     padding: 10px; text-align: center; color: var(--ink-faint);
     font-size: 12px; font-style: italic;
   }
-  /* Viewport preview toggle (top-right, always visible) */
-  .viewport-toggle {
-    position: fixed; top: 8px; right: 8px; z-index: 9999;
-    display: flex; gap: 2px;
-    background: rgba(0,0,0,0.65);
-    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-    border-radius: 8px; padding: 3px;
-    border: 1px solid rgba(255,255,255,0.08);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
-  }
-  .viewport-toggle button {
-    appearance: none; background: transparent; color: rgba(255,255,255,0.75);
-    border: 0; padding: 4px 8px; border-radius: 5px;
-    font: inherit; font-size: 12px; font-weight: 600; letter-spacing: 0.02em;
-    cursor: pointer; line-height: 1;
-    transition: background 180ms var(--ease), color 180ms var(--ease);
-    min-width: 26px;
-  }
-  .viewport-toggle button:hover { color: #fff; background: rgba(255,255,255,0.08); }
-  .viewport-toggle button.active { background: rgba(255,255,255,0.18); color: #fff; }
-
-  /* --- Force-mobile: mirror the essential @media (max-width: 720px) rules
-        so mobile layout renders even on desktop viewports. --- */
-  html.force-mobile body { padding: 0; }
-  html.force-mobile .wrap {
-    max-width: 420px !important;
-    margin: 0 auto !important;
-    padding-left: 12px; padding-right: 12px;
-    border-left: 1px solid rgba(255,255,255,0.05);
-    border-right: 1px solid rgba(255,255,255,0.05);
-    box-shadow: 0 0 60px rgba(0,0,0,0.4);
-    min-height: 100vh;
-  }
-  html.force-mobile .ex-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 18px !important; }
-  html.force-mobile .scoreboard {
-    display: flex !important;
-    grid-template-columns: none !important;
-    flex-wrap: nowrap; overflow-x: auto;
-    -webkit-overflow-scrolling: touch; scroll-snap-type: x mandatory;
-    gap: 8px; padding: 4px 2px 8px;
-    margin-left: -4px; margin-right: -4px;
-  }
-  html.force-mobile .scoreboard .scoretile {
-    flex: 0 0 42%; min-width: 42%; scroll-snap-align: start;
-    padding: 10px 12px 9px; border-radius: 12px;
-  }
-  html.force-mobile .scoreboard .scoretile .pillar-name { font-size: 9px; letter-spacing: 0.12em; }
-  html.force-mobile .scoreboard .scoretile .grade { font-size: 9px; letter-spacing: 0.10em; }
-  html.force-mobile .scoreboard .scoretile .lead { font-size: 16px; margin-top: 4px; }
-  html.force-mobile .scoreboard .scoretile .lead .of { font-size: 10px; }
-  html.force-mobile .scoreboard .scoretile .why { font-size: 10px; margin-top: 3px; min-height: 22px; line-height: 1.35; }
-  html.force-mobile .ex-tile { min-height: 110px !important; height: 110px !important; gap: 6px !important; }
-  html.force-mobile .ex-tile .ring-svg-container { width: 60px !important; height: 60px !important; }
-  html.force-mobile .ex-tile .ring-svg-container svg { width: 60px !important; height: 60px !important; }
-  html.force-mobile .ex-tile .sets-label { font-size: 10px !important; }
-  html.force-mobile .ex-tile .ex-label { font-size: 9px !important; }
-  html.force-mobile .ex-deck[open] summary .ex-tile { min-height: 100px; height: auto; }
-
-  /* --- Force-desktop: relies on <meta viewport width=1200> swap in JS.
-        The wrap min-width nudge keeps the layout from squishing if the browser ignores. --- */
-  html.force-desktop .wrap { min-width: 900px; }
-
   .ring-tile { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 12px 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
   .ring-tile svg { display: block; }
   .ring-tile .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-faint); }
@@ -1505,13 +1443,6 @@
 </style>
 </head>
 <body>
-
-<!-- Viewport preview toggle -->
-<div class="viewport-toggle" id="viewportToggle" aria-label="Preview viewport">
-  <button type="button" data-vp="auto" class="active" title="Auto (follow device)">Auto</button>
-  <button type="button" data-vp="mobile" title="Preview mobile layout">📱</button>
-  <button type="button" data-vp="desktop" title="Preview desktop layout">🖥</button>
-</div>
 
 <div class="wrap">
 
@@ -3902,41 +3833,6 @@ document.getElementById('themeToggle').addEventListener('click', () => {
 
 renderHeader(); renderToday(); renderWeek(); renderMission();
 
-/* ---------- Viewport preview toggle (Auto / Mobile / Desktop) ---------- */
-(function initViewportToggle() {
-  const VP_KEY = 'walkout_vp';
-  const html = document.documentElement;
-  const meta = document.querySelector('meta[name="viewport"]');
-  const wrap = document.getElementById('viewportToggle');
-  if (!wrap) return;
-  const btns = wrap.querySelectorAll('button');
-
-  function apply(mode) {
-    html.classList.remove('force-mobile', 'force-desktop');
-    if (mode === 'mobile') {
-      html.classList.add('force-mobile');
-      if (meta) meta.setAttribute('content', 'width=device-width, initial-scale=1');
-    } else if (mode === 'desktop') {
-      html.classList.add('force-desktop');
-      if (meta) meta.setAttribute('content', 'width=1200, initial-scale=1');
-    } else {
-      if (meta) meta.setAttribute('content', 'width=device-width, initial-scale=1');
-    }
-    btns.forEach(b => b.classList.toggle('active', b.dataset.vp === mode));
-    // Re-render rings so their SVG dimensions/animation replay under the new viewport class
-    try { renderToday(); renderWeek(); renderMission(); } catch(e) {}
-  }
-
-  let saved = 'auto';
-  try { saved = localStorage.getItem(VP_KEY) || 'auto'; } catch(e) {}
-  apply(saved);
-
-  btns.forEach(b => b.addEventListener('click', () => {
-    const mode = b.dataset.vp;
-    try { localStorage.setItem(VP_KEY, mode); } catch(e) {}
-    apply(mode);
-  }));
-})();
 </script>
 
 </body>
