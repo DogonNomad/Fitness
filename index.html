@@ -2730,30 +2730,47 @@ function ringTile(label, val, target, pct, color, size = 64) {
   return el;
 }
 function makeRingSvg(pct, color, size = 64) {
-  const r = (size - 8) / 2, c = 2 * Math.PI * r;
+  const strokeW = Math.max(5, Math.round(size * 0.09));
+  const r = (size - strokeW - 2) / 2, c = 2 * Math.PI * r;
   const filled = c * Math.min(1, pct / 100);
   const overflow = pct > 100;
+  const arcColor = overflow ? 'var(--gold)' : color;
   const ns = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(ns, 'svg');
   svg.setAttribute('width', size); svg.setAttribute('height', size); svg.setAttribute('viewBox', `0 0 ${size} ${size}`);
   const cx = size / 2, cy = size / 2;
+  // Track — use pillar color at low opacity so the full ring is always visible on any card bg
   const track = document.createElementNS(ns, 'circle');
   track.setAttribute('cx', cx); track.setAttribute('cy', cy); track.setAttribute('r', r);
-  const trackColor = (getComputedStyle(document.documentElement).getPropertyValue('--ring-track') || '').trim() || 'rgba(255,255,255,0.1)';
-  track.setAttribute('fill', 'none'); track.setAttribute('stroke', trackColor); track.setAttribute('stroke-width', 6);
+  track.setAttribute('fill', 'none');
+  track.setAttribute('stroke', color);
+  track.setAttribute('stroke-opacity', '0.22');
+  track.setAttribute('stroke-width', strokeW);
   svg.appendChild(track);
+  // Progress arc — animates fill-in on mount
   const arc = document.createElementNS(ns, 'circle');
   arc.setAttribute('cx', cx); arc.setAttribute('cy', cy); arc.setAttribute('r', r);
-  arc.setAttribute('fill', 'none'); arc.setAttribute('stroke', overflow ? 'var(--gold)' : color); arc.setAttribute('stroke-width', 6);
-  arc.setAttribute('stroke-linecap', 'round'); arc.setAttribute('stroke-dasharray', `${filled} ${c - filled}`);
+  arc.setAttribute('fill', 'none');
+  arc.setAttribute('stroke', arcColor);
+  arc.setAttribute('stroke-width', strokeW);
+  arc.setAttribute('stroke-linecap', 'round');
+  arc.setAttribute('stroke-dasharray', c);
+  arc.setAttribute('stroke-dashoffset', c); // start empty
   arc.setAttribute('transform', `rotate(-90 ${cx} ${cy})`);
+  arc.style.transition = 'stroke-dashoffset 900ms cubic-bezier(0.22, 0.68, 0.4, 1)';
   svg.appendChild(arc);
   const label = document.createElementNS(ns, 'text');
   label.setAttribute('x', cx); label.setAttribute('y', cy + 4);
-  label.setAttribute('text-anchor', 'middle'); label.setAttribute('font-size', '13'); label.setAttribute('font-weight', '700');
+  label.setAttribute('text-anchor', 'middle');
+  label.setAttribute('font-size', Math.round(size * 0.20));
+  label.setAttribute('font-weight', '700');
   label.setAttribute('fill', overflow ? 'var(--gold)' : 'var(--ink)');
   label.textContent = pct + '%';
   svg.appendChild(label);
+  // Trigger the fill-in animation on next frame so browsers see it as a transition, not initial state
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    arc.setAttribute('stroke-dashoffset', c - filled);
+  }));
   return svg;
 }
 function getPillarVar(k) { return getComputedStyle(document.documentElement).getPropertyValue(`--${k}`).trim() || '#888'; }
