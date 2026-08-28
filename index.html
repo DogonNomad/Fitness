@@ -1010,7 +1010,35 @@
   .footer { margin-top: 32px; color: var(--ink-faint); font-size: 11px; letter-spacing: 0.06em; }
 
   .scoreboard { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 4px; }
-  @media (max-width: 720px) { .scoreboard { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 720px) {
+    /* Mobile: horizontal-scroll strip, ~40% smaller tiles */
+    .scoreboard {
+      display: flex;
+      grid-template-columns: none;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x mandatory;
+      gap: 8px;
+      padding: 4px 2px 8px;
+      margin-left: -4px; margin-right: -4px;
+    }
+    .scoreboard::-webkit-scrollbar { height: 3px; }
+    .scoreboard::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.25); border-radius: 2px; }
+    .scoreboard::-webkit-scrollbar-track { background: transparent; }
+    .scoreboard .scoretile {
+      flex: 0 0 42%;
+      min-width: 42%;
+      scroll-snap-align: start;
+      padding: 10px 12px 9px;
+      border-radius: 12px;
+    }
+    .scoreboard .scoretile .pillar-name { font-size: 9px; letter-spacing: 0.12em; }
+    .scoreboard .scoretile .grade { font-size: 9px; letter-spacing: 0.10em; }
+    .scoreboard .scoretile .lead { font-size: 16px; margin-top: 4px; }
+    .scoreboard .scoretile .lead .of { font-size: 10px; }
+    .scoreboard .scoretile .why { font-size: 10px; margin-top: 3px; min-height: 22px; line-height: 1.35; }
+  }
   .scoretile {
     background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.008)) , var(--surface-2);
     border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 18px 18px 16px;
