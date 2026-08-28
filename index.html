@@ -619,21 +619,19 @@
     .day-strip-day .date-num { font-size: 14px; }
   }
 
-  /* Today's workout card */
+  /* Today's workout card — stripped, no nested wrapper, so weight-training pillar card matches height of Recovery */
   .workout-card {
-    background: linear-gradient(180deg, rgba(212,165,116,0.14), rgba(212,165,116,0.02));
-    border: 1px solid rgba(212,165,116,0.32);
-    border-radius: 16px;
-    padding: 20px 22px;
-    margin-top: 10px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin-top: 4px;
   }
-  .workout-card.rest {
-    background: linear-gradient(180deg, rgba(52,86,139,0.12), rgba(52,86,139,0.02));
-    border-color: rgba(52,86,139,0.28);
-  }
-  .workout-card .title { font-size: 17px; font-weight: 600; letter-spacing: -0.015em; color: var(--ink); margin-bottom: 6px; }
-  .workout-card .sub { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--weight); margin-bottom: 14px; font-weight: 600; }
-  .workout-card.rest .sub { color: var(--content); }
+  .workout-card.rest { background: transparent; border: none; }
+  .workout-card .title { display: none; }
+  .workout-card .sub { display: none; }
+  /* Session progress bar hidden — each tile ring already shows per-exercise progress */
+  .session-progress { display: none !important; }
   .workout-list { display: flex; flex-direction: column; gap: 6px; }
   .ex-grid {
     display: grid;
@@ -658,7 +656,7 @@
   .ex-deck[data-done="true"] {
     background: transparent !important;
     border: none !important;
-    box-shadow: 0 0 18px rgba(48,209,88,0.35) !important;
+    box-shadow: none !important;
   }
   /* Open state — restore rectangular container so the log form has room */
   .ex-deck[open] {
