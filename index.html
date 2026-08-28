@@ -21,13 +21,14 @@
     --green: #30d158;
     --yellow: #ffd60a;
     --red: #ff453a;
-    /* Pillar palette — rose-gold anchor, alternating dark / light through the section stack */
-    --weight:   #d4a574;  /* Weight training — rose gold (medium warm) */
-    --fitness:  #a0522d;  /* Calisthenics    — sienna / roast (dark warm) */
-    --recovery: #d9c8a9;  /* Body & Recovery — warm champagne (light warm) */
-    --content:  #34568b;  /* Content         — deep navy (dark cool) */
-    --network:  #a4b48a;  /* Network         — sage (light cool) */
-    --job:      #6b3d78;  /* Job hunt        — deep plum (dark cool) */
+    /* Pillar palette — rainbow spectrum walk in section order */
+    --fitness:  #e14b4b;  /* Calisthenics    — red */
+    --weight:   #f39038;  /* Weight training — orange */
+    --recovery: #e8b628;  /* Body & Recovery — amber-yellow */
+    --content:  #3d8ce8;  /* Content         — blue */
+    --career:   #8b5cf6;  /* People & Career — violet (merged network + job) */
+    --network:  #8b5cf6;  /* legacy alias, matches career */
+    --job:      #8b5cf6;  /* legacy alias, matches career */
     --accent: #2997ff;
     --ring-track: rgba(255,255,255,0.1);
     --tint-hi: rgba(255,255,255,0.045);
@@ -86,12 +87,13 @@
     --green: #22a54b;
     --yellow: #c78900;
     --red: #e5352c;
-    --weight:   #b88458;  /* rose gold — deeper for readability on white */
-    --fitness:  #8b4513;  /* saddle brown */
-    --recovery: #a89968;  /* deeper champagne */
-    --content:  #1e3a5f;  /* deeper navy */
-    --network:  #6b8e5d;  /* deeper sage */
-    --job:      #4c2c58;  /* deeper plum */
+    --fitness:  #c73030;  /* red — deeper for white */
+    --weight:   #d97706;  /* orange */
+    --recovery: #b45309;  /* deeper amber */
+    --content:  #1d4ed8;  /* deeper blue */
+    --career:   #6d28d9;  /* deeper violet */
+    --network:  #6d28d9;
+    --job:      #6d28d9;
     --accent: #0071e3;
     --ring-track: rgba(0,0,0,0.08);
     --tint-hi: rgba(0,0,0,0.02);
@@ -353,27 +355,47 @@
   .chip.yellow { color: var(--yellow); border-color: rgba(251, 191, 36, 0.4); }
   .chip.red { color: var(--red); border-color: rgba(248, 113, 113, 0.4); }
 
-  .pillar-weight h2 .accent   { background: var(--weight); }
   .pillar-fitness h2 .accent  { background: var(--fitness); }
+  .pillar-weight h2 .accent   { background: var(--weight); }
   .pillar-recovery h2 .accent { background: var(--recovery); }
   .pillar-content h2 .accent  { background: var(--content); }
-  .pillar-network h2 .accent  { background: var(--network); }
-  .pillar-job h2 .accent      { background: var(--job); }
+  .pillar-career h2 .accent   { background: var(--career); }
 
-  /* Per-pillar gradient card backgrounds — rose-gold anchor, alternating dark/light tints */
-  .card.pillar-weight   { background: linear-gradient(180deg, rgba(212,165,116,0.14), rgba(212,165,116,0.02)), var(--surface); border-color: rgba(212,165,116,0.30); }
-  .card.pillar-fitness  { background: linear-gradient(180deg, rgba(160,82,45,0.14),   rgba(160,82,45,0.02)),   var(--surface); border-color: rgba(160,82,45,0.30);  }
-  .card.pillar-recovery { background: linear-gradient(180deg, rgba(217,200,169,0.14), rgba(217,200,169,0.02)), var(--surface); border-color: rgba(217,200,169,0.32); }
-  .card.pillar-content  { background: linear-gradient(180deg, rgba(52,86,139,0.14),   rgba(52,86,139,0.02)),   var(--surface); border-color: rgba(52,86,139,0.30);  }
-  .card.pillar-network  { background: linear-gradient(180deg, rgba(164,180,138,0.14), rgba(164,180,138,0.02)), var(--surface); border-color: rgba(164,180,138,0.32); }
-  .card.pillar-job      { background: linear-gradient(180deg, rgba(107,61,120,0.14),  rgba(107,61,120,0.02)),  var(--surface); border-color: rgba(107,61,120,0.30);  }
-  /* Day theme: deeper tint values so gradients still register on white */
-  :root[data-theme="day"] .card.pillar-weight   { background: linear-gradient(180deg, rgba(184,132,88,0.10),  rgba(184,132,88,0.02)),  var(--surface); border-color: rgba(184,132,88,0.28); }
-  :root[data-theme="day"] .card.pillar-fitness  { background: linear-gradient(180deg, rgba(139,69,19,0.10),   rgba(139,69,19,0.02)),   var(--surface); border-color: rgba(139,69,19,0.28); }
-  :root[data-theme="day"] .card.pillar-recovery { background: linear-gradient(180deg, rgba(168,153,104,0.10), rgba(168,153,104,0.02)), var(--surface); border-color: rgba(168,153,104,0.30); }
-  :root[data-theme="day"] .card.pillar-content  { background: linear-gradient(180deg, rgba(30,58,95,0.10),    rgba(30,58,95,0.02)),    var(--surface); border-color: rgba(30,58,95,0.28); }
-  :root[data-theme="day"] .card.pillar-network  { background: linear-gradient(180deg, rgba(107,142,93,0.10),  rgba(107,142,93,0.02)),  var(--surface); border-color: rgba(107,142,93,0.30); }
-  :root[data-theme="day"] .card.pillar-job      { background: linear-gradient(180deg, rgba(76,44,88,0.10),    rgba(76,44,88,0.02)),    var(--surface); border-color: rgba(76,44,88,0.28); }
+  /* Per-pillar gradient card backgrounds — rainbow (R O Y B V) */
+  .card.pillar-fitness  { background: linear-gradient(180deg, rgba(225,75,75,0.14),   rgba(225,75,75,0.02)),   var(--surface); border-color: rgba(225,75,75,0.30); }
+  .card.pillar-weight   { background: linear-gradient(180deg, rgba(243,144,56,0.14),  rgba(243,144,56,0.02)),  var(--surface); border-color: rgba(243,144,56,0.30); }
+  .card.pillar-recovery { background: linear-gradient(180deg, rgba(232,182,40,0.14),  rgba(232,182,40,0.02)),  var(--surface); border-color: rgba(232,182,40,0.30); }
+  .card.pillar-content  { background: linear-gradient(180deg, rgba(61,140,232,0.14),  rgba(61,140,232,0.02)),  var(--surface); border-color: rgba(61,140,232,0.30); }
+  .card.pillar-career   { background: linear-gradient(180deg, rgba(139,92,246,0.14),  rgba(139,92,246,0.02)),  var(--surface); border-color: rgba(139,92,246,0.32); }
+  /* Day theme: deeper tint values so gradients register on white */
+  :root[data-theme="day"] .card.pillar-fitness  { background: linear-gradient(180deg, rgba(199,48,48,0.10),  rgba(199,48,48,0.02)),  var(--surface); border-color: rgba(199,48,48,0.28); }
+  :root[data-theme="day"] .card.pillar-weight   { background: linear-gradient(180deg, rgba(217,119,6,0.10),  rgba(217,119,6,0.02)),  var(--surface); border-color: rgba(217,119,6,0.28); }
+  :root[data-theme="day"] .card.pillar-recovery { background: linear-gradient(180deg, rgba(180,83,9,0.10),   rgba(180,83,9,0.02)),   var(--surface); border-color: rgba(180,83,9,0.28); }
+  :root[data-theme="day"] .card.pillar-content  { background: linear-gradient(180deg, rgba(29,78,216,0.10),  rgba(29,78,216,0.02)),  var(--surface); border-color: rgba(29,78,216,0.28); }
+  :root[data-theme="day"] .card.pillar-career   { background: linear-gradient(180deg, rgba(109,40,217,0.10), rgba(109,40,217,0.02)), var(--surface); border-color: rgba(109,40,217,0.28); }
+
+  /* Sleep banner — thin strip near the top */
+  .sleep-banner {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 14px;
+    margin-bottom: 14px;
+    background: rgba(139,92,246,0.06);
+    border: 1px solid rgba(139,92,246,0.18);
+    border-radius: 980px;
+    font-size: 12px;
+  }
+  :root[data-theme="day"] .sleep-banner { background: rgba(109,40,217,0.06); border-color: rgba(109,40,217,0.18); }
+  .sleep-banner .sleep-label { color: var(--ink-dim); letter-spacing: -0.005em; }
+  .sleep-banner input {
+    background: transparent; border: 0; color: var(--ink);
+    font: inherit; font-size: 14px; font-weight: 500;
+    padding: 4px 6px; width: 60px; outline: none;
+    text-align: center;
+  }
+  .sleep-banner input:focus { background: rgba(255,255,255,0.05); border-radius: 6px; }
+  :root[data-theme="day"] .sleep-banner input:focus { background: rgba(0,0,0,0.04); }
+  .sleep-banner .sleep-unit { color: var(--ink-faint); font-size: 11px; }
+  .sleep-banner .sleep-status { margin-left: auto; color: var(--ink-faint); font-size: 11px; }
 
   /* Content day-of-week posting hint */
   .content-day-hint {
@@ -415,12 +437,11 @@
   }
   .page-toc a:hover { background: rgba(255,255,255,0.08); color: var(--ink); }
   .page-toc a:active { transform: scale(0.96); }
-  .page-toc a.toc-workout:hover  { border-color: var(--weight); color: var(--weight); }
   .page-toc a.toc-fitness:hover  { border-color: var(--fitness); color: var(--fitness); }
+  .page-toc a.toc-workout:hover  { border-color: var(--weight); color: var(--weight); }
   .page-toc a.toc-recovery:hover { border-color: var(--recovery); color: var(--recovery); }
   .page-toc a.toc-content:hover  { border-color: var(--content); color: var(--content); }
-  .page-toc a.toc-network:hover  { border-color: var(--network); color: var(--network); }
-  .page-toc a.toc-job:hover      { border-color: var(--job); color: var(--job); }
+  .page-toc a.toc-career:hover   { border-color: var(--career); color: var(--career); }
   .toc-scroll-target { scroll-margin-top: 12px; }
 
   /* Collapsible grid: hide tiles past the 4th until expanded */
@@ -533,12 +554,14 @@
   .workout-list { display: flex; flex-direction: column; gap: 6px; }
   .ex-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
     align-items: start;
     margin: 8px 0 4px;
   }
-  @media (max-width: 720px) { .ex-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 720px) {
+    .ex-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  }
   .ex-deck {
     background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.01)) , var(--surface-2);
     border: 1px solid var(--line);
@@ -556,9 +579,36 @@
     background: var(--surface-2);
     border-color: rgba(255,255,255,0.18);
   }
-  .ex-deck summary { list-style: none; padding: 18px 12px 14px; cursor: pointer; text-align: center; }
+  .ex-deck summary { list-style: none; padding: 10px 8px 8px; cursor: pointer; text-align: center; }
   .ex-deck summary::-webkit-details-marker { display: none; }
-  .ex-tile { display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 128px; justify-content: center; transition: transform 400ms var(--ease-out); }
+  .ex-tile { display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 96px; justify-content: center; transition: transform 400ms var(--ease-out); }
+  .ex-tile .ring-svg-container svg { width: 56px !important; height: 56px !important; }
+  .ex-tile .sets-label { font-size: 11px; }
+  .ex-tile .ex-label { font-size: 9px; letter-spacing: 0.12em; }
+  @media (max-width: 720px) {
+    /* Circular tile styling — no rectangular card, just ring + label below */
+    .ex-deck {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      border-radius: 50%;
+    }
+    .ex-deck[data-done="true"] { border: none !important; box-shadow: 0 0 20px currentColor; }
+    .ex-deck summary { padding: 4px; }
+    .ex-tile { min-height: auto; gap: 6px; }
+    .ex-tile .ring-svg-container svg { width: 60px !important; height: 60px !important; }
+    .ex-tile .sets-label { font-size: 10px; margin-top: 2px; }
+    .ex-tile .ex-label { font-size: 9px; letter-spacing: 0.10em; line-height: 1.25; }
+    .ex-tile .ex-target-inline { display: none; }
+    /* Expanded tile on mobile — restore card look for logging */
+    .ex-deck[open] {
+      background: var(--surface-2) !important;
+      border: 1px solid var(--line) !important;
+      border-radius: 12px;
+      padding: 4px;
+    }
+    .ex-deck[open] summary .ex-tile { min-height: 84px; }
+  }
   .ex-deck summary:hover .ex-tile { transform: scale(1.04); }
   .ex-deck summary:active .ex-tile { transform: scale(0.98); }
   .ex-tile .ring-svg-container { display: flex; align-items: center; justify-content: center; }
@@ -837,18 +887,19 @@
     </div>
 
     <nav class="page-toc" aria-label="Jump to section">
-      <a href="#sec-workout"  class="toc-workout">Weights</a>
       <a href="#sec-fitness"  class="toc-fitness">Calisthenics</a>
+      <a href="#sec-workout"  class="toc-workout">Weights</a>
       <a href="#sec-recovery" class="toc-recovery">Recovery</a>
       <a href="#sec-content"  class="toc-content">Content</a>
-      <a href="#sec-network"  class="toc-network">Network</a>
-      <a href="#sec-job"      class="toc-job">Job</a>
+      <a href="#sec-career"   class="toc-career">Career</a>
     </nav>
 
-    <div id="sec-workout" class="toc-scroll-target card pillar-weight">
-      <h2><span class="accent"></span> Weight training</h2>
-      <div class="lede" id="workoutLede">—</div>
-      <div id="workoutCard"></div>
+    <!-- Sleep banner -->
+    <div class="sleep-banner">
+      <span class="sleep-label">Last night's sleep</span>
+      <input type="number" id="sleepInput" min="0" max="14" step="0.1" placeholder="hrs" />
+      <span class="sleep-unit">hrs</span>
+      <span class="sleep-status" id="sleepStatus"></span>
     </div>
 
     <div id="sec-fitness" class="toc-scroll-target card pillar-fitness" style="margin-top:18px;">
@@ -857,9 +908,15 @@
       <div class="ex-grid" id="fitnessGrid"></div>
     </div>
 
+    <div id="sec-workout" class="toc-scroll-target card pillar-weight" style="margin-top:18px;">
+      <h2><span class="accent"></span> Weight training</h2>
+      <div class="lede" id="workoutLede">—</div>
+      <div id="workoutCard"></div>
+    </div>
+
     <div id="sec-recovery" class="toc-scroll-target card pillar-recovery" style="margin-top:18px;">
       <h2><span class="accent"></span> Body &amp; Recovery</h2>
-      <div class="lede">Sleep, weight, sauna, cold plunge, protein, session type. Log the daily signals.</div>
+      <div class="lede">Bodyweight, sauna, cold plunge, creatine. Log the daily signals.</div>
       <div class="ex-grid" id="recoveryGrid"></div>
     </div>
 
@@ -870,16 +927,10 @@
       <div class="ex-grid" id="contentGrid"></div>
     </div>
 
-    <div id="sec-network" class="toc-scroll-target card pillar-network" style="margin-top:18px;">
-      <h2><span class="accent"></span> Network</h2>
-      <div class="lede">In-person counts. DMs are kindling, not fire.</div>
-      <div class="ex-grid" id="networkGrid"></div>
-    </div>
-
-    <div id="sec-job" class="toc-scroll-target card pillar-job" style="margin-top:18px;">
-      <h2><span class="accent"></span> Job hunt</h2>
-      <div class="lede">Pipeline lives or dies on weekly volume + active loops.</div>
-      <div class="ex-grid" id="jobGrid"></div>
+    <div id="sec-career" class="toc-scroll-target card pillar-career" style="margin-top:18px;">
+      <h2><span class="accent"></span> People &amp; Career</h2>
+      <div class="lede">Real-world contacts and the pipeline.</div>
+      <div class="ex-grid" id="careerGrid"></div>
     </div>
 
     <div class="card" style="margin-top:18px;">
@@ -1134,8 +1185,7 @@ const PILLAR_METRICS = {
     { key: 'kneeRaises',      label: 'Knee raises',   target: Math.round(CAL_TARGETS.kneeRaises/7),      input: 'sets', repLabel: 'reps' }
   ],
   recovery: [
-    { key: 'sleepHours', label: 'Sleep',       target: 7,    unit: 'hrs', input: 'number', step: 0.1 },
-    { key: 'weightKg',   label: 'Bodyweight',  target: null, unit: 'kg',  input: 'number', step: 0.1 },
+    { key: 'weightLbs',  label: 'Bodyweight',  target: null, unit: 'lbs', input: 'number', step: 0.2 },
     { key: 'steamMin',   label: 'Sauna',       target: 15,   unit: 'min', input: 'number' },
     { key: 'coldPlunge', label: 'Cold plunge', target: 3,    unit: 'min', input: 'number', step: 0.5 },
     { key: 'creatineG',  label: 'Creatine',    target: 5,    unit: 'g',   input: 'number', step: 0.5 }
@@ -1148,17 +1198,15 @@ const PILLAR_METRICS = {
     { key: 'carousels',  label: 'Carousels',          target: CONTENT_TARGETS.carousels, scope: 'week', input: 'entries',
         fields: [ { key: 'title', label: 'Title', type: 'text', placeholder: 'e.g. "3-slide equalization primer"' } ] },
   ],
-  network: [
+  career: [
     { key: 'peopleSeen', label: 'People IRL',  target: 1,   input: 'entries',
         fields: [
           { key: 'name',    label: 'Name',    type: 'text', placeholder: 'e.g. Pablo' },
           { key: 'company', label: 'Company / context', type: 'text', placeholder: 'e.g. Rappi, or gym Sabaneta' },
           { key: 'notes',   label: 'Notes on the interaction', type: 'text', placeholder: 'quality, topic, follow-up' }
         ] },
-    { key: 'dms',        label: 'Warm DMs',    target: 0.5, input: 'number' },
-    { key: 'intros',     label: 'New intros',  target: null, input: 'number' }
-  ],
-  job: [
+    { key: 'dms',          label: 'Warm DMs',     target: 0.5, input: 'number' },
+    { key: 'intros',       label: 'New intros',   target: null,input: 'number' },
     { key: 'apps',         label: 'Applications', target: 1,   input: 'number' },
     { key: 'outreach',     label: 'Outreach',     target: 2,   input: 'entries',
         fields: [
@@ -1331,10 +1379,38 @@ function renderToday() {
   const existing = STATE.days[iso];
   renderWorkoutCard(iso, existing || {});
   renderPillarGrids();
+  renderSleepBanner();
   updateSavedLabel(iso);
   renderDayStrip();
   updateBackTodayButton();
 }
+
+function renderSleepBanner() {
+  const iso = activeDate();
+  const day = STATE.days[iso] || {};
+  const inp = document.getElementById('sleepInput');
+  const status = document.getElementById('sleepStatus');
+  if (!inp) return;
+  const val = day.sleepHours;
+  inp.value = (val !== undefined && val !== null && val !== '') ? val : '';
+  if (status) status.textContent = val > 0 ? `${val >= 7 ? '✓' : '↑'} target 7h` : '';
+}
+(function wireSleepBanner() {
+  const inp = document.getElementById('sleepInput');
+  if (!inp) return;
+  const persist = () => {
+    const iso = activeDate();
+    const day = STATE.days[iso] || {};
+    day.sleepHours = inp.value === '' ? null : Number(inp.value);
+    day.savedAt = new Date().toISOString();
+    STATE.days[iso] = day;
+    saveAll(STATE);
+    renderSleepBanner();
+    updateSavedLabel(iso);
+  };
+  inp.addEventListener('blur', persist);
+  inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') inp.blur(); });
+})();
 
 function renderWorkoutCard(iso, dayData) {
   const root = document.getElementById('workoutCard');
@@ -1352,9 +1428,10 @@ function renderWorkoutCard(iso, dayData) {
   if (tpl.type === 'rest') {
     const rn = document.createElement('div');
     rn.className = 'rest-note';
-    rn.innerHTML = 'No prescribed gym work today. Recommended focus:' +
-      '<ul><li>Sleep 8+ hrs</li><li>Zone 2 walk or light dive if desired</li><li>Mobility &amp; hip openers, 10–15 min</li><li>Sauna optional</li></ul>';
+    rn.innerHTML = 'No prescribed gym work today — but if you did something, log it below.';
     card.appendChild(rn);
+    // Custom-session panel — add-exercise dropdown + per-exercise decks
+    renderCustomSession(card, iso, dayData);
   } else {
     // Migrate legacy formats: exercisesDone array → exercises object; scalar sets → sets array
     let exData = dayData.exercises || {};
@@ -1431,34 +1508,46 @@ function renderWorkoutCard(iso, dayData) {
       // Set list (already-logged sets this session)
       const setList = document.createElement('div');
       setList.className = 'set-list';
-      prev.sets.forEach((s, i) => setList.appendChild(renderSetRow(ex.name, s, i)));
+      const exMode = exerciseInputMode(ex.target);
+      prev.sets.forEach((s, i) => setList.appendChild(renderSetRow(ex.name, s, i, exMode)));
       details.appendChild(setList);
 
-      // Log-new-set form
+      // Log-new-set form — adapts to exercise type (weighted / bodyweight / duration)
+      const mode = exerciseInputMode(ex.target);
       const logForm = document.createElement('div');
       logForm.className = 'set-log-form';
-      const wIn = document.createElement('input');
-      wIn.type = 'number'; wIn.min = '0'; wIn.step = '0.5'; wIn.placeholder = 'Weight (lbs)';
-      const rIn = document.createElement('input');
-      rIn.type = 'number'; rIn.min = '0'; rIn.placeholder = 'Reps';
+      let wIn, rIn;
+      if (mode === 'duration') {
+        logForm.style.gridTemplateColumns = '1fr auto';
+        rIn = document.createElement('input');
+        rIn.type = 'number'; rIn.min = '0'; rIn.step = '0.5'; rIn.placeholder = 'Minutes';
+      } else if (mode === 'bodyweight') {
+        logForm.style.gridTemplateColumns = '1fr auto';
+        rIn = document.createElement('input');
+        rIn.type = 'number'; rIn.min = '0'; rIn.placeholder = 'Reps';
+      } else {
+        wIn = document.createElement('input');
+        wIn.type = 'number'; wIn.min = '0'; wIn.step = '0.5'; wIn.placeholder = 'Weight (lbs)';
+        rIn = document.createElement('input');
+        rIn.type = 'number'; rIn.min = '0'; rIn.placeholder = 'Reps';
+      }
       const logBtn = document.createElement('button');
-      logBtn.type = 'button'; logBtn.textContent = '+ Log set';
+      logBtn.type = 'button'; logBtn.textContent = '+ Log';
       logBtn.addEventListener('click', () => {
         const reps = Number(rIn.value);
         if (!reps || reps <= 0) { rIn.focus(); return; }
-        const weight = wIn.value === '' ? null : Number(wIn.value);
+        const weight = (mode === 'weighted' && wIn && wIn.value !== '') ? Number(wIn.value) : null;
         logSet(ex.name, weight, reps);
-        // Append to DOM
         const idx = (STATE.days[iso].exercises[ex.name].sets.length - 1);
-        setList.appendChild(renderSetRow(ex.name, { weight, reps }, idx));
+        setList.appendChild(renderSetRow(ex.name, { weight, reps, mode }, idx, mode));
         rIn.value = ''; rIn.focus();
-        // keep weight sticky for repeated logs
         updateExerciseRing(ex.name);
         updateWorkoutFooter();
       });
-      // Enter in reps triggers log
       rIn.addEventListener('keydown', (e) => { if (e.key === 'Enter') logBtn.click(); });
-      logForm.appendChild(wIn); logForm.appendChild(rIn); logForm.appendChild(logBtn);
+      if (wIn) logForm.appendChild(wIn);
+      logForm.appendChild(rIn);
+      logForm.appendChild(logBtn);
       details.appendChild(logForm);
 
       // Notes
@@ -1656,7 +1745,7 @@ function renderPillarGrids() {
     hintEl.textContent = CONTENT_SCHEDULE[dow] || '';
   }
 
-  ['fitness', 'recovery', 'content', 'network', 'job'].forEach(pillar => {
+  ['fitness', 'recovery', 'content', 'career'].forEach(pillar => {
     const grid = document.getElementById(pillar + 'Grid');
     if (!grid) return;
     grid.innerHTML = '';
@@ -2023,6 +2112,257 @@ function renderCaliSetRow(key, s, idx, repLabel, onChange) {
   return row;
 }
 
+/* Exercise catalog for rest-day custom sessions — grouped by movement type */
+const EXERCISE_GROUPS = {
+  'Upper body': [
+    { name: 'Bench press',         target: '4x8' },
+    { name: 'Incline chest press', target: '3x10' },
+    { name: 'Shoulder press',      target: '3x10' },
+    { name: 'Tricep pull down',    target: '3x10' },
+    { name: 'Tricep extension',    target: '3x10' },
+    { name: 'Pec fly',             target: '3x10' },
+    { name: 'Side delt raise',     target: '3x10' },
+    { name: 'Shoulder shrug',      target: '3x15' },
+    { name: 'Seated row',          target: '3x10' },
+    { name: 'BB Bicep curl',       target: '3x10' },
+    { name: 'Hammer curl',         target: '3x10' },
+    { name: 'Pull-ups',            target: 'max reps × 3 sets' },
+    { name: 'Dips',                target: 'max reps × 3 sets' },
+    { name: 'Push-ups',            target: 'max reps × 3 sets' }
+  ],
+  'Lower body': [
+    { name: 'Deadlift',            target: '3x8' },
+    { name: 'Leg press',           target: '3x10' },
+    { name: 'Prone leg curl',      target: '3x12' },
+    { name: 'Quad extension',      target: '3x10' },
+    { name: 'Calf raise',          target: '3x12' },
+    { name: 'Glute press',         target: '3x10' },
+    { name: 'Hip abduction (int)', target: '3x15' },
+    { name: 'Hip abduction (ext)', target: '3x15' },
+    { name: 'Back extension',      target: '3x10' }
+  ],
+  'Cardio': [
+    { name: 'Jump rope',       target: '20 min' },
+    { name: 'Zone 2 walk/run', target: '30 min' },
+    { name: 'Interval sprint', target: '15 min' }
+  ],
+  'Core': [
+    { name: 'Ab wheel',        target: '3x10' },
+    { name: 'Weighted crunch', target: '3x12' },
+    { name: 'Russian twist',   target: '3x20' },
+    { name: 'Leg raise',       target: '3x12' }
+  ]
+};
+
+/* Rest-day custom session — dropdown to add exercises + per-set decks below */
+function renderCustomSession(container, iso, dayData) {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'margin-top:14px;';
+
+  const dropdown = document.createElement('div');
+  dropdown.style.cssText = 'display:flex; gap:6px; align-items:center; margin-bottom:12px;';
+  const sel = document.createElement('select');
+  sel.style.cssText = 'flex:1; background:var(--bg-2); border:1px solid var(--line); color:var(--ink); padding:8px 10px; border-radius:8px; font:inherit; font-size:13px; outline:none;';
+  const placeholder = document.createElement('option');
+  placeholder.value = ''; placeholder.textContent = '+ Add exercise…';
+  sel.appendChild(placeholder);
+  Object.entries(EXERCISE_GROUPS).forEach(([group, exercises]) => {
+    const og = document.createElement('optgroup'); og.label = group;
+    exercises.forEach(ex => {
+      const opt = document.createElement('option');
+      opt.value = `${group}|${ex.name}|${ex.target}`;
+      opt.textContent = `${ex.name} · ${ex.target}`;
+      og.appendChild(opt);
+    });
+    sel.appendChild(og);
+  });
+  sel.addEventListener('change', () => {
+    if (!sel.value) return;
+    const [group, name, target] = sel.value.split('|');
+    addCustomExercise({ name, target, group });
+    sel.value = '';
+    // Re-render custom session panel
+    wrap.remove();
+    renderCustomSession(container, activeDate(), STATE.days[activeDate()] || {});
+  });
+  dropdown.appendChild(sel);
+  wrap.appendChild(dropdown);
+
+  // Render existing custom exercises
+  const customList = (dayData.customExercises || []);
+  if (customList.length) {
+    const grid = document.createElement('div');
+    grid.className = 'ex-grid';
+    customList.forEach((ex, idx) => {
+      grid.appendChild(renderCustomExerciseDeck(ex, idx));
+    });
+    wrap.appendChild(grid);
+  }
+  container.appendChild(wrap);
+}
+
+function addCustomExercise(ex) {
+  const iso = activeDate();
+  const day = STATE.days[iso] || {};
+  if (!Array.isArray(day.customExercises)) day.customExercises = [];
+  day.customExercises.push({ name: ex.name, target: ex.target, group: ex.group, sets: [] });
+  day.savedAt = new Date().toISOString();
+  STATE.days[iso] = day;
+  saveAll(STATE);
+  updateSavedLabel(iso);
+  renderDayStrip();
+}
+function logCustomSet(idx, weight, reps) {
+  const iso = activeDate();
+  const day = STATE.days[iso] || {};
+  if (!day.customExercises || !day.customExercises[idx]) return;
+  day.customExercises[idx].sets.push({ weight: weight == null || weight === '' ? null : Number(weight), reps: Number(reps) });
+  day.savedAt = new Date().toISOString();
+  STATE.days[iso] = day;
+  saveAll(STATE);
+  updateSavedLabel(iso);
+}
+function deleteCustomSet(idx, setIdx) {
+  const iso = activeDate();
+  const day = STATE.days[iso];
+  if (!day || !day.customExercises || !day.customExercises[idx]) return;
+  day.customExercises[idx].sets.splice(setIdx, 1);
+  day.savedAt = new Date().toISOString();
+  saveAll(STATE);
+  updateSavedLabel(iso);
+}
+function removeCustomExercise(idx) {
+  const iso = activeDate();
+  const day = STATE.days[iso];
+  if (!day || !day.customExercises) return;
+  day.customExercises.splice(idx, 1);
+  day.savedAt = new Date().toISOString();
+  saveAll(STATE);
+  updateSavedLabel(iso);
+}
+
+function renderCustomExerciseDeck(ex, idx) {
+  const mode = exerciseInputMode(ex.target);
+  const targetSets = parseTargetSets(ex.target);
+  const doneSets = ex.sets ? ex.sets.length : 0;
+  const pct = targetSets ? Math.min(150, Math.round((doneSets / targetSets) * 100)) : 0;
+
+  const deck = document.createElement('details');
+  deck.className = 'ex-deck';
+  deck.dataset.name = ex.name;
+  deck.dataset.done = doneSets >= targetSets ? 'true' : 'false';
+
+  const summary = document.createElement('summary');
+  const tile = document.createElement('div');
+  tile.className = 'ex-tile';
+  const svg = document.createElement('div');
+  svg.className = 'ring-svg-container';
+  svg.appendChild(makeRingSvg(pct, getPillarVar('weight'), 56));
+  const setsLbl = document.createElement('div');
+  setsLbl.className = 'sets-label';
+  setsLbl.textContent = `${doneSets} / ${targetSets} sets`;
+  const nameLbl = document.createElement('div');
+  nameLbl.className = 'ex-label';
+  nameLbl.innerHTML = `${escapeHtml(ex.name)} <span class="ex-target-inline">· ${escapeHtml(ex.target)}</span>`;
+  tile.appendChild(svg); tile.appendChild(setsLbl); tile.appendChild(nameLbl);
+  summary.appendChild(tile);
+  deck.appendChild(summary);
+
+  const details = document.createElement('div');
+  details.className = 'ex-details';
+
+  const setList = document.createElement('div');
+  setList.className = 'set-list';
+  (ex.sets || []).forEach((s, i) => setList.appendChild(renderCustomSetRow(idx, s, i, mode)));
+  details.appendChild(setList);
+
+  const logForm = document.createElement('div');
+  logForm.className = 'set-log-form';
+  let wIn, rIn;
+  if (mode === 'duration') {
+    logForm.style.gridTemplateColumns = '1fr auto';
+    rIn = document.createElement('input');
+    rIn.type = 'number'; rIn.min = '0'; rIn.step = '0.5'; rIn.placeholder = 'Minutes';
+  } else if (mode === 'bodyweight') {
+    logForm.style.gridTemplateColumns = '1fr auto';
+    rIn = document.createElement('input');
+    rIn.type = 'number'; rIn.min = '0'; rIn.placeholder = 'Reps';
+  } else {
+    wIn = document.createElement('input');
+    wIn.type = 'number'; wIn.min = '0'; wIn.step = '0.5'; wIn.placeholder = 'Weight (lbs)';
+    rIn = document.createElement('input');
+    rIn.type = 'number'; rIn.min = '0'; rIn.placeholder = 'Reps';
+  }
+  const logBtn = document.createElement('button');
+  logBtn.type = 'button'; logBtn.textContent = '+ Log';
+  logBtn.addEventListener('click', () => {
+    const reps = Number(rIn.value);
+    if (!reps || reps <= 0) { rIn.focus(); return; }
+    const weight = (mode === 'weighted' && wIn && wIn.value !== '') ? Number(wIn.value) : null;
+    logCustomSet(idx, weight, reps);
+    const arr = STATE.days[activeDate()].customExercises[idx].sets;
+    setList.appendChild(renderCustomSetRow(idx, { weight, reps }, arr.length - 1, mode));
+    rIn.value = ''; rIn.focus();
+  });
+  rIn.addEventListener('keydown', (e) => { if (e.key === 'Enter') logBtn.click(); });
+  if (wIn) logForm.appendChild(wIn);
+  logForm.appendChild(rIn);
+  logForm.appendChild(logBtn);
+  details.appendChild(logForm);
+
+  // Remove-exercise button
+  const rmBtn = document.createElement('button');
+  rmBtn.type = 'button';
+  rmBtn.textContent = 'Remove exercise';
+  rmBtn.style.cssText = 'appearance:none; background:transparent; border:1px solid var(--line); color:var(--ink-faint); padding:6px 12px; border-radius:6px; font:inherit; font-size:11px; cursor:pointer; margin-top:8px;';
+  rmBtn.addEventListener('click', () => {
+    if (!confirm(`Remove ${ex.name} from today's custom session?`)) return;
+    removeCustomExercise(idx);
+    renderToday();
+  });
+  details.appendChild(rmBtn);
+
+  deck.appendChild(details);
+  return deck;
+}
+
+function renderCustomSetRow(exIdx, s, setIdx, mode) {
+  const row = document.createElement('div');
+  row.className = 'set-row';
+  const num = document.createElement('span'); num.className = 'set-num'; num.textContent = 'Set ' + (setIdx + 1);
+  const det = document.createElement('span'); det.className = 'set-detail';
+  if (mode === 'duration') det.textContent = `${s.reps} min`;
+  else if (mode === 'bodyweight') det.textContent = `BW × ${s.reps} reps`;
+  else {
+    const wStr = (s.weight === null || s.weight === undefined || s.weight === '') ? 'BW' : (s.weight + ' lbs');
+    det.textContent = `${wStr} × ${s.reps} reps`;
+  }
+  const del = document.createElement('button');
+  del.className = 'set-delete'; del.type = 'button'; del.textContent = '×';
+  del.addEventListener('click', () => {
+    const parent = row.parentElement;
+    const i = Array.from(parent.children).indexOf(row);
+    deleteCustomSet(exIdx, i);
+    row.remove();
+    Array.from(parent.children).forEach((r, k) => {
+      const n = r.querySelector('.set-num'); if (n) n.textContent = 'Set ' + (k + 1);
+    });
+  });
+  row.appendChild(num); row.appendChild(det); row.appendChild(del);
+  return row;
+}
+
+/* Detect input mode for a weight-training exercise from its target string.
+   'duration'  → jump rope, plank-style (minutes only)
+   'bodyweight'→ pull-ups, dips, push-ups (reps only, no weight)
+   'weighted'  → default (weight + reps) */
+function exerciseInputMode(target) {
+  if (!target) return 'weighted';
+  if (/\d+\s*(min|sec)/i.test(target)) return 'duration';
+  if (/max reps|to failure|max\s*x/i.test(target)) return 'bodyweight';
+  return 'weighted';
+}
+
 /* Parse target sets from template target string, e.g. "3x8" → 3, "max reps × 3 sets" → 3, "20 min" → 1 */
 function parseTargetSets(target) {
   if (!target) return 3;
@@ -2096,13 +2436,19 @@ function persistExerciseMeta(name, patch) {
   updateSavedLabel(iso);
   renderDayStrip();
 }
-function renderSetRow(exName, s, idx) {
+function renderSetRow(exName, s, idx, mode) {
   const row = document.createElement('div');
   row.className = 'set-row';
   const num = document.createElement('span'); num.className = 'set-num'; num.textContent = 'Set ' + (idx + 1);
   const det = document.createElement('span'); det.className = 'set-detail';
-  const wStr = (s.weight === null || s.weight === undefined || s.weight === '') ? 'BW' : (s.weight + ' lbs');
-  det.textContent = `${wStr} × ${s.reps} reps`;
+  if (mode === 'duration') {
+    det.textContent = `${s.reps} min`;
+  } else if (mode === 'bodyweight') {
+    det.textContent = `BW × ${s.reps} reps`;
+  } else {
+    const wStr = (s.weight === null || s.weight === undefined || s.weight === '') ? 'BW' : (s.weight + ' lbs');
+    det.textContent = `${wStr} × ${s.reps} reps`;
+  }
   const del = document.createElement('button');
   del.className = 'set-delete'; del.type = 'button'; del.textContent = '×'; del.title = 'Delete set';
   del.addEventListener('click', () => {
