@@ -2803,11 +2803,12 @@ function aggregateWeek(week) {
   });
 
   const creatineDays = days.filter(d => Number(d.creatineG) >= 5).length;
+  const creatineTotal = sum('creatineG');
   const shootDays = days.filter(d => d.shootDay).length;
   const editBlocks = days.filter(d => d.editBlock).length;
   const engageBlocks = days.filter(d => d.engageBlock).length;
   const saunaMin = sum('steamMin');
-  const saunaDays = days.filter(d => d.steamRoom).length;
+  const saunaDays = days.filter(d => Number(d.steamMin) > 0 || d.steamRoom).length;
 
   // Bodyweight — switched from kg to lbs; keep both readable for backward compat
   const weightsLbs = days.map(d => Number(d.weightLbs)).filter(n => n > 0);
@@ -2827,7 +2828,7 @@ function aggregateWeek(week) {
     pushups: sum('pushups'), mountedCrunches: sum('mountedCrunches'), heelTaps: sum('heelTaps'),
     plankMinutes: sum('plankMinutes'), kneeRaises: sum('kneeRaises'),
     gymCount, cardioCount, sessionsTotal: gymCount + cardioCount,
-    creatineDays, saunaMin, saunaDays, coldPlungeMin, coldPlungeDays,
+    creatineDays, creatineTotal, saunaMin, saunaDays, coldPlungeMin, coldPlungeDays,
     avgSleep, sleepsOnTarget, closingWeight, closingWeightUnit,
     weightsCount: weightsLbs.length || weightsKg.length,
     longForm: sum('longForm'), reels: sum('reels'), carousels: sum('carousels'),
@@ -2926,9 +2927,9 @@ function renderWeekPillarGrids(agg, contentShipped, contentTarget) {
     recovery: [
       { label: 'Avg sleep',    val: agg.avgSleep || 0,        target: 7,      unit: 'h',   display: agg.avgSleep ? (Math.round(agg.avgSleep*10)/10)+' / 7 h' : '— / 7 h', breakdown: (d) => Number(d.sleepHours) || 0, breakdownUnit: 'h' },
       { label: 'Sleep hours ≥7h', val: agg.sleepsOnTarget,    target: 7,      breakdown: (d) => Number(d.sleepHours) >= 7 ? 1 : 0 },
-      { label: 'Sauna',        val: agg.saunaDays,            target: 3,      breakdown: (d) => d.steamRoom ? 1 : 0 },
-      { label: 'Creatine ≥5g', val: agg.creatineDays,         target: 7,      breakdown: (d) => Number(d.creatineG) >= 5 ? 1 : 0 },
-      { label: 'Cold plunge',  val: agg.coldPlungeMin,        target: 21,     unit: 'min', breakdown: (d) => Number(d.coldPlunge) || 0, breakdownUnit: 'min' },
+      { label: 'Sauna',        val: agg.saunaMin,             target: 75,     unit: 'min', breakdown: (d) => Number(d.steamMin) || 0,   breakdownUnit: 'min' },
+      { label: 'Creatine',     val: agg.creatineTotal,        target: 35,     unit: 'g',   breakdown: (d) => Number(d.creatineG) || 0,  breakdownUnit: 'g'   },
+      { label: 'Cold plunge',  val: agg.coldPlungeMin,        target: 3,      unit: 'min', breakdown: (d) => Number(d.coldPlunge) || 0, breakdownUnit: 'min' },
     ],
     content: [
       { label: 'Long-form', val: agg.longForm,   target: CONTENT_TARGETS.longForm,  breakdown: (d) => Number(d.longForm) || 0 },
