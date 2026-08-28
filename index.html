@@ -361,18 +361,101 @@
   .pillar-content h2 .accent  { background: var(--content); }
   .pillar-career h2 .accent   { background: var(--career); }
 
-  /* Per-pillar gradient card backgrounds — rainbow (R O Y B V), bumped alpha so the hue actually reads */
-  .card.pillar-fitness  { background: linear-gradient(180deg, rgba(225,75,75,0.24),   rgba(225,75,75,0.04)),   var(--surface); border-color: rgba(225,75,75,0.42); }
-  .card.pillar-weight   { background: linear-gradient(180deg, rgba(243,144,56,0.24),  rgba(243,144,56,0.04)),  var(--surface); border-color: rgba(243,144,56,0.42); }
-  .card.pillar-recovery { background: linear-gradient(180deg, rgba(232,182,40,0.24),  rgba(232,182,40,0.04)),  var(--surface); border-color: rgba(232,182,40,0.42); }
-  .card.pillar-content  { background: linear-gradient(180deg, rgba(61,140,232,0.24),  rgba(61,140,232,0.04)),  var(--surface); border-color: rgba(61,140,232,0.42); }
-  .card.pillar-career   { background: linear-gradient(180deg, rgba(139,92,246,0.24),  rgba(139,92,246,0.04)),  var(--surface); border-color: rgba(139,92,246,0.44); }
-  /* Day theme: deeper tint values so gradients register on white */
-  :root[data-theme="day"] .card.pillar-fitness  { background: linear-gradient(180deg, rgba(199,48,48,0.10),  rgba(199,48,48,0.02)),  var(--surface); border-color: rgba(199,48,48,0.28); }
-  :root[data-theme="day"] .card.pillar-weight   { background: linear-gradient(180deg, rgba(217,119,6,0.10),  rgba(217,119,6,0.02)),  var(--surface); border-color: rgba(217,119,6,0.28); }
-  :root[data-theme="day"] .card.pillar-recovery { background: linear-gradient(180deg, rgba(180,83,9,0.10),   rgba(180,83,9,0.02)),   var(--surface); border-color: rgba(180,83,9,0.28); }
-  :root[data-theme="day"] .card.pillar-content  { background: linear-gradient(180deg, rgba(29,78,216,0.10),  rgba(29,78,216,0.02)),  var(--surface); border-color: rgba(29,78,216,0.28); }
-  :root[data-theme="day"] .card.pillar-career   { background: linear-gradient(180deg, rgba(109,40,217,0.10), rgba(109,40,217,0.02)), var(--surface); border-color: rgba(109,40,217,0.28); }
+  /* Per-pillar card backgrounds — light pastel gradients (bottom-left white → top-right pastel).
+     Cards render light regardless of active theme so the rainbow reads cleanly. */
+  .card.pillar-fitness,
+  .card.pillar-weight,
+  .card.pillar-recovery,
+  .card.pillar-content,
+  .card.pillar-career {
+    color: #1d1d1f;
+    min-height: 300px;
+    display: flex; flex-direction: column;
+    --ring-track: rgba(0,0,0,0.08);
+    --ink: #1d1d1f;
+    --ink-dim: #545862;
+    --ink-faint: #86868b;
+    --line: rgba(0,0,0,0.08);
+    --line-2: rgba(0,0,0,0.16);
+    --surface-2: #ffffff;
+    --bg-2: rgba(0,0,0,0.02);
+  }
+  /* Weight training + recovery may not have grid-toggle — reserve space so cards line up */
+  .card.pillar-fitness .ex-grid,
+  .card.pillar-weight .ex-grid,
+  .card.pillar-recovery .ex-grid,
+  .card.pillar-content .ex-grid,
+  .card.pillar-career .ex-grid { min-height: 130px; }
+  @media (max-width: 720px) {
+    .card.pillar-fitness,
+    .card.pillar-weight,
+    .card.pillar-recovery,
+    .card.pillar-content,
+    .card.pillar-career { min-height: 340px; }
+    .card.pillar-fitness .ex-grid,
+    .card.pillar-weight .ex-grid,
+    .card.pillar-recovery .ex-grid,
+    .card.pillar-content .ex-grid,
+    .card.pillar-career .ex-grid { min-height: 240px; }
+  }
+  .card.pillar-fitness  { background: linear-gradient(to top right, #ffffff 0%, #fecaca 100%); border-color: rgba(225,75,75,0.35); }
+  .card.pillar-weight   { background: linear-gradient(to top right, #ffffff 0%, #fed7aa 100%); border-color: rgba(243,144,56,0.35); }
+  .card.pillar-recovery { background: linear-gradient(to top right, #ffffff 0%, #fef3c7 100%); border-color: rgba(232,182,40,0.42); }
+  .card.pillar-content  { background: linear-gradient(to top right, #ffffff 0%, #bfdbfe 100%); border-color: rgba(61,140,232,0.35); }
+  .card.pillar-career   { background: linear-gradient(to top right, #ffffff 0%, #ddd6fe 100%); border-color: rgba(139,92,246,0.35); }
+  /* Text + inner surfaces inside light cards */
+  .card.pillar-fitness .lede, .card.pillar-weight .lede,
+  .card.pillar-recovery .lede, .card.pillar-content .lede,
+  .card.pillar-career .lede { color: #545862; }
+  .card.pillar-fitness h2, .card.pillar-weight h2,
+  .card.pillar-recovery h2, .card.pillar-content h2,
+  .card.pillar-career h2 { color: #1d1d1f; }
+  .card.pillar-fitness .ex-tile .sets-label,
+  .card.pillar-weight .ex-tile .sets-label,
+  .card.pillar-recovery .ex-tile .sets-label,
+  .card.pillar-content .ex-tile .sets-label,
+  .card.pillar-career .ex-tile .sets-label { color: #545862; }
+  .card.pillar-fitness .ex-tile .ex-label,
+  .card.pillar-weight .ex-tile .ex-label,
+  .card.pillar-recovery .ex-tile .ex-label,
+  .card.pillar-content .ex-tile .ex-label,
+  .card.pillar-career .ex-tile .ex-label { color: #86868b; }
+  .card.pillar-fitness .ex-deck[open],
+  .card.pillar-weight .ex-deck[open],
+  .card.pillar-recovery .ex-deck[open],
+  .card.pillar-content .ex-deck[open],
+  .card.pillar-career .ex-deck[open] { background: rgba(255,255,255,0.85) !important; border: 1px solid rgba(0,0,0,0.12) !important; }
+  .card.pillar-fitness .ex-details,
+  .card.pillar-weight .ex-details,
+  .card.pillar-recovery .ex-details,
+  .card.pillar-content .ex-details,
+  .card.pillar-career .ex-details { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.08); }
+  .card.pillar-fitness .set-row, .card.pillar-weight .set-row,
+  .card.pillar-recovery .set-row, .card.pillar-content .set-row,
+  .card.pillar-career .set-row { background: #ffffff; border-color: rgba(0,0,0,0.08); }
+  .card.pillar-fitness .set-log-form input, .card.pillar-weight .set-log-form input,
+  .card.pillar-recovery .set-log-form input, .card.pillar-content .set-log-form input,
+  .card.pillar-career .set-log-form input,
+  .card.pillar-fitness .entry-form input, .card.pillar-weight .entry-form input,
+  .card.pillar-recovery .entry-form input, .card.pillar-content .entry-form input,
+  .card.pillar-career .entry-form input,
+  .card.pillar-fitness .note-row input, .card.pillar-weight .note-row input,
+  .card.pillar-recovery .note-row input, .card.pillar-content .note-row input,
+  .card.pillar-career .note-row input,
+  .card.pillar-fitness .field-mini input, .card.pillar-weight .field-mini input,
+  .card.pillar-recovery .field-mini input, .card.pillar-content .field-mini input,
+  .card.pillar-career .field-mini input { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.12); color: #1d1d1f; }
+  .card.pillar-fitness .set-history, .card.pillar-weight .set-history,
+  .card.pillar-recovery .set-history, .card.pillar-content .set-history,
+  .card.pillar-career .set-history { background: rgba(0,113,227,0.06); border-color: rgba(0,113,227,0.18); color: #545862; }
+  .card.pillar-fitness .set-history strong, .card.pillar-weight .set-history strong,
+  .card.pillar-recovery .set-history strong, .card.pillar-content .set-history strong,
+  .card.pillar-career .set-history strong { color: #1d1d1f; }
+  .card.pillar-fitness .grid-toggle,
+  .card.pillar-weight .grid-toggle,
+  .card.pillar-recovery .grid-toggle,
+  .card.pillar-content .grid-toggle,
+  .card.pillar-career .grid-toggle { border-color: rgba(0,0,0,0.15); color: #545862; }
 
   /* Sleep banner — thin strip near the top */
   .sleep-banner {
@@ -562,23 +645,31 @@
   @media (max-width: 720px) {
     .ex-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; }
   }
+  /* Base tile — circular, transparent (no rectangular container) both desktop + mobile */
   .ex-deck {
-    background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.01)) , var(--surface-2);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    transition: border-color 300ms var(--ease), transform 400ms var(--ease-out), box-shadow 300ms var(--ease);
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 50%;
+    overflow: visible;
+    transition: transform 300ms var(--ease);
   }
-  .ex-deck:hover { border-color: rgba(255,255,255,0.16); box-shadow: 0 12px 32px rgba(0,0,0,0.4); }
+  .ex-deck:hover { transform: none; }
   .ex-deck[data-done="true"] {
-    border-color: rgba(48,209,88,0.35);
-    box-shadow: 0 0 32px rgba(48,209,88,0.1);
+    background: transparent !important;
+    border: none !important;
+    box-shadow: 0 0 18px rgba(48,209,88,0.35) !important;
   }
+  /* Open state — restore rectangular container so the log form has room */
   .ex-deck[open] {
     grid-column: 1 / -1;
-    background: var(--surface-2);
-    border-color: rgba(255,255,255,0.18);
+    background: var(--surface-2) !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.28) !important;
+    padding: 4px;
   }
+  :root[data-theme="day"] .ex-deck[open] { background: rgba(255,255,255,0.9) !important; border-color: rgba(0,0,0,0.12) !important; }
   .ex-deck summary { list-style: none; padding: 10px 8px 8px; cursor: pointer; text-align: center; }
   .ex-deck summary::-webkit-details-marker { display: none; }
   .ex-tile {
@@ -605,27 +696,54 @@
   /* Hide the "· 3x10" tail on tiles — too noisy, target is shown when expanded */
   .ex-tile .ex-target-inline { display: none; }
   @media (max-width: 720px) {
-    /* Circular tile styling — no rectangular card, just ring + label below */
-    .ex-deck {
-      background: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
-      border-radius: 50%;
+    /* Horizontal-scroll log forms — every field stays full-size, user swipes to reach them all */
+    .set-log-form {
+      display: flex !important;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x proximity;
+      gap: 8px;
+      padding: 4px 2px 6px;
+      grid-template-columns: none !important;
     }
-    .ex-deck[data-done="true"] { border: none !important; box-shadow: 0 0 20px currentColor; }
+    .set-log-form input {
+      flex: 0 0 130px;
+      min-width: 130px;
+      scroll-snap-align: start;
+    }
+    .set-log-form button {
+      flex: 0 0 auto;
+      min-width: 90px;
+      scroll-snap-align: end;
+    }
+    .set-log-form::-webkit-scrollbar { height: 3px; }
+    .set-log-form::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.25); border-radius: 2px; }
+    .set-log-form::-webkit-scrollbar-track { background: transparent; }
+    /* Same treatment for entry-form (Content title, People IRL name/company/notes, Outreach 5 fields) */
+    .entry-form {
+      display: flex !important;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      gap: 8px;
+      padding: 4px 2px 6px;
+      grid-template-columns: none !important;
+    }
+    .entry-form .field-mini {
+      flex: 0 0 160px;
+      min-width: 160px;
+    }
+    .entry-form::-webkit-scrollbar { height: 3px; }
+    .entry-form::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.25); border-radius: 2px; }
+
+    /* Mobile — slightly smaller circular tiles */
     .ex-deck summary { padding: 4px; }
     .ex-tile { min-height: 110px; height: 110px; gap: 6px; }
     .ex-tile .ring-svg-container { width: 60px; height: 60px; }
     .ex-tile .ring-svg-container svg { width: 60px !important; height: 60px !important; }
     .ex-tile .sets-label { font-size: 10px; height: 12px; }
     .ex-tile .ex-label { font-size: 9px; height: 22px; }
-    /* Expanded tile on mobile — restore card look for logging */
-    .ex-deck[open] {
-      background: var(--surface-2) !important;
-      border: 1px solid var(--line) !important;
-      border-radius: 12px;
-      padding: 4px;
-    }
     .ex-deck[open] summary .ex-tile { min-height: 100px; height: auto; }
   }
   .ex-deck summary:hover .ex-tile { transform: scale(1.04); }
