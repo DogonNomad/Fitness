@@ -374,26 +374,28 @@
     .today-hero { top: 68px; margin: -8px -6px 14px; padding-left: 6px; padding-right: 6px; }
   }
 
-  /* Sticky page header — Walk-Out brand + Day pill + toggle buttons pinned at top */
+  /* Sticky page header — Walk-Out brand + Day pill + toggle buttons pinned at top.
+     Full-width bleed + soft gradient fade at the bottom edge — no hard border, no boxy shadow. */
   header.top {
     position: sticky;
     top: 0;
     z-index: 60;
-    padding: 14px 0 12px;
-    margin: 0 0 8px;
-    background: rgba(18, 22, 32, 0.88);
-    backdrop-filter: blur(20px) saturate(1.4);
-    -webkit-backdrop-filter: blur(20px) saturate(1.4);
-    border-bottom: 1px solid var(--line);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    padding: 16px 24px 22px;
+    margin: 0 -24px 8px;
+    background:
+      linear-gradient(180deg, var(--bg) 0%, rgba(18, 22, 32, 0.9) 60%, rgba(18, 22, 32, 0) 100%);
+    backdrop-filter: blur(16px) saturate(1.2);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+    border: 0;
+    box-shadow: none;
   }
   :root[data-theme="day"] header.top {
-    background: rgba(244, 245, 247, 0.9);
-    border-bottom-color: rgba(0,0,0,0.08);
+    background:
+      linear-gradient(180deg, var(--bg) 0%, rgba(244, 245, 247, 0.92) 60%, rgba(244, 245, 247, 0) 100%);
   }
   :root[data-theme="sunset"] header.top {
-    background: rgba(30, 14, 48, 0.88);
-    border-bottom-color: var(--line);
+    background:
+      linear-gradient(180deg, rgba(26, 13, 46, 0.85) 0%, rgba(30, 14, 48, 0.72) 55%, rgba(30, 14, 48, 0) 100%);
   }
 
   /* Mobile: sidebar collapses to fixed bottom tab bar */
