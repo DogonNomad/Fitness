@@ -361,12 +361,12 @@
   .pillar-content h2 .accent  { background: var(--content); }
   .pillar-career h2 .accent   { background: var(--career); }
 
-  /* Per-pillar gradient card backgrounds — rainbow (R O Y B V) */
-  .card.pillar-fitness  { background: linear-gradient(180deg, rgba(225,75,75,0.14),   rgba(225,75,75,0.02)),   var(--surface); border-color: rgba(225,75,75,0.30); }
-  .card.pillar-weight   { background: linear-gradient(180deg, rgba(243,144,56,0.14),  rgba(243,144,56,0.02)),  var(--surface); border-color: rgba(243,144,56,0.30); }
-  .card.pillar-recovery { background: linear-gradient(180deg, rgba(232,182,40,0.14),  rgba(232,182,40,0.02)),  var(--surface); border-color: rgba(232,182,40,0.30); }
-  .card.pillar-content  { background: linear-gradient(180deg, rgba(61,140,232,0.14),  rgba(61,140,232,0.02)),  var(--surface); border-color: rgba(61,140,232,0.30); }
-  .card.pillar-career   { background: linear-gradient(180deg, rgba(139,92,246,0.14),  rgba(139,92,246,0.02)),  var(--surface); border-color: rgba(139,92,246,0.32); }
+  /* Per-pillar gradient card backgrounds — rainbow (R O Y B V), bumped alpha so the hue actually reads */
+  .card.pillar-fitness  { background: linear-gradient(180deg, rgba(225,75,75,0.24),   rgba(225,75,75,0.04)),   var(--surface); border-color: rgba(225,75,75,0.42); }
+  .card.pillar-weight   { background: linear-gradient(180deg, rgba(243,144,56,0.24),  rgba(243,144,56,0.04)),  var(--surface); border-color: rgba(243,144,56,0.42); }
+  .card.pillar-recovery { background: linear-gradient(180deg, rgba(232,182,40,0.24),  rgba(232,182,40,0.04)),  var(--surface); border-color: rgba(232,182,40,0.42); }
+  .card.pillar-content  { background: linear-gradient(180deg, rgba(61,140,232,0.24),  rgba(61,140,232,0.04)),  var(--surface); border-color: rgba(61,140,232,0.42); }
+  .card.pillar-career   { background: linear-gradient(180deg, rgba(139,92,246,0.24),  rgba(139,92,246,0.04)),  var(--surface); border-color: rgba(139,92,246,0.44); }
   /* Day theme: deeper tint values so gradients register on white */
   :root[data-theme="day"] .card.pillar-fitness  { background: linear-gradient(180deg, rgba(199,48,48,0.10),  rgba(199,48,48,0.02)),  var(--surface); border-color: rgba(199,48,48,0.28); }
   :root[data-theme="day"] .card.pillar-weight   { background: linear-gradient(180deg, rgba(217,119,6,0.10),  rgba(217,119,6,0.02)),  var(--surface); border-color: rgba(217,119,6,0.28); }
@@ -581,10 +581,29 @@
   }
   .ex-deck summary { list-style: none; padding: 10px 8px 8px; cursor: pointer; text-align: center; }
   .ex-deck summary::-webkit-details-marker { display: none; }
-  .ex-tile { display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 96px; justify-content: center; transition: transform 400ms var(--ease-out); }
+  .ex-tile {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 4px; min-height: 118px; height: 118px;
+    justify-content: center;
+    transition: transform 400ms var(--ease-out);
+    width: 100%; padding: 0 4px;
+  }
+  .ex-tile .ring-svg-container { width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; }
   .ex-tile .ring-svg-container svg { width: 56px !important; height: 56px !important; }
-  .ex-tile .sets-label { font-size: 11px; }
-  .ex-tile .ex-label { font-size: 9px; letter-spacing: 0.12em; }
+  .ex-tile .sets-label {
+    font-size: 11px; line-height: 1.2; height: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-variant-numeric: tabular-nums;
+  }
+  .ex-tile .ex-label {
+    font-size: 9px; letter-spacing: 0.10em; line-height: 1.25;
+    height: 22px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    overflow: hidden; text-overflow: ellipsis; text-align: center;
+    width: 100%; padding: 0 2px;
+  }
+  /* Hide the "· 3x10" tail on tiles — too noisy, target is shown when expanded */
+  .ex-tile .ex-target-inline { display: none; }
   @media (max-width: 720px) {
     /* Circular tile styling — no rectangular card, just ring + label below */
     .ex-deck {
@@ -595,11 +614,11 @@
     }
     .ex-deck[data-done="true"] { border: none !important; box-shadow: 0 0 20px currentColor; }
     .ex-deck summary { padding: 4px; }
-    .ex-tile { min-height: auto; gap: 6px; }
+    .ex-tile { min-height: 110px; height: 110px; gap: 6px; }
+    .ex-tile .ring-svg-container { width: 60px; height: 60px; }
     .ex-tile .ring-svg-container svg { width: 60px !important; height: 60px !important; }
-    .ex-tile .sets-label { font-size: 10px; margin-top: 2px; }
-    .ex-tile .ex-label { font-size: 9px; letter-spacing: 0.10em; line-height: 1.25; }
-    .ex-tile .ex-target-inline { display: none; }
+    .ex-tile .sets-label { font-size: 10px; height: 12px; }
+    .ex-tile .ex-label { font-size: 9px; height: 22px; }
     /* Expanded tile on mobile — restore card look for logging */
     .ex-deck[open] {
       background: var(--surface-2) !important;
@@ -607,7 +626,7 @@
       border-radius: 12px;
       padding: 4px;
     }
-    .ex-deck[open] summary .ex-tile { min-height: 84px; }
+    .ex-deck[open] summary .ex-tile { min-height: 100px; height: auto; }
   }
   .ex-deck summary:hover .ex-tile { transform: scale(1.04); }
   .ex-deck summary:active .ex-tile { transform: scale(0.98); }
