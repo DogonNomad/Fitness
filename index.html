@@ -3881,16 +3881,39 @@ else setSyncStatus('none', 'sync off');
 
 /* Theme toggle — persists to localStorage under 'walkout_theme'. Default = night. */
 const THEME_KEY = 'walkout_theme';
-const THEME_CYCLE = ['night', 'day', 'sunset'];
-const THEME_ICONS = { night: '☀︎', day: '🌅', sunset: '☾' };
-const THEME_TITLES = { night: 'Switch to day', day: 'Switch to sunset · San Andrés', sunset: 'Switch to night' };
+const THEME_CYCLE = ['night', 'day', 'sunset', 'auto'];
+const THEME_ICONS = { night: '☀︎', day: '🌅', sunset: '☾', auto: '🌐' };
+const THEME_TITLES = {
+  night:  'Switch to day',
+  day:    'Switch to sunset · San Andrés',
+  sunset: 'Switch to auto (synced to time of day)',
+  auto:   'Switch to night'
+};
+// Auto mode → theme by local hour: day 06:00–16:59, sunset 17:00–19:59, night otherwise
+function autoThemeForNow() {
+  const h = new Date().getHours();
+  if (h >= 6 && h < 17) return 'day';
+  if (h >= 17 && h < 20) return 'sunset';
+  return 'night';
+}
+let __currentThemeMode = 'night';   // one of THEME_CYCLE (what the user chose)
+let __lastAutoEffective = null;
 function applyTheme(name) {
-  if (name === 'day' || name === 'sunset') document.documentElement.setAttribute('data-theme', name);
-  else document.documentElement.removeAttribute('data-theme');
+  __currentThemeMode = name;
+  const effective = (name === 'auto') ? autoThemeForNow() : name;
+  __lastAutoEffective = effective;
+  if (effective === 'day' || effective === 'sunset') {
+    document.documentElement.setAttribute('data-theme', effective);
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+  }
   const btn = document.getElementById('themeToggle');
   if (btn) {
     btn.innerHTML = THEME_ICONS[name] || '☀︎';
-    btn.title = THEME_TITLES[name] || 'Toggle theme';
+    // For auto mode, show the current effective in the title so user knows what it resolved to
+    btn.title = (name === 'auto')
+      ? `Auto · currently ${effective} — click to switch to night`
+      : (THEME_TITLES[name] || 'Toggle theme');
   }
   // Re-render rings so their SVG track picks up the new --ring-track color
   try { renderToday(); renderWeek(); renderMission(); } catch(e) {}
@@ -3898,15 +3921,20 @@ function applyTheme(name) {
 (function initTheme() {
   let saved = null;
   try { saved = localStorage.getItem(THEME_KEY); } catch(e) {}
-  applyTheme(THEME_CYCLE.includes(saved) ? saved : 'night');
+  applyTheme(THEME_CYCLE.includes(saved) ? saved : 'auto');
 })();
 document.getElementById('themeToggle').addEventListener('click', () => {
-  const cur = document.documentElement.getAttribute('data-theme') || 'night';
-  const idx = THEME_CYCLE.indexOf(cur);
+  const idx = THEME_CYCLE.indexOf(__currentThemeMode);
   const next = THEME_CYCLE[(idx + 1) % THEME_CYCLE.length];
   try { localStorage.setItem(THEME_KEY, next); } catch(e) {}
   applyTheme(next);
 });
+// Every minute, if we're in auto mode and the effective theme should change, swap it.
+setInterval(() => {
+  if (__currentThemeMode !== 'auto') return;
+  const eff = autoThemeForNow();
+  if (eff !== __lastAutoEffective) applyTheme('auto');
+}, 60 * 1000);
 
 renderHeader(); renderToday(); renderWeek(); renderMission();
 
