@@ -619,7 +619,7 @@
     .day-strip-day .date-num { font-size: 14px; }
   }
 
-  /* Today's workout card — stripped, no nested wrapper, so weight-training pillar card matches height of Recovery */
+  /* Today's workout card — stripped, no nested wrapper. Show only the workout name (title). */
   .workout-card {
     background: transparent;
     border: none;
@@ -628,8 +628,15 @@
     margin-top: 4px;
   }
   .workout-card.rest { background: transparent; border: none; }
-  .workout-card .title { display: none; }
-  .workout-card .sub { display: none; }
+  .workout-card .title {
+    display: block !important;
+    font-size: 15px; font-weight: 600; letter-spacing: -0.015em;
+    color: #1d1d1f; margin-bottom: 10px;
+  }
+  .workout-card .sub { display: none !important; }
+  /* Hide the day/week/date lede on weight training — the day-strip already carries that info */
+  #sec-workout > .lede,
+  #sec-workout #workoutLede { display: none !important; }
   /* Session progress bar hidden — each tile ring already shows per-exercise progress */
   .session-progress { display: none !important; }
   .workout-list { display: flex; flex-direction: column; gap: 6px; }
@@ -1044,7 +1051,7 @@
     </div>
 
     <div id="sec-workout" class="toc-scroll-target card pillar-weight" style="margin-top:18px;">
-      <h2><span class="accent"></span> Weight training</h2>
+      <h2><span class="accent"></span> <span id="workoutSectionTitle">Weight training</span></h2>
       <div class="lede" id="workoutLede">—</div>
       <div id="workoutCard"></div>
     </div>
@@ -1275,15 +1282,15 @@ const WORKOUT_TEMPLATE = {
     { name: 'Tricep extension', target: '3x10' },
     { name: 'Pec fly', target: '3x10' }
   ]},
-  5: { name: 'Full body + Cardio', type: 'gym', exercises: [
+  5: { name: 'Rest · active recovery', type: 'rest', exercises: [] },
+  6: { name: 'Full body + Cardio', type: 'gym', exercises: [
     { name: 'Jump rope', target: '20 min' },
     { name: 'Bench press', target: '3x10' },
     { name: 'Deadlift', target: '3x8' },
     { name: 'BB Bicep curl', target: '3x10' },
     { name: 'Shoulder shrug', target: '3x15' },
     { name: 'Core work (twist / crunch / plank)', target: 'to failure' }
-  ]},
-  6: { name: 'Rest · network / dive day', type: 'rest', exercises: [] }
+  ]}
 };
 
 const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -1552,6 +1559,9 @@ function renderWorkoutCard(iso, dayData) {
   root.innerHTML = '';
   const dow = dayOfWeekIndex(iso);
   const tpl = WORKOUT_TEMPLATE[dow];
+  // Section h2 swaps title based on rest vs training day
+  const secTitle = document.getElementById('workoutSectionTitle');
+  if (secTitle) secTitle.textContent = tpl.type === 'rest' ? 'Rest / active recovery' : 'Weight training';
   const card = document.createElement('div');
   card.className = 'workout-card' + (tpl.type === 'rest' ? ' rest' : '');
   const title = document.createElement('div');
@@ -1563,7 +1573,8 @@ function renderWorkoutCard(iso, dayData) {
   if (tpl.type === 'rest') {
     const rn = document.createElement('div');
     rn.className = 'rest-note';
-    rn.innerHTML = 'No prescribed gym work today — but if you did something, log it below.';
+    rn.style.cssText = 'font-size:13px; color:#545862; margin-bottom:12px; line-height:1.5;';
+    rn.innerHTML = 'Recovery day. Sleep, mobility, sauna, cold plunge. If you did any training anyway, log it below.';
     card.appendChild(rn);
     // Custom-session panel — add-exercise dropdown + per-exercise decks
     renderCustomSession(card, iso, dayData);
@@ -2719,8 +2730,13 @@ function aggregateWeek(week) {
     for (let i = s.length-1; i >= 0; i--) if (s[i][k] !== undefined && s[i][k] !== null && s[i][k] !== '') return s[i][k];
     return null;
   };
+  // Session type field was retired — derive gymCount from actual logged exercise sets (template or custom).
+  const gymCount = days.filter(d => {
+    const hasTemplateSets = d.exercises && Object.values(d.exercises).some(ex => Array.isArray(ex.sets) && ex.sets.length > 0);
+    const hasCustomSets   = Array.isArray(d.customExercises) && d.customExercises.some(ex => Array.isArray(ex.sets) && ex.sets.length > 0);
+    return hasTemplateSets || hasCustomSets;
+  }).length;
   const st = days.map(d => d.sessionType).filter(Boolean);
-  const gymCount = st.filter(s => s === 'gym').length;
   const cardioCount = st.filter(s => s === 'cardio' || s === 'interval').length;
 
   const peopleMap = {};
@@ -2752,19 +2768,27 @@ function aggregateWeek(week) {
   const saunaMin = sum('steamMin');
   const saunaDays = days.filter(d => d.steamRoom).length;
 
-  const weights = days.map(d => Number(d.weightKg)).filter(n => n > 0);
-  const sleeps = days.map(d => Number(d.sleepHours)).filter(n => n > 0);
-  const avgSleep = sleeps.length ? (sleeps.reduce((a,b)=>a+b,0) / sleeps.length) : null;
-  const satIso = week.endDate;
+  // Bodyweight — switched from kg to lbs; keep both readable for backward compat
+  const weightsLbs = days.map(d => Number(d.weightLbs)).filter(n => n > 0);
+  const weightsKg  = days.map(d => Number(d.weightKg)).filter(n => n > 0);
+  const sleeps     = days.map(d => Number(d.sleepHours)).filter(n => n > 0);
+  const avgSleep   = sleeps.length ? (sleeps.reduce((a,b)=>a+b,0) / sleeps.length) : null;
+  const sleepsOnTarget = days.filter(d => Number(d.sleepHours) >= 7).length;
+  const satIso  = week.endDate;
   const satEntry = STATE.days[satIso];
-  const closingWeight = satEntry && satEntry.weightKg ? Number(satEntry.weightKg) : null;
+  const closingWeight = satEntry ? (Number(satEntry.weightLbs) || Number(satEntry.weightKg) || null) : null;
+  const closingWeightUnit = satEntry && satEntry.weightLbs ? 'lbs' : 'kg';
+  const coldPlungeMin  = sum('coldPlunge');
+  const coldPlungeDays = days.filter(d => Number(d.coldPlunge) > 0).length;
 
   return {
     week, days,
-    pushups: sum('pushups'), mountedCrunches: sum('mountedCrunches'), heelTaps: sum('heelTaps'), plankMinutes: sum('plankMinutes'),
+    pushups: sum('pushups'), mountedCrunches: sum('mountedCrunches'), heelTaps: sum('heelTaps'),
+    plankMinutes: sum('plankMinutes'), kneeRaises: sum('kneeRaises'),
     gymCount, cardioCount, sessionsTotal: gymCount + cardioCount,
-    creatineDays, saunaMin, saunaDays,
-    avgSleep, closingWeight, weightsCount: weights.length,
+    creatineDays, saunaMin, saunaDays, coldPlungeMin, coldPlungeDays,
+    avgSleep, sleepsOnTarget, closingWeight, closingWeightUnit,
+    weightsCount: weightsLbs.length || weightsKg.length,
     longForm: sum('longForm'), reels: sum('reels'), carousels: sum('carousels'),
     clips: sum('clips'), bestReach: Math.max(0, ...days.map(d => Number(d.bestReach) || 0)),
     shootDays, editBlocks, engageBlocks,
@@ -2840,8 +2864,8 @@ function renderWeek() {
 
   const fbody = document.getElementById('fitnessBodyStats');
   fbody.innerHTML = '';
-  fbody.appendChild(stat('Avg sleep', agg.avgSleep ? (Math.round(agg.avgSleep*10)/10)+' h' : '—', 'target ≥7'));
-  fbody.appendChild(stat('Closing weight', agg.closingWeight ? agg.closingWeight.toFixed(1)+' kg' : '—', `${agg.weightsCount} entries`));
+  fbody.appendChild(stat('Avg sleep', agg.avgSleep ? (Math.round(agg.avgSleep*10)/10)+' h' : '—', `${agg.sleepsOnTarget}/7 ≥ 7h`));
+  fbody.appendChild(stat('Closing weight', agg.closingWeight ? agg.closingWeight.toFixed(1)+' '+agg.closingWeightUnit : '—', `${agg.weightsCount} entries`));
   fbody.appendChild(stat('Creatine ≥5g', `${agg.creatineDays}/7`, 'target ≥5'));
   fbody.appendChild(stat('Sauna days', agg.saunaDays, `${agg.saunaMin} min total`));
 
@@ -2977,16 +3001,28 @@ function renderMission() {
   summary.innerHTML = '';
   const allDays = Object.keys(STATE.days).filter(iso => iso >= MISSION_START && iso <= MISSION_END);
   const totalLogged = allDays.length;
-  const totalGym = allDays.reduce((a, iso) => a + (STATE.days[iso].sessionType === 'gym' ? 1 : 0), 0);
+  // Gym sessions: count days where any exercise (template OR custom) has a set logged
+  const totalGym = allDays.reduce((a, iso) => {
+    const d = STATE.days[iso];
+    const hasTemplateSets = d.exercises && Object.values(d.exercises).some(ex => Array.isArray(ex.sets) && ex.sets.length > 0);
+    const hasCustomSets   = Array.isArray(d.customExercises) && d.customExercises.some(ex => Array.isArray(ex.sets) && ex.sets.length > 0);
+    return a + ((hasTemplateSets || hasCustomSets) ? 1 : 0);
+  }, 0);
   const totalContent = allDays.reduce((a, iso) => {
     const d = STATE.days[iso];
     return a + (Number(d.longForm) || 0) + (Number(d.reels) || 0) + (Number(d.carousels) || 0);
   }, 0);
+  const totalCalisthenics = allDays.reduce((a, iso) => {
+    const d = STATE.days[iso];
+    return a + (Number(d.pushups) || 0) + (Number(d.mountedCrunches) || 0) + (Number(d.heelTaps) || 0) + (Number(d.kneeRaises) || 0);
+  }, 0);
   const contentWeeklyTarget = CONTENT_TARGETS.longForm + CONTENT_TARGETS.reels + CONTENT_TARGETS.carousels;
   const totalApps = allDays.reduce((a, iso) => a + (Number(STATE.days[iso].apps) || 0), 0);
+  const calWeeklyTarget = CAL_TARGETS.pushups + CAL_TARGETS.mountedCrunches + CAL_TARGETS.heelTaps + CAL_TARGETS.kneeRaises;
   summary.appendChild(stat('Days logged', `${totalLogged}/${day}`, `${day - totalLogged} unlogged`));
   summary.appendChild(stat('Gym sessions', totalGym, `target ${SESSION_TARGET * 6} = 30`));
-  summary.appendChild(stat('Posts total', totalContent, `target ${contentWeeklyTarget * 6} = ${contentWeeklyTarget * 6}`));
+  summary.appendChild(stat('Calisthenics reps', totalCalisthenics.toLocaleString(), `target ${(calWeeklyTarget * 6).toLocaleString()}`));
+  summary.appendChild(stat('Posts total', totalContent, `target ${contentWeeklyTarget * 6}`));
   summary.appendChild(stat('Apps total', totalApps, `target ${APPS_TARGET * 6} = ${APPS_TARGET * 6}`));
 
   const tg = document.getElementById('templateGrid');
