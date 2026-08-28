@@ -3385,7 +3385,6 @@ function renderWeekPillarGrids(agg, contentShipped, contentTarget) {
     ],
     recovery: [
       { label: 'Sleep hours',  val: agg.sleepHoursTotal,      target: 49,     unit: 'h',   breakdown: (d) => Number(d.sleepHours) || 0, breakdownUnit: 'h' },
-      { label: 'Sleep hours ≥7h', val: agg.sleepsOnTarget,    target: 7,      breakdown: (d) => Number(d.sleepHours) >= 7 ? 1 : 0 },
       { label: 'Sauna',        val: agg.saunaMin,             target: 75,     unit: 'min', breakdown: (d) => Number(d.steamMin) || 0,   breakdownUnit: 'min' },
       { label: 'Creatine',     val: agg.creatineTotal,        target: 35,     unit: 'g',   breakdown: (d) => Number(d.creatineG) || 0,  breakdownUnit: 'g'   },
       { label: 'Cold plunge',  val: agg.coldPlungeMin,        target: 3,      unit: 'min', breakdown: (d) => Number(d.coldPlunge) || 0, breakdownUnit: 'min' },
