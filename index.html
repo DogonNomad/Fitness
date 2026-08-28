@@ -208,14 +208,14 @@
   :root[data-theme="sunset"] .scoretile .why { color: #ffffff !important; }
 
   /* ---------- Left-sidebar navigation + sticky top header ---------- */
-  /* Sidebar layout — desktop: fixed left, vertical; mobile: fixed bottom, horizontal */
+  /* Sidebar layout — desktop: fixed left, vertical, collapsible; mobile: fixed bottom, horizontal */
   nav.tabs.side-nav {
     position: fixed;
     top: 0; bottom: 0; left: 0;
-    width: 180px;
+    width: 148px;
     display: flex; flex-direction: column;
-    padding: 22px 12px;
-    gap: 6px;
+    padding: 16px 8px;
+    gap: 4px;
     background: rgba(18, 22, 32, 0.85);
     backdrop-filter: blur(20px) saturate(1.4);
     -webkit-backdrop-filter: blur(20px) saturate(1.4);
@@ -223,32 +223,68 @@
     border-radius: 0;
     margin: 0;
     z-index: 100;
-    box-shadow: 4px 0 24px rgba(0,0,0,0.35);
+    box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+    transition: width 260ms var(--ease);
   }
-  nav.tabs.side-nav button {
+  nav.tabs.side-nav button[data-tab] {
     width: 100%;
     text-align: left;
-    display: flex; align-items: center; gap: 12px;
-    padding: 11px 14px;
-    border-radius: 12px;
-    font-size: 13px;
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px;
+    border-radius: 10px;
+    font-size: 12px;
     letter-spacing: 0.02em;
+    white-space: nowrap;
+    overflow: hidden;
   }
-  nav.tabs.side-nav button .ico {
-    font-size: 18px; line-height: 1;
-    width: 22px; text-align: center;
+  nav.tabs.side-nav button[data-tab] .ico {
+    font-size: 16px; line-height: 1;
+    width: 20px; text-align: center; flex-shrink: 0;
   }
-  nav.tabs.side-nav button .lbl { flex: 1; }
-  nav.tabs.side-nav button.active {
+  nav.tabs.side-nav button[data-tab] .lbl {
+    flex: 1;
+    transition: opacity 180ms var(--ease);
+  }
+  nav.tabs.side-nav button[data-tab].active {
     background: rgba(255,255,255,0.12);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.1) inset, 0 8px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.1) inset, 0 6px 16px rgba(0,0,0,0.28);
   }
   nav.tabs.side-nav .side-brand {
-    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
     color: var(--ink-faint);
-    padding: 0 14px 14px;
+    padding: 0 10px 10px;
     border-bottom: 1px solid var(--line);
-    margin-bottom: 8px;
+    margin: 0 0 6px 0;
+    transition: opacity 180ms var(--ease);
+  }
+  /* Collapse toggle button — sits above the brand */
+  nav.tabs.side-nav .side-collapse {
+    align-self: flex-end;
+    appearance: none; background: transparent; color: var(--ink-dim);
+    border: 1px solid var(--line); border-radius: 6px;
+    width: 24px; height: 24px; padding: 0;
+    cursor: pointer;
+    font-size: 14px; line-height: 1;
+    margin: 0 0 8px 0;
+    transition: background 180ms var(--ease), color 180ms var(--ease), transform 260ms var(--ease);
+  }
+  nav.tabs.side-nav .side-collapse:hover { background: rgba(255,255,255,0.08); color: var(--ink); }
+  /* Collapsed state — icons only */
+  nav.tabs.side-nav.collapsed { width: 52px; padding: 16px 6px; }
+  nav.tabs.side-nav.collapsed .side-brand { display: none; }
+  nav.tabs.side-nav.collapsed button[data-tab] {
+    justify-content: center;
+    padding: 10px 6px;
+    gap: 0;
+  }
+  nav.tabs.side-nav.collapsed button[data-tab] .lbl {
+    opacity: 0;
+    width: 0;
+    flex: 0;
+  }
+  nav.tabs.side-nav.collapsed .side-collapse {
+    align-self: center;
+    transform: rotate(180deg);
   }
   :root[data-theme="day"] nav.tabs.side-nav {
     background: rgba(255,255,255,0.85);
@@ -267,8 +303,9 @@
     box-shadow: 0 1px 0 rgba(255,220,180,0.15) inset, 0 8px 20px rgba(255,120,80,0.2);
   }
 
-  /* Push content right to make room for sidebar */
-  body { padding-left: 180px; }
+  /* Push content right to make room for sidebar (collapses when sidebar collapses) */
+  body { padding-left: 148px; transition: padding-left 260ms var(--ease); }
+  body.side-collapsed { padding-left: 52px; }
 
   /* Today freeze zone — calendar strip + jump-toc + sleep banner all pin together */
   .today-hero {
@@ -320,8 +357,10 @@
 
   /* Mobile: sidebar collapses to fixed bottom tab bar */
   @media (max-width: 720px) {
-    body { padding-left: 0; padding-bottom: 68px; }
-    nav.tabs.side-nav {
+    body,
+    body.side-collapsed { padding-left: 0; padding-bottom: 68px; }
+    nav.tabs.side-nav,
+    nav.tabs.side-nav.collapsed {
       top: auto; bottom: 0; left: 0; right: 0;
       width: auto;
       flex-direction: row;
@@ -330,17 +369,23 @@
       border-right: 0;
       border-top: 1px solid var(--line);
       box-shadow: 0 -4px 20px rgba(0,0,0,0.35);
+      transition: none;
     }
-    nav.tabs.side-nav .side-brand { display: none; }
-    nav.tabs.side-nav button {
+    nav.tabs.side-nav .side-brand,
+    nav.tabs.side-nav .side-collapse { display: none; }
+    nav.tabs.side-nav button[data-tab],
+    nav.tabs.side-nav.collapsed button[data-tab] {
       flex: 1; justify-content: center;
       flex-direction: column; gap: 3px;
       padding: 6px 4px;
       font-size: 10px;
       letter-spacing: 0.04em;
     }
-    nav.tabs.side-nav button .ico { font-size: 18px; }
-    nav.tabs.side-nav button .lbl { font-size: 10px; }
+    nav.tabs.side-nav button[data-tab] .ico { font-size: 18px; }
+    nav.tabs.side-nav button[data-tab] .lbl,
+    nav.tabs.side-nav.collapsed button[data-tab] .lbl {
+      font-size: 10px; opacity: 1; width: auto; flex: 1;
+    }
     header.top { top: 0; }
   }
   :root[data-theme="sunset"] nav.tabs,
@@ -1467,7 +1512,8 @@
     </div>
   </header>
 
-  <nav class="tabs side-nav" role="tablist">
+  <nav class="tabs side-nav" role="tablist" id="sideNav">
+    <button type="button" class="side-collapse" id="sideCollapse" title="Collapse sidebar" aria-label="Collapse sidebar">‹</button>
     <div class="side-brand">Walk-Out</div>
     <button data-tab="today" class="active"><span class="ico">☀︎</span><span class="lbl">Today</span></button>
     <button data-tab="week"><span class="ico">📊</span><span class="lbl">This Week</span></button>
@@ -1486,14 +1532,6 @@
         <div class="day-strip" id="dayStrip"></div>
         <button class="day-strip-nav" id="nextWeek" title="Next week">›</button>
       </div>
-
-      <nav class="page-toc" aria-label="Jump to section">
-        <a href="#sec-fitness"  class="toc-fitness">Calisthenics</a>
-        <a href="#sec-workout"  class="toc-workout">Weights</a>
-        <a href="#sec-recovery" class="toc-recovery">Recovery</a>
-        <a href="#sec-content"  class="toc-content">Content</a>
-        <a href="#sec-career"   class="toc-career">Career</a>
-      </nav>
 
       <!-- Sleep banner -->
       <div class="sleep-banner">
@@ -3832,6 +3870,28 @@ document.getElementById('themeToggle').addEventListener('click', () => {
 });
 
 renderHeader(); renderToday(); renderWeek(); renderMission();
+
+/* ---------- Sidebar collapse toggle ---------- */
+(function initSideCollapse() {
+  const SIDE_KEY = 'walkout_side_collapsed';
+  const nav = document.getElementById('sideNav');
+  const btn = document.getElementById('sideCollapse');
+  if (!nav || !btn) return;
+  function apply(collapsed) {
+    nav.classList.toggle('collapsed', collapsed);
+    document.body.classList.toggle('side-collapsed', collapsed);
+    btn.title = collapsed ? 'Expand sidebar' : 'Collapse sidebar';
+    btn.setAttribute('aria-label', btn.title);
+  }
+  let saved = false;
+  try { saved = localStorage.getItem(SIDE_KEY) === '1'; } catch(e) {}
+  apply(saved);
+  btn.addEventListener('click', () => {
+    const next = !nav.classList.contains('collapsed');
+    try { localStorage.setItem(SIDE_KEY, next ? '1' : '0'); } catch(e) {}
+    apply(next);
+  });
+})();
 
 </script>
 
