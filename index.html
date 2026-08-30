@@ -348,7 +348,7 @@
   body { padding-left: 148px; transition: padding-left 260ms var(--ease); }
   body.side-collapsed { padding-left: 52px; }
 
-  /* Header + Today hero — normal flow, no sticky (page scrolls freely) */
+  /* Header + Today hero — normal flow on desktop (page scrolls freely) */
   .today-hero,
   header.top {
     position: static;
@@ -362,6 +362,26 @@
   }
   header.top { padding: 16px 0 8px; }
   .today-hero { padding: 4px 0 8px; margin: 0 0 12px; }
+
+  /* Mobile: pin ONLY the PROJECT 35 header, everything else scrolls */
+  @media (max-width: 720px) {
+    header.top {
+      position: sticky;
+      top: 0;
+      z-index: 60;
+      padding: 12px 24px 22px;
+      margin: 0 -24px 8px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 60%, rgba(0,0,0,0) 100%);
+      backdrop-filter: blur(18px) saturate(1.25);
+      -webkit-backdrop-filter: blur(18px) saturate(1.25);
+    }
+    :root[data-theme="day"] header.top {
+      background: linear-gradient(180deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.55) 60%, rgba(255,255,255,0) 100%);
+    }
+    :root[data-theme="sunset"] header.top {
+      background: linear-gradient(180deg, rgba(20,8,40,0.7) 0%, rgba(20,8,40,0.4) 60%, rgba(20,8,40,0) 100%);
+    }
+  }
 
   /* Mobile: sidebar collapses to fixed bottom tab bar */
   @media (max-width: 720px) {
