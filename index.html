@@ -1385,7 +1385,12 @@
     margin: 8px 0 4px;
   }
   @media (max-width: 720px) {
-    .ex-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; align-items: start; margin: 4px 0 2px; }
+    .ex-grid {
+      grid-template-columns: repeat(2, 1fr);
+      column-gap: 4px; row-gap: 12px;
+      align-items: start;
+      margin: 4px 0 2px;
+    }
   }
   /* Base tile — circular, transparent (no rectangular container) both desktop + mobile */
   .ex-deck {
@@ -1519,32 +1524,52 @@
     .entry-form::-webkit-scrollbar { height: 3px; }
     .entry-form::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.25); border-radius: 2px; }
 
-    /* Mobile — compact deck: ~35-40% smaller tiles, uniform tight spacing across every deck */
+    /* Mobile — compact deck: uniform tile size, tight horizontal spacing, breathing between decks */
     .ex-deck summary { padding: 2px; }
-    .ex-tile { min-height: 72px !important; height: 72px !important; gap: 3px !important; padding: 0 2px; justify-content: center; }
+    /* Grid-based tile internals guarantee ring + labels sit on the same rows across every tile */
+    .ex-tile {
+      display: grid !important;
+      grid-template-rows: 40px 12px 18px !important;
+      row-gap: 2px !important;
+      justify-items: center; align-items: center;
+      min-height: 74px !important; height: 74px !important;
+      padding: 2px !important;
+      gap: 0 !important;
+    }
     .ex-tile .ring-svg-container { width: 40px !important; height: 40px !important; }
     .ex-tile .ring-svg-container svg { width: 40px !important; height: 40px !important; }
-    .ex-tile .sets-label { font-size: 9px !important; height: 11px !important; line-height: 1.1; }
-    .ex-tile .ex-label { font-size: 8px !important; height: 18px !important; line-height: 1.2; letter-spacing: 0.08em; }
-    .ex-deck[open] summary .ex-tile { min-height: 60px !important; height: auto !important; }
+    .ex-tile .sets-label { font-size: 9px !important; height: 12px !important; line-height: 1; margin: 0 !important; }
+    .ex-tile .ex-label { font-size: 8px !important; height: 18px !important; line-height: 1.15; letter-spacing: 0.08em; padding: 0 2px !important; }
+    .ex-deck[open] summary .ex-tile { min-height: 60px !important; height: auto !important; display: flex !important; flex-direction: column; }
 
-    /* Mobile card chrome — trim padding + margins so multiple decks fit at once */
-    .card { padding: 12px 12px !important; border-radius: 12px; }
-    .card + .card { margin-top: 10px !important; }
+    /* Mobile card chrome — smaller deck + real breathing room between decks */
+    .card { padding: 10px 10px !important; border-radius: 12px; }
+    .card + .card { margin-top: 22px !important; }
     .card h2 { font-size: 15px !important; margin: 0 0 3px !important; gap: 8px; }
     .card h2 .accent { width: 5px !important; height: 16px !important; }
     .card h3 { margin: 10px 0 6px !important; font-size: 10px !important; }
     .card .lede { font-size: 11px !important; margin: 0 0 8px !important; line-height: 1.35 !important; }
   }
   /* Same shrink under force-mobile preview */
-  html.force-mobile .ex-grid { gap: 8px !important; align-items: start; margin: 4px 0 2px !important; }
-  html.force-mobile .ex-tile { min-height: 72px !important; height: 72px !important; gap: 3px !important; padding: 0 2px; }
+  html.force-mobile .ex-grid {
+    column-gap: 4px !important; row-gap: 12px !important; gap: 4px 12px !important;
+    align-items: start; margin: 4px 0 2px !important;
+  }
+  html.force-mobile .ex-tile {
+    display: grid !important;
+    grid-template-rows: 40px 12px 18px !important;
+    row-gap: 2px !important;
+    justify-items: center; align-items: center;
+    min-height: 74px !important; height: 74px !important;
+    padding: 2px !important;
+    gap: 0 !important;
+  }
   html.force-mobile .ex-tile .ring-svg-container { width: 40px !important; height: 40px !important; }
   html.force-mobile .ex-tile .ring-svg-container svg { width: 40px !important; height: 40px !important; }
-  html.force-mobile .ex-tile .sets-label { font-size: 9px !important; height: 11px !important; }
-  html.force-mobile .ex-tile .ex-label { font-size: 8px !important; height: 18px !important; letter-spacing: 0.08em; }
-  html.force-mobile .card { padding: 12px 12px !important; border-radius: 12px; }
-  html.force-mobile .card + .card { margin-top: 10px !important; }
+  html.force-mobile .ex-tile .sets-label { font-size: 9px !important; height: 12px !important; line-height: 1; }
+  html.force-mobile .ex-tile .ex-label { font-size: 8px !important; height: 18px !important; letter-spacing: 0.08em; padding: 0 2px !important; }
+  html.force-mobile .card { padding: 10px 10px !important; border-radius: 12px; }
+  html.force-mobile .card + .card { margin-top: 22px !important; }
   html.force-mobile .card h2 { font-size: 15px !important; margin: 0 0 3px !important; }
   html.force-mobile .card h2 .accent { width: 5px !important; height: 16px !important; }
   html.force-mobile .card h3 { margin: 10px 0 6px !important; font-size: 10px !important; }
