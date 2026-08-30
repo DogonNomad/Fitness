@@ -1263,6 +1263,9 @@
 
   /* Collapsible grid: hide tiles past the 4th until expanded */
   .ex-grid.collapsible.collapsed > .ex-deck:nth-child(n+5) { display: none; }
+  /* Extra workouts on gym days — hidden while the template grid is collapsed; shown on Show more */
+  .workout-card .ex-grid.collapsible.collapsed ~ .extra-workouts-header,
+  .workout-card .ex-grid.collapsible.collapsed ~ .extra-workouts-wrap { display: none; }
   .grid-toggle {
     margin-top: 10px;
     background: transparent;
@@ -2580,12 +2583,16 @@ function renderWorkoutCard(iso, dayData) {
     prog.innerHTML = '<div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div><div class="progress-stats" id="progressStats">0/0 done</div>';
     card.appendChild(prog);
 
-    // Extra workouts — add anything you did on top of the fixed template
+    // Extra workouts — hidden behind the template-grid's "Show more" toggle so the card matches other segments' height
     const extraHeader = document.createElement('h3');
+    extraHeader.className = 'extra-workouts-header';
     extraHeader.textContent = 'Extra workouts';
     extraHeader.style.cssText = 'margin-top:18px; margin-bottom:4px; font-size:11px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint);';
     card.appendChild(extraHeader);
-    renderCustomSession(card, iso, dayData);
+    const extraWrap = document.createElement('div');
+    extraWrap.className = 'extra-workouts-wrap';
+    card.appendChild(extraWrap);
+    renderCustomSession(extraWrap, iso, dayData);
   }
   root.appendChild(card);
   // populate footer AFTER card is in DOM so selectors resolve
