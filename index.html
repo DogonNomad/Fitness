@@ -1386,11 +1386,15 @@
   }
   @media (max-width: 720px) {
     .ex-grid {
-      grid-template-columns: repeat(2, 1fr);
-      column-gap: 4px; row-gap: 12px;
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(84px, 96px)) !important;
+      justify-content: space-evenly !important;
+      column-gap: 24px !important;
+      row-gap: 10px !important;
       align-items: start;
       margin: 4px 0 2px;
     }
+    .ex-grid > .ex-deck { width: 100%; max-width: 96px; margin: 0 auto; }
   }
   /* Base tile — circular, transparent (no rectangular container) both desktop + mobile */
   .ex-deck {
@@ -1552,9 +1556,14 @@
   }
   /* Same shrink under force-mobile preview */
   html.force-mobile .ex-grid {
-    column-gap: 4px !important; row-gap: 12px !important; gap: 4px 12px !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(84px, 96px)) !important;
+    justify-content: space-evenly !important;
+    column-gap: 24px !important;
+    row-gap: 10px !important;
     align-items: start; margin: 4px 0 2px !important;
   }
+  html.force-mobile .ex-grid > .ex-deck { width: 100%; max-width: 96px; margin: 0 auto; }
   html.force-mobile .ex-tile {
     display: grid !important;
     grid-template-rows: 40px 12px 18px !important;
