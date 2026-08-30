@@ -3905,6 +3905,13 @@ function renderWeekPillarGrids(agg, contentShipped, contentTarget) {
     if (!grid) return;
     grid.innerHTML = '';
     specs[pillar].forEach(sp => grid.appendChild(renderWeekPillarTile(pillar, sp, agg.days)));
+    // Remove any leftover Show-more buttons from previous renders before adding a new one
+    let sib = grid.nextElementSibling;
+    while (sib && sib.classList && sib.classList.contains('grid-toggle')) {
+      const next = sib.nextElementSibling;
+      sib.remove();
+      sib = next;
+    }
     // Match Today-tab behavior: 4 tiles visible, rest hidden behind "Show N more ▾"
     makeCollapsibleGrid(grid);
   });
