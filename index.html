@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Walk-Out · 6-Week Tracker</title>
+<title>PROJECT 35 · Classified · 6-Week Tracker</title>
 <style>
   :root {
     /* Night theme (default) — softened from pure black to a warmer navy-charcoal */
@@ -348,58 +348,20 @@
   body { padding-left: 148px; transition: padding-left 260ms var(--ease); }
   body.side-collapsed { padding-left: 52px; }
 
-  /* Today freeze zone — calendar strip + sleep banner pin together with soft gradient fade */
-  .today-hero {
-    position: sticky;
-    top: 76px;
-    z-index: 50;
-    padding: 10px 24px 26px;
-    margin: -8px -24px 18px;
-    background:
-      linear-gradient(180deg, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0.18) 55%, rgba(0,0,0,0) 100%);
-    backdrop-filter: blur(18px) saturate(1.25);
-    -webkit-backdrop-filter: blur(18px) saturate(1.25);
-    border: 0;
-    box-shadow: none;
-  }
-  :root[data-theme="day"] .today-hero {
-    background:
-      linear-gradient(180deg, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.35) 55%, rgba(255,255,255,0) 100%);
-  }
-  :root[data-theme="sunset"] .today-hero {
-    background:
-      linear-gradient(180deg, rgba(20,8,40,0.42) 0%, rgba(20,8,40,0.22) 55%, rgba(20,8,40,0) 100%);
-  }
-  @media (max-width: 720px) {
-    .today-hero { top: 68px; margin: -8px -24px 14px; padding: 8px 24px 24px; }
-  }
-
-  /* Sticky page header — Walk-Out brand + Day pill + toggle buttons pinned at top.
-     Full-width bleed + soft gradient fade at the bottom edge — no hard border, no boxy shadow. */
+  /* Header + Today hero — normal flow, no sticky (page scrolls freely) */
+  .today-hero,
   header.top {
-    position: sticky;
-    top: 0;
-    z-index: 60;
-    padding: 16px 24px 26px;
-    margin: 0 -24px 8px;
-    background:
-      linear-gradient(180deg, rgba(0,0,0,0.32) 0%, rgba(0,0,0,0.20) 60%, rgba(0,0,0,0) 100%);
-    backdrop-filter: blur(18px) saturate(1.25);
-    -webkit-backdrop-filter: blur(18px) saturate(1.25);
+    position: static;
+    background: transparent;
     border: 0;
     box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    margin: 0;
+    padding: 0;
   }
-  :root[data-theme="day"] header.top {
-    background:
-      linear-gradient(180deg, rgba(255,255,255,0.70) 0%, rgba(255,255,255,0.40) 60%, rgba(255,255,255,0) 100%);
-  }
-  :root[data-theme="sunset"] header.top {
-    background:
-      linear-gradient(180deg, rgba(20,8,40,0.42) 0%, rgba(20,8,40,0.22) 55%, rgba(20,8,40,0) 100%);
-  }
-  @media (max-width: 720px) {
-    header.top { padding: 12px 24px 22px; margin: 0 -24px 6px; }
-  }
+  header.top { padding: 16px 0 8px; }
+  .today-hero { padding: 4px 0 8px; margin: 0 0 12px; }
 
   /* Mobile: sidebar collapses to fixed bottom tab bar */
   @media (max-width: 720px) {
@@ -690,6 +652,82 @@
   }
   .brand .mark .dim { color: var(--ink-faint); -webkit-text-fill-color: var(--ink-faint); font-weight: 300; }
   .brand .sub { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); font-weight: 500; margin-top: 6px; }
+
+  /* PROJECT 35 — classified/CIA-style branding */
+  .brand.project35 { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .brand.project35 .p35-classified {
+    font-family: 'SF Mono', 'JetBrains Mono', 'Menlo', 'Courier New', monospace;
+    font-size: 10px; letter-spacing: 0.35em; font-weight: 700;
+    color: #ff3b30;
+    padding: 3px 8px;
+    border: 1.5px solid #ff3b30;
+    border-radius: 2px;
+    display: inline-block;
+    text-transform: uppercase;
+    -webkit-text-fill-color: #ff3b30;
+    background: rgba(255,59,48,0.06);
+    margin-bottom: 2px;
+    box-shadow: 0 0 12px rgba(255,59,48,0.2), 0 0 0 1px rgba(255,59,48,0.15) inset;
+    animation: p35Classified 2.6s ease-in-out infinite;
+  }
+  @keyframes p35Classified {
+    0%,100% { opacity: 0.85; }
+    50%     { opacity: 1;    box-shadow: 0 0 20px rgba(255,59,48,0.35), 0 0 0 1px rgba(255,59,48,0.25) inset; }
+  }
+  .brand.project35 .mark {
+    font-family: 'SF Mono', 'JetBrains Mono', 'Menlo', 'Courier New', monospace;
+    font-size: 44px; font-weight: 800;
+    letter-spacing: 0.06em;
+    line-height: 1;
+    background: linear-gradient(180deg, #ffffff 0%, #8e8e93 140%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-flex; align-items: baseline; gap: 8px;
+    text-shadow: 0 0 30px rgba(255,255,255,0.08);
+  }
+  .brand.project35 .mark .p35-num {
+    font-size: 44px; font-weight: 800;
+    color: #ff3b30;
+    -webkit-text-fill-color: #ff3b30;
+    background: none;
+    padding: 0 4px;
+    text-shadow: 0 0 16px rgba(255,59,48,0.4);
+    letter-spacing: 0.02em;
+  }
+  .brand.project35 .p35-sub {
+    font-family: 'SF Mono', 'JetBrains Mono', 'Menlo', 'Courier New', monospace;
+    font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--ink-faint); font-weight: 500;
+    padding-top: 3px;
+    border-top: 1px dashed rgba(255,255,255,0.15);
+    margin-top: 4px;
+  }
+  :root[data-theme="day"] .brand.project35 .mark {
+    background: linear-gradient(180deg, #1d1d1f 0%, #545862 130%);
+    -webkit-background-clip: text; background-clip: text;
+  }
+  :root[data-theme="day"] .brand.project35 .p35-sub {
+    border-top-color: rgba(0,0,0,0.14);
+  }
+  :root[data-theme="sunset"] .brand.project35 .mark {
+    background: linear-gradient(180deg, #ffe4c0 0%, #ffca3a 140%);
+    -webkit-background-clip: text; background-clip: text;
+  }
+  :root[data-theme="sunset"] .brand.project35 .p35-classified {
+    color: #ffcc4d; border-color: #ffcc4d; background: rgba(255,204,77,0.08);
+    box-shadow: 0 0 14px rgba(255,204,77,0.25), 0 0 0 1px rgba(255,204,77,0.18) inset;
+    -webkit-text-fill-color: #ffcc4d;
+  }
+  :root[data-theme="sunset"] .brand.project35 .mark .p35-num {
+    color: #ff6b9d; -webkit-text-fill-color: #ff6b9d;
+    text-shadow: 0 0 16px rgba(255,107,157,0.5);
+  }
+  @media (max-width: 720px) {
+    .brand.project35 .mark { font-size: 32px; }
+    .brand.project35 .mark .p35-num { font-size: 32px; }
+    .brand.project35 .p35-classified { font-size: 9px; letter-spacing: 0.28em; }
+    .brand.project35 .p35-sub { font-size: 9px; letter-spacing: 0.18em; }
+  }
   .day-pill {
     display: inline-flex; align-items: center; gap: 10px;
     background: rgba(255,255,255,0.06);
@@ -1282,6 +1320,46 @@
     .set-log-form::-webkit-scrollbar { height: 3px; }
     .set-log-form::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.25); border-radius: 2px; }
     .set-log-form::-webkit-scrollbar-track { background: transparent; }
+
+    /* ---- Mobile: compact ex-details dropdown (half the desktop footprint) ---- */
+    .ex-details {
+      padding: 7px 8px !important;
+      font-size: 11px;
+    }
+    .ex-details .note-row label,
+    .ex-details .field-mini label { font-size: 9px; margin-bottom: 2px; }
+    .ex-details .note-row input,
+    .ex-details .field-mini input {
+      padding: 4px 6px !important; font-size: 11px !important; border-radius: 4px;
+    }
+    .ex-details .set-log-form { gap: 6px; margin-bottom: 8px; padding: 2px 1px 4px; }
+    .ex-details .set-log-form input {
+      padding: 6px 10px !important; font-size: 12px !important; border-radius: 8px;
+      flex: 0 0 108px !important; min-width: 108px !important;
+    }
+    .ex-details .set-log-form button {
+      padding: 6px 12px !important; font-size: 11px !important;
+      min-width: 72px !important;
+    }
+    .ex-details .set-row {
+      padding: 4px 7px; font-size: 11px; grid-template-columns: 46px 1fr auto; gap: 6px;
+    }
+    .ex-details .set-row .set-num { font-size: 9px; }
+    .ex-details .set-row .set-delete { width: 18px; height: 18px; font-size: 11px; }
+    .ex-details .set-history { padding: 5px 7px; font-size: 10px; margin: 6px 0 8px; }
+    .ex-details .set-history div + div { margin-top: 2px; }
+    .ex-details .set-list { gap: 3px; margin-bottom: 6px; }
+    .ex-details .set-list:empty::after { padding: 5px; font-size: 10px; }
+    .ex-details .entry-form { gap: 6px; margin-bottom: 8px; padding: 2px 1px 4px; }
+    .ex-details .entry-form .field-mini { flex: 0 0 130px; min-width: 130px; }
+    .ex-details .entry-form .field-mini input {
+      padding: 6px 8px !important; font-size: 11px !important;
+    }
+    .ex-details .wk-bd { gap: 3px; }
+    .ex-details .wk-bd-row { padding: 4px 8px; font-size: 10px; border-radius: 4px; }
+    .ex-details .wk-bd-empty { padding: 6px; font-size: 10px; }
+    .ex-details .cal-breakdown { padding: 4px 7px; margin-top: 6px; }
+    .ex-details .cal-breakdown .cbd-row { padding: 3px 0; font-size: 10px; }
     /* Same treatment for entry-form (Content title, People IRL name/company/notes, Outreach 5 fields) */
     .entry-form {
       display: flex !important;
@@ -1630,8 +1708,10 @@
 
   <header class="top">
     <div>
-      <div class="brand">
-        <div class="mark">Walk-Out <span class="dim">·</span> 6-Week Tracker</div>
+      <div class="brand project35">
+        <div class="p35-classified">TOP SECRET // OPERATIONAL</div>
+        <div class="mark">PROJECT<span class="p35-num">35</span></div>
+        <div class="p35-sub">Classified · 6-Week Tracker · Eyes Only</div>
       </div>
       <div class="sub" id="dateLine">— · Day —/42</div>
     </div>
@@ -1651,7 +1731,7 @@
 
   <nav class="tabs side-nav" role="tablist" id="sideNav">
     <button type="button" class="side-collapse" id="sideCollapse" title="Collapse sidebar" aria-label="Collapse sidebar">‹</button>
-    <div class="side-brand">Walk-Out</div>
+    <div class="side-brand">P-35</div>
     <button data-tab="today" class="active"><span class="ico">☀︎</span><span class="lbl">Today</span></button>
     <button data-tab="week"><span class="ico">📊</span><span class="lbl">This Week</span></button>
     <button data-tab="mission"><span class="ico">🎯</span><span class="lbl">Mission</span></button>
@@ -1801,7 +1881,7 @@
   </section>
 
   <div class="footer">
-    Walk-Out · 2026-08-23 → 2026-10-03 · 6 weeks. One day at a time.
+    PROJECT 35 · 2026-08-23 → 2026-10-03 · 42 operational days. Executed one at a time.
   </div>
 </div>
 
@@ -1864,6 +1944,7 @@ const PEOPLE_SEEN_TARGET = 5;
 // Fixed weekly template — smoothed from Roland's 2022 pattern.
 // Keys are JS getDay() indices: 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
 const WORKOUT_TEMPLATE = {
+  // Sun · workout
   0: { name: 'Back + Posterior chain', type: 'gym', exercises: [
     { name: 'Deadlift', target: '3x8 · progressive' },
     { name: 'Pull-ups', target: 'max reps × 3 sets' },
@@ -1873,6 +1954,7 @@ const WORKOUT_TEMPLATE = {
     { name: 'Hip abduction (ext)', target: '3x15' },
     { name: 'Glute press', target: '3x10' }
   ]},
+  // Mon · workout
   1: { name: 'Push · Chest + Shoulders + Triceps', type: 'gym', exercises: [
     { name: 'Bench press', target: '4x8 · progressive' },
     { name: 'Incline chest press', target: '3x10' },
@@ -1882,8 +1964,12 @@ const WORKOUT_TEMPLATE = {
     { name: 'Tricep pull down', target: '3x10' },
     { name: 'Dips', target: 'max reps × 3 sets' }
   ]},
-  2: { name: 'Rest · active recovery', type: 'rest', exercises: [] },
-  3: { name: 'Legs', type: 'gym', exercises: [
+  // Tue · swim
+  2: { name: 'Swim', type: 'swim', exercises: [] },
+  // Wed · hike
+  3: { name: 'Hike', type: 'hike', exercises: [] },
+  // Thu · workout (legs)
+  4: { name: 'Legs', type: 'gym', exercises: [
     { name: 'Leg press', target: '3x10 · progressive' },
     { name: 'Prone leg curl', target: '3x12' },
     { name: 'Quad extension', target: '3x10' },
@@ -1892,7 +1978,8 @@ const WORKOUT_TEMPLATE = {
     { name: 'Hip abduction (int)', target: '3x15' },
     { name: 'Jump rope', target: '15 min' }
   ]},
-  4: { name: 'Pull + Arms', type: 'gym', exercises: [
+  // Fri · workout (pull + arms)
+  5: { name: 'Pull + Arms', type: 'gym', exercises: [
     { name: 'Pull-ups', target: 'max reps × 3 sets' },
     { name: 'Seated row', target: '3x10' },
     { name: 'BB Bicep curl', target: '3x10' },
@@ -1900,8 +1987,8 @@ const WORKOUT_TEMPLATE = {
     { name: 'Tricep extension', target: '3x10' },
     { name: 'Pec fly', target: '3x10' }
   ]},
-  5: { name: 'Rest · active recovery', type: 'rest', exercises: [] },
-  6: { name: 'Full body + Cardio', type: 'gym', exercises: [
+  // Sat · optional (full body + cardio if you want, or rest)
+  6: { name: 'Optional · Full body + Cardio (or rest)', type: 'optional', exercises: [
     { name: 'Jump rope', target: '20 min' },
     { name: 'Bench press', target: '3x10' },
     { name: 'Deadlift', target: '3x8' },
@@ -2178,22 +2265,31 @@ function renderWorkoutCard(iso, dayData) {
   root.innerHTML = '';
   const dow = dayOfWeekIndex(iso);
   const tpl = WORKOUT_TEMPLATE[dow];
-  // Section h2 swaps title based on rest vs training day
+  // Section h2 swaps title based on day type
+  const TITLES = { gym: 'Weight training', rest: 'Rest / active recovery', swim: 'Swim', hike: 'Hike', optional: 'Optional session' };
+  const SUBS   = { gym: 'Training day',    rest: 'Recovery',               swim: 'Pool day', hike: 'Trail day', optional: 'Your call' };
   const secTitle = document.getElementById('workoutSectionTitle');
-  if (secTitle) secTitle.textContent = tpl.type === 'rest' ? 'Rest / active recovery' : 'Weight training';
+  if (secTitle) secTitle.textContent = TITLES[tpl.type] || 'Weight training';
   const card = document.createElement('div');
-  card.className = 'workout-card' + (tpl.type === 'rest' ? ' rest' : '');
+  const isCustomType = (tpl.type !== 'gym');
+  card.className = 'workout-card' + (isCustomType ? ' rest' : '');
   const title = document.createElement('div');
   title.className = 'title'; title.textContent = tpl.name;
   const sub = document.createElement('div');
-  sub.className = 'sub'; sub.textContent = DAY_NAMES[dow] + ' · ' + (tpl.type === 'gym' ? 'Training day' : 'Recovery');
+  sub.className = 'sub'; sub.textContent = DAY_NAMES[dow] + ' · ' + (SUBS[tpl.type] || 'Training day');
   card.appendChild(title); card.appendChild(sub);
 
-  if (tpl.type === 'rest') {
+  if (isCustomType) {
     const rn = document.createElement('div');
     rn.className = 'rest-note';
     rn.style.cssText = 'font-size:13px; color:#545862; margin-bottom:12px; line-height:1.5;';
-    rn.innerHTML = 'Recovery day. Sleep, mobility, sauna, cold plunge. If you did any training anyway, log it below.';
+    const notes = {
+      rest:     'Recovery day. Sleep, mobility, sauna, cold plunge. If you did any training anyway, log it below.',
+      swim:     'Swim day. Log distance (m/yd), pool time, laps, or an open-water session below.',
+      hike:     'Hike day. Log distance (km/mi), elevation, or total time below.',
+      optional: 'Optional day — full-body + cardio if you feel like it, or take the rest. Log whatever you did below.'
+    };
+    rn.innerHTML = notes[tpl.type] || notes.rest;
     card.appendChild(rn);
     // Custom-session panel — add-exercise dropdown + per-exercise decks
     renderCustomSession(card, iso, dayData);
