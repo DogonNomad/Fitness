@@ -2837,10 +2837,8 @@ function makeCollapsibleGrid(grid, opts) {
     return;
   }
   grid.classList.add('collapsible');
-  // Auto-expand if any hidden tile already has data (data-done="true")
-  const hasHiddenData = kids.slice(showN).some(el => el.dataset && el.dataset.done === 'true');
-  if (hasHiddenData) grid.classList.remove('collapsed');
-  else grid.classList.add('collapsed');
+  // Always start collapsed on load/refresh — user expands manually via Show more
+  grid.classList.add('collapsed');
 
   const btn = document.createElement('button');
   btn.type = 'button';
