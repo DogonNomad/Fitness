@@ -2061,9 +2061,9 @@ const MISSION_START = '2026-08-23'; // Sun, Day 1
 const MISSION_END   = '2026-10-03'; // Sat, Day 42
 const MISSION_DAYS  = 42;
 
-const CAL_TARGETS = { pushups: 500, mountedCrunches: 250, heelTaps: 250, plankMinutes: 50, kneeRaises: 250 };
-const CAL_LABELS = { pushups: 'Pushups', mountedCrunches: 'Crunches', heelTaps: 'Heel taps', plankMinutes: 'Plank (min)', kneeRaises: 'Knee raises' };
-const CAL_KEYS = ['pushups', 'mountedCrunches', 'heelTaps', 'plankMinutes', 'kneeRaises'];
+const CAL_TARGETS = { plankMinutes: 50, pushups: 500, mountedCrunches: 250, heelTaps: 250, pullups: 60, kneeRaises: 250 };
+const CAL_LABELS = { plankMinutes: 'Plank (min)', pushups: 'Pushups', mountedCrunches: 'Crunches', heelTaps: 'Heel taps', pullups: 'Pull-ups', kneeRaises: 'Knee raises' };
+const CAL_KEYS = ['plankMinutes', 'pushups', 'mountedCrunches', 'heelTaps', 'pullups', 'kneeRaises'];
 
 // Weekly content targets by FORMAT (not platform).
 // Minimums; going over is fine.
@@ -2093,7 +2093,6 @@ const WORKOUT_TEMPLATE = {
   // Sun · workout
   0: { name: 'Back + Posterior chain', type: 'gym', exercises: [
     { name: 'Deadlift', target: '3x8 · progressive' },
-    { name: 'Pull-ups', target: 'max reps × 3 sets' },
     { name: 'Lat pull down', target: '4x10' },
     { name: 'Seated row', target: '3x10' },
     { name: 'Back extension', target: '3x10' },
@@ -2127,7 +2126,6 @@ const WORKOUT_TEMPLATE = {
   ]},
   // Fri · workout (pull + arms)
   5: { name: 'Pull + Arms', type: 'gym', exercises: [
-    { name: 'Pull-ups', target: 'max reps × 3 sets' },
     { name: 'Seated row', target: '3x10' },
     { name: 'BB Bicep curl', target: '3x10' },
     { name: 'Hammer curl', target: '3x10' },
@@ -2172,10 +2170,11 @@ const STORAGE_KEY = 'walkout_v4';
    input: 'number' | 'check' | 'select' | 'text'  */
 const PILLAR_METRICS = {
   fitness: [
+    { key: 'plankMinutes',    label: 'Plank',         target: Math.round(CAL_TARGETS.plankMinutes/7*10)/10, unit: 'min', input: 'sets', repLabel: 'min', repStep: 0.5 },
     { key: 'pushups',         label: 'Pushups',       target: Math.round(CAL_TARGETS.pushups/7),         input: 'sets', repLabel: 'reps' },
     { key: 'mountedCrunches', label: 'Crunches',      target: Math.round(CAL_TARGETS.mountedCrunches/7), input: 'sets', repLabel: 'reps' },
     { key: 'heelTaps',        label: 'Heel taps',     target: Math.round(CAL_TARGETS.heelTaps/7),        input: 'sets', repLabel: 'reps' },
-    { key: 'plankMinutes',    label: 'Plank',         target: Math.round(CAL_TARGETS.plankMinutes/7*10)/10, unit: 'min', input: 'sets', repLabel: 'min', repStep: 0.5 },
+    { key: 'pullups',         label: 'Pull-ups',      target: Math.round(CAL_TARGETS.pullups/7),         input: 'sets', repLabel: 'reps' },
     { key: 'kneeRaises',      label: 'Knee raises',   target: Math.round(CAL_TARGETS.kneeRaises/7),      input: 'sets', repLabel: 'reps' }
   ],
   recovery: [
@@ -3715,7 +3714,7 @@ function aggregateWeek(week) {
   return {
     week, days,
     pushups: sum('pushups'), mountedCrunches: sum('mountedCrunches'), heelTaps: sum('heelTaps'),
-    plankMinutes: sum('plankMinutes'), kneeRaises: sum('kneeRaises'),
+    plankMinutes: sum('plankMinutes'), kneeRaises: sum('kneeRaises'), pullups: sum('pullups'),
     gymCount, cardioCount, sessionsTotal: gymCount + cardioCount,
     creatineDays, creatineTotal, saunaMin, saunaDays, coldPlungeMin, coldPlungeDays,
     avgSleep, sleepHoursTotal, sleepsOnTarget, closingWeight, closingWeightUnit,
@@ -3802,11 +3801,12 @@ function stat(label, value, meta) {
 function renderWeekPillarGrids(agg, contentShipped, contentTarget) {
   const specs = {
     fitness: [
+      { label: 'Plank',        val: agg.plankMinutes,    target: CAL_TARGETS.plankMinutes,    unit: 'min', breakdown: (d) => Number(d.plankMinutes) || 0 },
       { label: 'Pushups',      val: agg.pushups,         target: CAL_TARGETS.pushups,         breakdown: (d) => Number(d.pushups) || 0 },
       { label: 'Crunches',     val: agg.mountedCrunches, target: CAL_TARGETS.mountedCrunches, breakdown: (d) => Number(d.mountedCrunches) || 0 },
       { label: 'Heel taps',    val: agg.heelTaps,        target: CAL_TARGETS.heelTaps,        breakdown: (d) => Number(d.heelTaps) || 0 },
+      { label: 'Pull-ups',     val: agg.pullups,         target: CAL_TARGETS.pullups,         breakdown: (d) => Number(d.pullups) || 0 },
       { label: 'Knee raises',  val: agg.kneeRaises,      target: CAL_TARGETS.kneeRaises,      breakdown: (d) => Number(d.kneeRaises) || 0 },
-      { label: 'Plank',        val: agg.plankMinutes,    target: CAL_TARGETS.plankMinutes,    unit: 'min', breakdown: (d) => Number(d.plankMinutes) || 0 },
       { label: 'Gym sessions', val: agg.gymCount,        target: SESSION_TARGET,              breakdown: (d) => {
           const hasT = d.exercises && Object.values(d.exercises).some(ex => Array.isArray(ex.sets) && ex.sets.length > 0);
           const hasC = Array.isArray(d.customExercises) && d.customExercises.some(ex => Array.isArray(ex.sets) && ex.sets.length > 0);
@@ -3991,11 +3991,11 @@ function renderMission() {
   }, 0);
   const totalCalisthenics = allDays.reduce((a, iso) => {
     const d = STATE.days[iso];
-    return a + (Number(d.pushups) || 0) + (Number(d.mountedCrunches) || 0) + (Number(d.heelTaps) || 0) + (Number(d.kneeRaises) || 0);
+    return a + (Number(d.pushups) || 0) + (Number(d.mountedCrunches) || 0) + (Number(d.heelTaps) || 0) + (Number(d.kneeRaises) || 0) + (Number(d.pullups) || 0);
   }, 0);
   const contentWeeklyTarget = CONTENT_TARGETS.longForm + CONTENT_TARGETS.reels + CONTENT_TARGETS.carousels;
   const totalApps = allDays.reduce((a, iso) => a + (Number(STATE.days[iso].apps) || 0), 0);
-  const calWeeklyTarget = CAL_TARGETS.pushups + CAL_TARGETS.mountedCrunches + CAL_TARGETS.heelTaps + CAL_TARGETS.kneeRaises;
+  const calWeeklyTarget = CAL_TARGETS.pushups + CAL_TARGETS.mountedCrunches + CAL_TARGETS.heelTaps + CAL_TARGETS.kneeRaises + CAL_TARGETS.pullups;
   summary.appendChild(stat('Days logged', `${totalLogged}/${day}`, `${day - totalLogged} unlogged`));
   summary.appendChild(stat('Gym sessions', totalGym, `target ${SESSION_TARGET * 6} = 30`));
   summary.appendChild(stat('Calisthenics reps', totalCalisthenics.toLocaleString(), `target ${(calWeeklyTarget * 6).toLocaleString()}`));
