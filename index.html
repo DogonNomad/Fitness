@@ -676,6 +676,13 @@
   * { box-sizing: border-box; }
   /* Prevent iOS input auto-zoom / tap delay */
   input, select, textarea, button { touch-action: manipulation; }
+  /* Mobile: hide bottom nav bar while an input is focused (frees screen space + prevents overlap with keyboard) */
+  @media (max-width: 720px) {
+    body.inputs-focused nav.tabs.side-nav { display: none !important; }
+    body.inputs-focused { padding-bottom: 0 !important; }
+  }
+  html.force-mobile body.inputs-focused nav.tabs.side-nav { display: none !important; }
+  html.force-mobile body.inputs-focused { padding-bottom: 0 !important; }
   html, body { margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
   body {
@@ -4307,6 +4314,23 @@ setInterval(() => {
 }, 60 * 1000);
 
 renderHeader(); renderToday(); renderWeek(); renderMission();
+
+/* ---------- Mobile: hide bottom nav while an input is focused ---------- */
+(function initInputFocusNavHide() {
+  const isInput = (el) => el && el.matches && el.matches('input, select, textarea');
+  document.addEventListener('focusin', (e) => {
+    if (isInput(e.target)) document.body.classList.add('inputs-focused');
+  });
+  document.addEventListener('focusout', (e) => {
+    if (isInput(e.target)) {
+      // Small delay so a focus-jump between inputs doesn't flash the nav
+      setTimeout(() => {
+        const a = document.activeElement;
+        if (!isInput(a)) document.body.classList.remove('inputs-focused');
+      }, 50);
+    }
+  });
+})();
 
 /* ---------- Viewport preview toggle (local-only; hidden on github.io) ---------- */
 (function initViewportToggle() {
