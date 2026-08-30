@@ -2097,7 +2097,7 @@ const WORKOUT_TEMPLATE = {
     { name: 'Lat pull down', target: '4x10' },
     { name: 'Seated row', target: '3x10' },
     { name: 'Back extension', target: '3x10' },
-    { name: 'Hip abduction (ext)', target: '3x15' },
+    { name: 'Seated chest fly', target: '3x10' },
     { name: 'Glute press', target: '3x10' }
   ]},
   // Mon · workout
@@ -2580,6 +2580,13 @@ function renderWorkoutCard(iso, dayData) {
     prog.className = 'session-progress';
     prog.innerHTML = '<div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div><div class="progress-stats" id="progressStats">0/0 done</div>';
     card.appendChild(prog);
+
+    // Extra workouts — add anything you did on top of the fixed template
+    const extraHeader = document.createElement('h3');
+    extraHeader.textContent = 'Extra workouts';
+    extraHeader.style.cssText = 'margin-top:18px; margin-bottom:4px; font-size:11px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint);';
+    card.appendChild(extraHeader);
+    renderCustomSession(card, iso, dayData);
   }
   root.appendChild(card);
   // populate footer AFTER card is in DOM so selectors resolve
