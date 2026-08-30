@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <title>PROJECT 35 · Classified · 6-Week Tracker</title>
 <style>
   :root {
@@ -674,6 +674,8 @@
   }
 
   * { box-sizing: border-box; }
+  /* Prevent iOS input auto-zoom / tap delay */
+  input, select, textarea, button { touch-action: manipulation; }
   html, body { margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
   body {
@@ -4324,12 +4326,12 @@ renderHeader(); renderToday(); renderWeek(); renderMission();
     html.classList.remove('force-mobile', 'force-desktop');
     if (mode === 'mobile') {
       html.classList.add('force-mobile');
-      if (meta) meta.setAttribute('content', 'width=device-width, initial-scale=1');
+      if (meta) meta.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no');
     } else if (mode === 'desktop') {
       html.classList.add('force-desktop');
-      if (meta) meta.setAttribute('content', 'width=1200, initial-scale=1');
+      if (meta) meta.setAttribute('content', 'width=1200, initial-scale=1, maximum-scale=1, user-scalable=no');
     } else {
-      if (meta) meta.setAttribute('content', 'width=device-width, initial-scale=1');
+      if (meta) meta.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no');
     }
     btns.forEach(b => b.classList.toggle('active', b.dataset.vp === mode));
     try { renderToday(); renderWeek(); renderMission(); } catch(e) {}
