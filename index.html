@@ -3012,6 +3012,15 @@ const EXERCISE_GROUPS = {
     { name: 'Weighted crunch', target: '3x12' },
     { name: 'Russian twist',   target: '3x20' },
     { name: 'Leg raise',       target: '3x12' }
+  ],
+  'Swim / Apnea': [
+    { name: 'Static apnea',    target: 'apnea · breath-hold' },
+    { name: 'Depth attempt',   target: 'apnea · depth + hold' },
+    { name: 'Swim laps',       target: '30 min' },
+    { name: 'Open-water swim', target: '45 min' }
+  ],
+  'Hike': [
+    { name: 'Hike',            target: 'hike · miles + minutes' }
   ]
 };
 
@@ -3148,6 +3157,18 @@ function renderCustomExerciseDeck(ex, idx) {
     logForm.style.gridTemplateColumns = '1fr auto';
     rIn = document.createElement('input');
     rIn.type = 'number'; rIn.min = '0'; rIn.placeholder = 'Reps';
+  } else if (mode === 'apnea') {
+    logForm.style.gridTemplateColumns = '1fr 1fr auto';
+    wIn = document.createElement('input');
+    wIn.type = 'number'; wIn.min = '0'; wIn.step = '0.1'; wIn.placeholder = 'Depth (m)';
+    rIn = document.createElement('input');
+    rIn.type = 'number'; rIn.min = '0'; rIn.step = '1'; rIn.placeholder = 'Hold (sec)';
+  } else if (mode === 'hike') {
+    logForm.style.gridTemplateColumns = '1fr 1fr auto';
+    wIn = document.createElement('input');
+    wIn.type = 'number'; wIn.min = '0'; wIn.step = '0.1'; wIn.placeholder = 'Miles';
+    rIn = document.createElement('input');
+    rIn.type = 'number'; rIn.min = '0'; rIn.step = '1'; rIn.placeholder = 'Minutes';
   } else {
     wIn = document.createElement('input');
     wIn.type = 'number'; wIn.min = '0'; wIn.step = '0.5'; wIn.placeholder = 'Weight (lbs)';
@@ -3158,12 +3179,18 @@ function renderCustomExerciseDeck(ex, idx) {
   logBtn.type = 'button'; logBtn.textContent = '+ Log';
   logBtn.addEventListener('click', () => {
     const reps = Number(rIn.value);
-    if (!reps || reps <= 0) { rIn.focus(); return; }
-    const weight = (mode === 'weighted' && wIn && wIn.value !== '') ? Number(wIn.value) : null;
+    const weightRaw = (wIn && wIn.value !== '') ? Number(wIn.value) : null;
+    // Apnea: allow logging depth-only (no hold time yet) — need at least one field
+    if (mode === 'apnea') {
+      if ((!reps || reps <= 0) && (weightRaw == null || weightRaw <= 0)) { rIn.focus(); return; }
+    } else {
+      if (!reps || reps <= 0) { rIn.focus(); return; }
+    }
+    const weight = (['weighted', 'apnea', 'hike'].includes(mode)) ? weightRaw : null;
     logCustomSet(idx, weight, reps);
     const arr = STATE.days[activeDate()].customExercises[idx].sets;
     setList.appendChild(renderCustomSetRow(idx, { weight, reps }, arr.length - 1, mode));
-    rIn.value = ''; rIn.focus();
+    rIn.value = ''; if (wIn) wIn.value = ''; rIn.focus();
   });
   rIn.addEventListener('keydown', (e) => { if (e.key === 'Enter') logBtn.click(); });
   if (wIn) logForm.appendChild(wIn);
@@ -3194,6 +3221,19 @@ function renderCustomSetRow(exIdx, s, setIdx, mode) {
   const det = document.createElement('span'); det.className = 'set-detail';
   if (mode === 'duration') det.textContent = `${s.reps} min`;
   else if (mode === 'bodyweight') det.textContent = `BW × ${s.reps} reps`;
+  else if (mode === 'apnea') {
+    const hold = Number(s.reps) || 0;
+    const mm = Math.floor(hold / 60), ss = String(hold % 60).padStart(2, '0');
+    const holdStr = hold >= 60 ? `${mm}:${ss}` : `${hold}s`;
+    const parts = [];
+    if (hold > 0) parts.push(`${holdStr} hold`);
+    if (s.weight != null && s.weight !== '') parts.push(`${s.weight} m depth`);
+    det.textContent = parts.join(' · ') || '—';
+  }
+  else if (mode === 'hike') {
+    const mi = (s.weight != null && s.weight !== '') ? s.weight : '?';
+    det.textContent = `${mi} mi · ${s.reps} min`;
+  }
   else {
     const wStr = (s.weight === null || s.weight === undefined || s.weight === '') ? 'BW' : (s.weight + ' lbs');
     det.textContent = `${wStr} × ${s.reps} reps`;
@@ -3219,6 +3259,8 @@ function renderCustomSetRow(exIdx, s, setIdx, mode) {
    'weighted'  → default (weight + reps) */
 function exerciseInputMode(target) {
   if (!target) return 'weighted';
+  if (/apnea|breath.?hold/i.test(target)) return 'apnea';
+  if (/^hike|miles.*min|hike\s*·/i.test(target)) return 'hike';
   if (/\d+\s*(min|sec)/i.test(target)) return 'duration';
   if (/max reps|to failure|max\s*x/i.test(target)) return 'bodyweight';
   return 'weighted';
