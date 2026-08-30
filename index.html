@@ -3848,6 +3848,8 @@ function renderWeekPillarGrids(agg, contentShipped, contentTarget) {
     if (!grid) return;
     grid.innerHTML = '';
     specs[pillar].forEach(sp => grid.appendChild(renderWeekPillarTile(pillar, sp, agg.days)));
+    // Match Today-tab behavior: 4 tiles visible, rest hidden behind "Show N more ▾"
+    makeCollapsibleGrid(grid);
   });
 }
 
