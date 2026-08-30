@@ -1387,14 +1387,13 @@
   @media (max-width: 720px) {
     .ex-grid {
       display: grid !important;
-      grid-template-columns: repeat(2, minmax(84px, 96px)) !important;
-      justify-content: space-evenly !important;
-      column-gap: 24px !important;
-      row-gap: 10px !important;
+      grid-template-columns: 1fr 1fr !important;
+      column-gap: 4px !important;
+      row-gap: 8px !important;
       align-items: start;
       margin: 4px 0 2px;
     }
-    .ex-grid > .ex-deck { width: 100%; max-width: 96px; margin: 0 auto; }
+    .ex-grid > .ex-deck { width: 100%; max-width: none !important; margin: 0 !important; }
   }
   /* Base tile — circular, transparent (no rectangular container) both desktop + mobile */
   .ex-deck {
@@ -1528,61 +1527,59 @@
     .entry-form::-webkit-scrollbar { height: 3px; }
     .entry-form::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.25); border-radius: 2px; }
 
-    /* Mobile — compact deck: uniform tile size, tight horizontal spacing, breathing between decks */
+    /* Mobile — compact deck: bigger rings that actually fill each cell, tight uniform spacing */
     .ex-deck summary { padding: 2px; }
-    /* Grid-based tile internals guarantee ring + labels sit on the same rows across every tile */
     .ex-tile {
       display: grid !important;
-      grid-template-rows: 40px 12px 18px !important;
-      row-gap: 2px !important;
+      grid-template-rows: 68px 12px 18px !important;
+      row-gap: 3px !important;
       justify-items: center; align-items: center;
-      min-height: 74px !important; height: 74px !important;
-      padding: 2px !important;
+      min-height: 104px !important; height: 104px !important;
+      padding: 4px 2px !important;
       gap: 0 !important;
     }
-    .ex-tile .ring-svg-container { width: 40px !important; height: 40px !important; }
-    .ex-tile .ring-svg-container svg { width: 40px !important; height: 40px !important; }
-    .ex-tile .sets-label { font-size: 9px !important; height: 12px !important; line-height: 1; margin: 0 !important; }
-    .ex-tile .ex-label { font-size: 8px !important; height: 18px !important; line-height: 1.15; letter-spacing: 0.08em; padding: 0 2px !important; }
-    .ex-deck[open] summary .ex-tile { min-height: 60px !important; height: auto !important; display: flex !important; flex-direction: column; }
+    .ex-tile .ring-svg-container { width: 68px !important; height: 68px !important; }
+    .ex-tile .ring-svg-container svg { width: 68px !important; height: 68px !important; }
+    .ex-tile .sets-label { font-size: 10px !important; height: 12px !important; line-height: 1; margin: 0 !important; }
+    .ex-tile .ex-label { font-size: 9px !important; height: 18px !important; line-height: 1.15; letter-spacing: 0.06em; padding: 0 2px !important; }
+    .ex-deck[open] summary .ex-tile { min-height: 92px !important; height: auto !important; display: flex !important; flex-direction: column; }
 
-    /* Mobile card chrome — smaller deck + real breathing room between decks */
-    .card { padding: 10px 10px !important; border-radius: 12px; }
+    /* Mobile card chrome — tight padding so tiles reach near the deck edges */
+    .card { padding: 8px 6px !important; border-radius: 12px; }
     .card + .card { margin-top: 22px !important; }
-    .card h2 { font-size: 15px !important; margin: 0 0 3px !important; gap: 8px; }
+    .card h2 { font-size: 15px !important; margin: 0 0 3px !important; gap: 8px; padding: 0 4px; }
     .card h2 .accent { width: 5px !important; height: 16px !important; }
-    .card h3 { margin: 10px 0 6px !important; font-size: 10px !important; }
-    .card .lede { font-size: 11px !important; margin: 0 0 8px !important; line-height: 1.35 !important; }
+    .card h3 { margin: 10px 0 6px !important; font-size: 10px !important; padding: 0 4px; }
+    .card .lede { font-size: 11px !important; margin: 0 0 8px !important; line-height: 1.35 !important; padding: 0 4px; }
   }
   /* Same shrink under force-mobile preview */
   html.force-mobile .ex-grid {
     display: grid !important;
-    grid-template-columns: repeat(2, minmax(84px, 96px)) !important;
-    justify-content: space-evenly !important;
-    column-gap: 24px !important;
-    row-gap: 10px !important;
+    grid-template-columns: 1fr 1fr !important;
+    column-gap: 4px !important;
+    row-gap: 8px !important;
     align-items: start; margin: 4px 0 2px !important;
   }
-  html.force-mobile .ex-grid > .ex-deck { width: 100%; max-width: 96px; margin: 0 auto; }
+  html.force-mobile .ex-grid > .ex-deck { width: 100%; max-width: none !important; margin: 0 !important; }
   html.force-mobile .ex-tile {
     display: grid !important;
-    grid-template-rows: 40px 12px 18px !important;
-    row-gap: 2px !important;
+    grid-template-rows: 68px 12px 18px !important;
+    row-gap: 3px !important;
     justify-items: center; align-items: center;
-    min-height: 74px !important; height: 74px !important;
-    padding: 2px !important;
+    min-height: 104px !important; height: 104px !important;
+    padding: 4px 2px !important;
     gap: 0 !important;
   }
-  html.force-mobile .ex-tile .ring-svg-container { width: 40px !important; height: 40px !important; }
-  html.force-mobile .ex-tile .ring-svg-container svg { width: 40px !important; height: 40px !important; }
-  html.force-mobile .ex-tile .sets-label { font-size: 9px !important; height: 12px !important; line-height: 1; }
-  html.force-mobile .ex-tile .ex-label { font-size: 8px !important; height: 18px !important; letter-spacing: 0.08em; padding: 0 2px !important; }
-  html.force-mobile .card { padding: 10px 10px !important; border-radius: 12px; }
+  html.force-mobile .ex-tile .ring-svg-container { width: 68px !important; height: 68px !important; }
+  html.force-mobile .ex-tile .ring-svg-container svg { width: 68px !important; height: 68px !important; }
+  html.force-mobile .ex-tile .sets-label { font-size: 10px !important; height: 12px !important; line-height: 1; }
+  html.force-mobile .ex-tile .ex-label { font-size: 9px !important; height: 18px !important; letter-spacing: 0.06em; padding: 0 2px !important; }
+  html.force-mobile .card { padding: 8px 6px !important; border-radius: 12px; }
   html.force-mobile .card + .card { margin-top: 22px !important; }
-  html.force-mobile .card h2 { font-size: 15px !important; margin: 0 0 3px !important; }
+  html.force-mobile .card h2 { font-size: 15px !important; margin: 0 0 3px !important; padding: 0 4px; }
   html.force-mobile .card h2 .accent { width: 5px !important; height: 16px !important; }
-  html.force-mobile .card h3 { margin: 10px 0 6px !important; font-size: 10px !important; }
-  html.force-mobile .card .lede { font-size: 11px !important; margin: 0 0 8px !important; }
+  html.force-mobile .card h3 { margin: 10px 0 6px !important; font-size: 10px !important; padding: 0 4px; }
+  html.force-mobile .card .lede { font-size: 11px !important; margin: 0 0 8px !important; padding: 0 4px; }
   .ex-deck summary:hover .ex-tile { transform: scale(1.04); }
   .ex-deck summary:active .ex-tile { transform: scale(0.98); }
   .ex-tile .ring-svg-container { display: flex; align-items: center; justify-content: center; }
