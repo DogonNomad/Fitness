@@ -2165,9 +2165,28 @@ const PILLAR_METRICS = {
           { key: 'company', label: 'Company / context', type: 'text', placeholder: 'e.g. Rappi, or gym Sabaneta' },
           { key: 'notes',   label: 'Notes on the interaction', type: 'text', placeholder: 'quality, topic, follow-up' }
         ] },
-    { key: 'dms',          label: 'Warm DMs',     target: 0.5, input: 'number' },
-    { key: 'intros',       label: 'New intros',   target: null,input: 'number' },
-    { key: 'apps',         label: 'Applications', target: 1,   input: 'number' },
+    { key: 'dms',          label: 'Warm DMs',     target: 0.5, input: 'entries',
+        fields: [
+          { key: 'contact', label: 'Sent to',      type: 'text', placeholder: 'e.g. Maria Torres' },
+          { key: 'platform',label: 'Platform',     type: 'text', placeholder: 'LinkedIn / IG / Slack / X' },
+          { key: 'track',   label: 'Career track', type: 'text', placeholder: 'PMP · Security Engineer · Both' },
+          { key: 'notes',   label: 'Notes / feedback', type: 'text', placeholder: 'response, next step, sentiment' }
+        ] },
+    { key: 'intros',       label: 'New intros',   target: null, input: 'entries',
+        fields: [
+          { key: 'contact', label: 'Introduced to', type: 'text', placeholder: 'e.g. Alice Chen' },
+          { key: 'via',     label: 'Introduced by', type: 'text', placeholder: 'who made the intro' },
+          { key: 'platform',label: 'Platform',      type: 'text', placeholder: 'LinkedIn / IRL / Slack / X' },
+          { key: 'context', label: 'Context / notes', type: 'text', placeholder: 'why + follow-up' }
+        ] },
+    { key: 'apps',         label: 'Applications', target: 1,   input: 'entries',
+        fields: [
+          { key: 'company', label: 'Company',  type: 'text', placeholder: 'e.g. Datadog' },
+          { key: 'role',    label: 'Role',     type: 'text', placeholder: 'Sr Product Security Eng · PM' },
+          { key: 'track',   label: 'Career track', type: 'text', placeholder: 'PMP · Security · Both' },
+          { key: 'source',  label: 'Source',   type: 'text', placeholder: 'referral / job board / recruiter' },
+          { key: 'notes',   label: 'Notes',    type: 'text', placeholder: 'link, resume version, contact' }
+        ] },
     { key: 'outreach',     label: 'Outreach',     target: 2,   input: 'entries',
         fields: [
           { key: 'contact', label: 'Sent to',  type: 'text', placeholder: 'e.g. Alice Chen' },
