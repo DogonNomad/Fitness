@@ -1263,9 +1263,10 @@
 
   /* Collapsible grid: hide tiles past the 4th until expanded */
   .ex-grid.collapsible.collapsed > .ex-deck:nth-child(n+5) { display: none; }
-  /* Extra workouts on gym days — hidden while the template grid is collapsed; shown on Show more */
+  /* Extra workouts on gym days — hidden while the template grid is collapsed; shown on Show more.
+     !important beats the inline display:flex on the +Add exercise dropdown. */
   .workout-card .ex-grid.collapsible.collapsed ~ .extra-workouts-header,
-  .workout-card .ex-grid.collapsible.collapsed ~ .extra-workouts-wrap { display: none; }
+  .workout-card .ex-grid.collapsible.collapsed ~ .extra-workouts-wrap { display: none !important; }
   .grid-toggle {
     margin-top: 10px;
     background: transparent;
