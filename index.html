@@ -2427,6 +2427,12 @@ function renderToday() {
 
   const existing = STATE.days[iso];
   renderWorkoutCard(iso, existing || {});
+  // On non-gym days (swim/hike/optional/rest), hide the Calisthenics deck —
+  // user can log calisthenics via the "+ Add exercise" dropdown in the workout section instead.
+  const dowIdx = dayOfWeekIndex(iso);
+  const tplToday = WORKOUT_TEMPLATE[dowIdx];
+  const secFitness = document.getElementById('sec-fitness');
+  if (secFitness) secFitness.style.display = (tplToday && tplToday.type === 'gym') ? '' : 'none';
   renderPillarGrids();
   renderSleepBanner();
   updateSavedLabel(iso);
@@ -2627,24 +2633,28 @@ function renderWorkoutCard(iso, dayData) {
       deck.appendChild(details);
       list.appendChild(deck);
     });
+    // Append any custom-added exercises INTO the same grid as the template tiles.
+    // This way user-added tiles land right below the template tiles (same visual row flow).
+    (dayData.customExercises || []).forEach((ex, idx) => {
+      list.appendChild(renderCustomExerciseDeck(ex, idx));
+    });
     card.appendChild(list);
-    makeCollapsibleGrid(list);
 
     const prog = document.createElement('div');
     prog.className = 'session-progress';
     prog.innerHTML = '<div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div><div class="progress-stats" id="progressStats">0/0 done</div>';
     card.appendChild(prog);
 
-    // Extra workouts — hidden behind the template-grid's "Show more" toggle so the card matches other segments' height
-    const extraHeader = document.createElement('h3');
-    extraHeader.className = 'extra-workouts-header';
-    extraHeader.textContent = 'Extra workouts';
-    extraHeader.style.cssText = 'margin-top:18px; margin-bottom:4px; font-size:11px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint);';
-    card.appendChild(extraHeader);
-    const extraWrap = document.createElement('div');
-    extraWrap.className = 'extra-workouts-wrap';
-    card.appendChild(extraWrap);
-    renderCustomSession(extraWrap, iso, dayData);
+    // +Add exercise dropdown — sits right below the grid, but hidden while grid is collapsed.
+    const addDropdown = createAddExerciseDropdown();
+    addDropdown.classList.add('extra-workouts-wrap');
+    card.appendChild(addDropdown);
+
+    // Collapsible: 4 tiles visible by default, "Show N more ▾" toggle at the very bottom.
+    makeCollapsibleGrid(list);
+    // Move the toggle button to be the LAST child so it appears after both grid + dropdown.
+    const gridToggleBtn = card.querySelector(':scope > .grid-toggle');
+    if (gridToggleBtn) card.appendChild(gridToggleBtn);
   }
   root.appendChild(card);
   // populate footer AFTER card is in DOM so selectors resolve
@@ -3224,6 +3234,14 @@ const EXERCISE_GROUPS = {
     { name: 'Russian twist',   target: '3x20' },
     { name: 'Leg raise',       target: '3x12' }
   ],
+  'Calisthenics': [
+    { name: 'Plank',           target: '3 min' },
+    { name: 'Pushups',         target: 'max reps × 3 sets' },
+    { name: 'Crunches',        target: 'max reps × 3 sets' },
+    { name: 'Heel taps',       target: 'max reps × 3 sets' },
+    { name: 'Pull-ups',        target: 'max reps × 3 sets' },
+    { name: 'Knee raises',     target: 'max reps × 3 sets' }
+  ],
   'Swim / Apnea': [
     { name: 'Static apnea',    target: 'apnea · breath-hold' },
     { name: 'Depth attempt',   target: 'apnea · depth + hold' },
@@ -3236,12 +3254,9 @@ const EXERCISE_GROUPS = {
 };
 
 /* Rest-day custom session — dropdown to add exercises + per-set decks below */
-function renderCustomSession(container, iso, dayData) {
-  const wrap = document.createElement('div');
-  wrap.style.cssText = 'margin-top:14px;';
-
+function createAddExerciseDropdown(onAdd) {
   const dropdown = document.createElement('div');
-  dropdown.style.cssText = 'display:flex; gap:6px; align-items:center; margin-bottom:12px;';
+  dropdown.style.cssText = 'display:flex; gap:6px; align-items:center; margin: 12px 0 4px;';
   const sel = document.createElement('select');
   sel.style.cssText = 'flex:1; background:var(--bg-2); border:1px solid var(--line); color:var(--ink); padding:8px 10px; border-radius:8px; font:inherit; font-size:13px; outline:none;';
   const placeholder = document.createElement('option');
@@ -3262,13 +3277,20 @@ function renderCustomSession(container, iso, dayData) {
     const [group, name, target] = sel.value.split('|');
     addCustomExercise({ name, target, group });
     sel.value = '';
-    // Re-render custom session panel
+    if (typeof onAdd === 'function') onAdd();
+    else renderToday();
+  });
+  dropdown.appendChild(sel);
+  return dropdown;
+}
+function renderCustomSession(container, iso, dayData) {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'margin-top:14px;';
+  const dropdown = createAddExerciseDropdown(() => {
     wrap.remove();
     renderCustomSession(container, activeDate(), STATE.days[activeDate()] || {});
   });
-  dropdown.appendChild(sel);
   wrap.appendChild(dropdown);
-
   // Render existing custom exercises
   const customList = (dayData.customExercises || []);
   if (customList.length) {
