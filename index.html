@@ -585,93 +585,6 @@
   /* Force-desktop — swaps meta viewport in JS to force desktop width on mobile browsers */
   html.force-desktop .wrap { min-width: 900px; }
 
-  /* ---------- Weather ambient layer ---------- */
-  .wx-layer {
-    position: fixed; inset: 0;
-    pointer-events: none;
-    z-index: 2;
-    overflow: hidden;
-    opacity: 0;
-    transition: opacity 900ms ease;
-  }
-  body.wx-rain .wx-layer,
-  body.wx-snow .wx-layer,
-  body.wx-wind .wx-layer,
-  body.wx-sunny .wx-layer { opacity: 1; }
-
-  /* Rain — diagonal streaks scrolling down-left */
-  body.wx-rain .wx-layer {
-    background:
-      repeating-linear-gradient(
-        100deg,
-        transparent 0 6px,
-        rgba(180, 200, 240, 0.28) 6px 7.5px,
-        transparent 7.5px 24px);
-    background-size: 48px 220px;
-    animation: wxRainDrops 0.55s linear infinite;
-  }
-  body.wx-rain .wx-layer::after {
-    content: ''; position: absolute; inset: 0;
-    background:
-      repeating-linear-gradient(
-        100deg,
-        transparent 0 8px,
-        rgba(150, 180, 220, 0.18) 8px 9px,
-        transparent 9px 34px);
-    background-size: 60px 320px;
-    animation: wxRainFar 0.9s linear infinite;
-  }
-  @keyframes wxRainDrops {
-    from { background-position: 0 0; }
-    to   { background-position: -14px 220px; }
-  }
-  @keyframes wxRainFar {
-    from { background-position: 0 0; }
-    to   { background-position: -8px 320px; }
-  }
-
-  /* Snow — four layers of white dots drifting down */
-  body.wx-snow .wx-layer {
-    background-image:
-      radial-gradient(2.5px 2.5px at 25% 20%, rgba(255,255,255,0.95), transparent 60%),
-      radial-gradient(1.5px 1.5px at 60% 60%, rgba(255,255,255,0.75), transparent 60%),
-      radial-gradient(3px 3px at 80% 40%, rgba(255,255,255,1), transparent 60%),
-      radial-gradient(1.5px 1.5px at 40% 80%, rgba(255,255,255,0.7), transparent 60%);
-    background-size: 220px 220px, 280px 280px, 340px 340px, 200px 200px;
-    animation: wxSnowFall 24s linear infinite;
-  }
-  @keyframes wxSnowFall {
-    from { background-position: 0 0, 0 0, 0 0, 0 0; }
-    to   { background-position: 30px 220px, -22px 280px, 40px 340px, -12px 200px; }
-  }
-
-  /* Wind — horizontal streaks blowing across */
-  body.wx-wind .wx-layer {
-    background: repeating-linear-gradient(
-      100deg,
-      transparent 0 40px,
-      rgba(255,255,255,0.10) 40px 42px,
-      transparent 42px 220px);
-    background-size: 260px 100%;
-    animation: wxWindStreak 4s linear infinite;
-    opacity: 0.6;
-  }
-  @keyframes wxWindStreak {
-    from { background-position: 0 0; }
-    to   { background-position: -260px 0; }
-  }
-
-  /* Sunny — warm golden glow in the upper region, gentle pulse */
-  body.wx-sunny .wx-layer {
-    background:
-      radial-gradient(600px 400px at 72% 12%, rgba(255,220,120,0.20), transparent 65%),
-      radial-gradient(300px 200px at 72% 12%, rgba(255,240,180,0.30), transparent 60%);
-    animation: wxSunnyPulse 8s ease-in-out infinite;
-  }
-  @keyframes wxSunnyPulse {
-    0%, 100% { opacity: 0.55; }
-    50%      { opacity: 1;    }
-  }
 
   * { box-sizing: border-box; }
   /* Prevent iOS input auto-zoom / tap delay */
@@ -1895,9 +1808,6 @@
 </style>
 </head>
 <body>
-
-<!-- Weather ambient layer — synced to local conditions -->
-<div class="wx-layer" id="wxLayer" aria-hidden="true"></div>
 
 <!-- Viewport preview toggle (local-only; hidden on deployed GitHub Pages) -->
 <div class="viewport-toggle" id="viewportToggle" aria-label="Preview viewport" hidden>
@@ -4471,54 +4381,6 @@ renderHeader(); renderToday(); renderWeek(); renderMission();
     try { localStorage.setItem(VP_KEY, mode); } catch(e) {}
     apply(mode);
   }));
-})();
-
-/* ---------- Weather ambience — synced to local conditions ---------- */
-(function initWeather() {
-  const WX_CLASSES = ['wx-rain', 'wx-snow', 'wx-wind', 'wx-sunny'];
-  // WMO weather codes (Open-Meteo)
-  const RAIN_CODES = [51,53,55,56,57,61,63,65,66,67,80,81,82,95,96,99];
-  const SNOW_CODES = [71,73,75,77,85,86];
-
-  function applyWxClass(code, windspeed) {
-    const body = document.body;
-    WX_CLASSES.forEach(c => body.classList.remove(c));
-    const c = Number(code);
-    if (RAIN_CODES.includes(c))       body.classList.add('wx-rain');
-    else if (SNOW_CODES.includes(c))  body.classList.add('wx-snow');
-    else if (c === 0 || c === 1)      body.classList.add('wx-sunny');
-    else if (Number(windspeed) > 20)  body.classList.add('wx-wind');
-    // Cloudy/fog codes → no animation (calm ambient)
-  }
-
-  async function getCoords() {
-    // Try browser geolocation (cached up to 1 hour), 4s timeout, fall back to Medellín
-    return new Promise((resolve) => {
-      if (!navigator.geolocation) return resolve({ lat: 6.2442, lon: -75.5812 });
-      navigator.geolocation.getCurrentPosition(
-        (pos) => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
-        ()    => resolve({ lat: 6.2442, lon: -75.5812 }),
-        { timeout: 4000, maximumAge: 60 * 60 * 1000 }
-      );
-    });
-  }
-
-  async function updateWeather() {
-    try {
-      const { lat, lon } = await getCoords();
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
-      const r = await fetch(url);
-      if (!r.ok) return;
-      const data = await r.json();
-      const cw = data.current_weather || {};
-      applyWxClass(cw.weathercode, cw.windspeed);
-    } catch (e) {
-      // Silent fail — ambient layer stays hidden
-    }
-  }
-
-  updateWeather();
-  setInterval(updateWeather, 30 * 60 * 1000);  // refresh every 30 minutes
 })();
 
 /* ---------- Sidebar collapse toggle ---------- */
