@@ -1176,8 +1176,9 @@
 
   /* Collapsible grid: hide tiles past the 4th until expanded */
   .ex-grid.collapsible.collapsed > .ex-deck:nth-child(n+5) { display: none; }
-  /* Content pillar collapses to 2 tiles (it only has 3 total, so show 2 + hide 1 to match other decks' height) */
-  .card.pillar-content .ex-grid.collapsible.collapsed > .ex-deck:nth-child(n+3) { display: none; }
+  /* Content pillar collapses fully — all tiles hidden until user clicks Show more */
+  .card.pillar-content .ex-grid.collapsible.collapsed > .ex-deck { display: none; }
+  .card.pillar-content .ex-grid.collapsible.collapsed { min-height: 0 !important; }
   /* Extra workouts on gym days — hidden while the template grid is collapsed; shown on Show more.
      !important beats the inline display:flex on the +Add exercise dropdown. */
   .workout-card .ex-grid.collapsible.collapsed ~ .extra-workouts-header,
@@ -2789,9 +2790,8 @@ function renderPillarGrids() {
     PILLAR_METRICS[pillar].forEach(metric => {
       grid.appendChild(renderPillarTile(pillar, metric, dayData));
     });
-    // Content has only 3 tiles — force showN:2 so the collapsible toggle still kicks in
-    // (matches height of other decks: shows 2 tiles + "Show 1 more ▾" when collapsed).
-    const showN = pillar === 'content' ? 2 : 4;
+    // Content collapses fully — all 3 tiles hidden by default, Show more reveals the whole metric dashboard.
+    const showN = pillar === 'content' ? 0 : 4;
     makeCollapsibleGrid(grid, { showN });
   });
 }
