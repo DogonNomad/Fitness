@@ -1890,6 +1890,12 @@
       <div class="lede">Weekly targets: 2+ long-form · 3+ reels · 1+ carousel.</div>
       <div class="content-day-hint" id="contentDayHint">—</div>
       <div class="ex-grid" id="contentGrid"></div>
+      <h3 style="margin-top:18px; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:700;">Actually posted (Metricool live) <span id="metricoolStatus" style="font-size:10px; margin-left:8px; font-weight:400;">—</span></h3>
+      <div id="metricoolTiles" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-top:8px;"></div>
+      <details id="contentReportDetails" style="margin-top:18px; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:12px 16px;">
+        <summary style="cursor:pointer; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:700;">Content Tracker report</summary>
+        <div id="contentReportBody" style="margin-top:14px;"></div>
+      </details>
     </div>
 
     <div id="sec-career" class="toc-scroll-target card pillar-career" style="margin-top:18px;">
@@ -4555,5 +4561,159 @@ renderHeader(); renderToday(); renderWeek(); renderMission();
 
 </script>
 
+<!-- Metricool live snapshot integration v3 (auto-added; safe to remove) -->
+<script>
+(function(){
+  var METRICOOL_SNAPSHOT = null;
+  function fmtNum(n){
+    if (n == null || isNaN(n)) return '—';
+    if (n >= 10000) return (n/1000).toFixed(1) + 'k';
+    return Math.round(n).toLocaleString();
+  }
+  function loadSnapshot(){
+    return fetch('./data/metricool-snapshot.json?_=' + Date.now())
+      .then(function(r){ if(!r.ok) throw new Error('not found'); return r.json(); })
+      .then(function(j){ METRICOOL_SNAPSHOT = j; return j; })
+      .catch(function(){ METRICOOL_SNAPSHOT = null; return null; });
+  }
+  function renderTiles(iso){
+    var container = document.getElementById('metricoolTiles');
+    var statusEl  = document.getElementById('metricoolStatus');
+    if (!container) return;
+    container.innerHTML = '';
+    if (!METRICOOL_SNAPSHOT) {
+      if (statusEl) statusEl.innerHTML = '<span style="color:var(--ink-faint);">No snapshot yet</span>';
+      return;
+    }
+    var dayData = (METRICOOL_SNAPSHOT.days || {})[iso] || {};
+    if (statusEl && METRICOOL_SNAPSHOT.generatedAt) {
+      var dt = new Date(METRICOOL_SNAPSHOT.generatedAt);
+      statusEl.innerHTML = '<span style="color:var(--green);">● snapshot ' + dt.toLocaleDateString() + '</span>';
+    }
+    var tiles = [
+      { label: 'IG Reels',      value: dayData.igReels      || 0 },
+      { label: 'IG Feed posts', value: dayData.igFeedPosts  || 0 },
+      { label: 'TikTok videos', value: dayData.tiktok       || 0 },
+      { label: 'YT videos',     value: dayData.ytVideos     || 0 }
+    ];
+    tiles.forEach(function(t){
+      var tile = document.createElement('div');
+      tile.style.cssText = 'background: rgba(184,138,37,0.06); border: 1px solid rgba(184,138,37,0.25); border-radius: 8px; padding: 10px 12px; text-align: center;';
+      var lbl = document.createElement('div');
+      lbl.style.cssText = 'font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:700;';
+      lbl.textContent = t.label;
+      var val = document.createElement('div');
+      val.style.cssText = 'font-size:22px; font-weight:700; margin-top:4px; color:var(--ink); font-variant-numeric:tabular-nums;';
+      val.textContent = t.value;
+      tile.appendChild(lbl); tile.appendChild(val);
+      container.appendChild(tile);
+    });
+  }
+  function renderContentReport(){
+    var body = document.getElementById('contentReportBody');
+    if (!body) return;
+    if (!METRICOOL_SNAPSHOT || !METRICOOL_SNAPSHOT.report || !METRICOOL_SNAPSHOT.followers){
+      body.innerHTML = '<div style="font-size:12px; color:var(--ink-faint);">No report data yet — push a new snapshot from Content Tracker.</div>';
+      return;
+    }
+    var f = METRICOOL_SNAPSHOT.followers;
+    var r = METRICOOL_SNAPSHOT.report;
+    var css = {
+      row: 'display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; margin-bottom:14px;',
+      tile: 'background:rgba(184,138,37,0.05); border:1px solid rgba(184,138,37,0.2); border-radius:8px; padding:10px 12px;',
+      tileLbl: 'font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:700;',
+      tileVal: 'font-size:22px; font-weight:700; margin-top:4px; color:var(--ink); font-variant-numeric:tabular-nums;',
+      tileSub: 'font-size:10px; color:var(--ink-faint); margin-top:2px;',
+      section: 'font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink-faint); font-weight:700; margin:14px 0 8px;',
+    };
+    function tile(label, value, sub) {
+      var s = sub ? '<div style="' + css.tileSub + '">' + sub + '</div>' : '';
+      return '<div style="' + css.tile + '"><div style="' + css.tileLbl + '">' + label + '</div><div style="' + css.tileVal + '">' + value + '</div>' + s + '</div>';
+    }
+    var html = '';
+    // Followers
+    html += '<div style="' + css.section + '">Followers today</div>';
+    html += '<div style="' + css.row + '">';
+    html +=   tile('Instagram', fmtNum(f.ig));
+    html +=   tile('TikTok', fmtNum(f.tt));
+    html +=   tile('YouTube', fmtNum(f.yt));
+    html +=   tile('Combined', fmtNum(f.combined));
+    html += '</div>';
+    // Posts this week
+    html += '<div style="' + css.section + '">Posts shipped</div>';
+    html += '<div style="' + css.row + '">';
+    html +=   tile('This week', fmtNum(r.postsThisWeek.total), 'IG ' + (r.postsThisWeek.igReels + r.postsThisWeek.igFeedPosts) + ' · TT ' + r.postsThisWeek.tiktok + ' · YT ' + r.postsThisWeek.ytVideos);
+    html +=   tile('This month', fmtNum(r.postsThisMonth.total), 'IG ' + (r.postsThisMonth.igReels + r.postsThisMonth.igFeedPosts) + ' · TT ' + r.postsThisMonth.tiktok + ' · YT ' + r.postsThisMonth.ytVideos);
+    html += '</div>';
+    // Streaks + consistency
+    html += '<div style="' + css.section + '">Consistency</div>';
+    html += '<div style="' + css.row + '">';
+    html +=   tile('Current streak', fmtNum(r.streaks.current), r.streaks.current > 0 ? 'ending today' : 'nothing today');
+    html +=   tile('Longest streak', fmtNum(r.streaks.longest), 'last 90 days');
+    html +=   tile('Days posted', fmtNum(r.daysPosted30) + ' / 30', 'of last 30 days');
+    html += '</div>';
+    // Peak reach
+    if (r.peakReach && r.peakReach.date && r.peakReach.reach > 0) {
+      var pd = new Date(r.peakReach.date + 'T00:00:00');
+      var pdStr = pd.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+      html += '<div style="' + css.section + '">Peak reach this month</div>';
+      html += '<div style="' + css.row + '">';
+      html +=   tile(pdStr, fmtNum(r.peakReach.reach), 'IG accounts reached');
+      html += '</div>';
+    }
+    // Weekly rhythm mini bars
+    html += '<div style="' + css.section + '">Weekly rhythm · avg posts/day</div>';
+    var dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    var dayKeys = ['sun','mon','tue','wed','thu','fri','sat'];
+    var vals = dayKeys.map(function(k){ return r.weeklyRhythm[k] || 0; });
+    var maxV = Math.max.apply(null, vals) || 1;
+    html += '<div style="display:flex; align-items:flex-end; justify-content:space-around; height:80px; gap:6px; padding:0 4px; margin-bottom:4px;">';
+    vals.forEach(function(v){
+      var h = Math.max(4, (v / maxV) * 66);
+      html += '<div style="flex:1; max-width:36px; height:' + h + 'px; background:linear-gradient(180deg, var(--gold), rgba(184,138,37,0.6)); border-radius:4px 4px 2px 2px; position:relative;">';
+      html += '<div style="position:absolute; top:-16px; left:0; right:0; text-align:center; font-size:10px; color:var(--ink); font-weight:700; font-variant-numeric:tabular-nums;">' + v.toFixed(1) + '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+    html += '<div style="display:flex; justify-content:space-around; padding:0 4px;">';
+    dayNames.forEach(function(n){
+      html += '<div style="flex:1; max-width:36px; text-align:center; font-size:10px; color:var(--ink-dim);">' + n + '</div>';
+    });
+    html += '</div>';
+    body.innerHTML = html;
+  }
+  function currentIso(){
+    try {
+      if (typeof window.activeDate === 'function') return window.activeDate();
+    } catch(e){}
+    var d = new Date();
+    var pad = function(n){ return String(n).padStart(2,'0'); };
+    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+  }
+  var hookAttempts = 0;
+  function tryHook(){
+    hookAttempts++;
+    if (typeof window.renderToday !== 'function') {
+      if (hookAttempts < 40) return setTimeout(tryHook, 150);
+      renderTiles(currentIso()); renderContentReport(); return;
+    }
+    var original = window.renderToday;
+    window.renderToday = function(){
+      var result = original.apply(this, arguments);
+      try { renderTiles(currentIso()); renderContentReport(); } catch(e){ console.warn('Metricool render error', e); }
+      return result;
+    };
+    try { renderTiles(currentIso()); renderContentReport(); } catch(e){}
+  }
+  function boot(){
+    loadSnapshot().then(function(){ tryHook(); });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot);
+  } else {
+    boot();
+  }
+})();
+</script>
 </body>
 </html>
