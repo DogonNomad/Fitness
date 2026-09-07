@@ -1809,6 +1809,9 @@
   details summary { cursor: pointer; font-size: 13px; color: var(--ink-dim); }
   details[open] summary { color: var(--ink); }
 </style>
+<style id="metricool-collapsible-css">
+  .metricool-collapsible.collapsed { display: none; }
+</style>
 </head>
 <body>
 
@@ -1890,12 +1893,15 @@
       <div class="lede">Weekly targets: 2+ long-form · 3+ reels · 1+ carousel.</div>
       <div class="content-day-hint" id="contentDayHint">—</div>
       <div class="ex-grid" id="contentGrid"></div>
-      <h3 style="margin-top:18px; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:700;">Actually posted (Metricool live) <span id="metricoolStatus" style="font-size:10px; margin-left:8px; font-weight:400;">—</span></h3>
-      <div id="metricoolTiles" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-top:8px;"></div>
-      <details id="contentReportDetails" style="margin-top:18px; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:12px 16px;">
-        <summary style="cursor:pointer; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:700;">Content Tracker report</summary>
-        <div id="contentReportBody" style="margin-top:14px;"></div>
-      </details>
+      <div id="metricoolWrap" class="metricool-collapsible collapsed" style="margin-top:18px;">
+        <h3 style="font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:700; margin:0 0 8px;">Actually posted (Metricool live) <span id="metricoolStatus" style="font-size:10px; margin-left:8px; font-weight:400;">—</span></h3>
+        <div id="metricoolTiles" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px;"></div>
+        <details id="contentReportDetails" style="margin-top:14px; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:12px 16px;">
+          <summary style="cursor:pointer; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:700;">Content Tracker report</summary>
+          <div id="contentReportBody" style="margin-top:14px;"></div>
+        </details>
+      </div>
+      <button type="button" id="metricoolWrapToggle" class="grid-toggle" style="margin-top:8px;">Show Metricool insights ▾</button>
     </div>
 
     <div id="sec-career" class="toc-scroll-target card pillar-career" style="margin-top:18px;">
@@ -4561,7 +4567,7 @@ renderHeader(); renderToday(); renderWeek(); renderMission();
 
 </script>
 
-<!-- Metricool live snapshot integration v3 (auto-added; safe to remove) -->
+<!-- Metricool live snapshot integration v4 (auto-added; safe to remove) -->
 <script>
 (function(){
   var METRICOOL_SNAPSHOT = null;
@@ -4631,7 +4637,6 @@ renderHeader(); renderToday(); renderWeek(); renderMission();
       return '<div style="' + css.tile + '"><div style="' + css.tileLbl + '">' + label + '</div><div style="' + css.tileVal + '">' + value + '</div>' + s + '</div>';
     }
     var html = '';
-    // Followers
     html += '<div style="' + css.section + '">Followers today</div>';
     html += '<div style="' + css.row + '">';
     html +=   tile('Instagram', fmtNum(f.ig));
@@ -4639,20 +4644,17 @@ renderHeader(); renderToday(); renderWeek(); renderMission();
     html +=   tile('YouTube', fmtNum(f.yt));
     html +=   tile('Combined', fmtNum(f.combined));
     html += '</div>';
-    // Posts this week
     html += '<div style="' + css.section + '">Posts shipped</div>';
     html += '<div style="' + css.row + '">';
     html +=   tile('This week', fmtNum(r.postsThisWeek.total), 'IG ' + (r.postsThisWeek.igReels + r.postsThisWeek.igFeedPosts) + ' · TT ' + r.postsThisWeek.tiktok + ' · YT ' + r.postsThisWeek.ytVideos);
     html +=   tile('This month', fmtNum(r.postsThisMonth.total), 'IG ' + (r.postsThisMonth.igReels + r.postsThisMonth.igFeedPosts) + ' · TT ' + r.postsThisMonth.tiktok + ' · YT ' + r.postsThisMonth.ytVideos);
     html += '</div>';
-    // Streaks + consistency
     html += '<div style="' + css.section + '">Consistency</div>';
     html += '<div style="' + css.row + '">';
     html +=   tile('Current streak', fmtNum(r.streaks.current), r.streaks.current > 0 ? 'ending today' : 'nothing today');
     html +=   tile('Longest streak', fmtNum(r.streaks.longest), 'last 90 days');
     html +=   tile('Days posted', fmtNum(r.daysPosted30) + ' / 30', 'of last 30 days');
     html += '</div>';
-    // Peak reach
     if (r.peakReach && r.peakReach.date && r.peakReach.reach > 0) {
       var pd = new Date(r.peakReach.date + 'T00:00:00');
       var pdStr = pd.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
@@ -4661,7 +4663,6 @@ renderHeader(); renderToday(); renderWeek(); renderMission();
       html +=   tile(pdStr, fmtNum(r.peakReach.reach), 'IG accounts reached');
       html += '</div>';
     }
-    // Weekly rhythm mini bars
     html += '<div style="' + css.section + '">Weekly rhythm · avg posts/day</div>';
     var dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     var dayKeys = ['sun','mon','tue','wed','thu','fri','sat'];
@@ -4682,6 +4683,17 @@ renderHeader(); renderToday(); renderWeek(); renderMission();
     html += '</div>';
     body.innerHTML = html;
   }
+  function hookToggle(){
+    var btn = document.getElementById('metricoolWrapToggle');
+    var wrap = document.getElementById('metricoolWrap');
+    if (!btn || !wrap) return;
+    if (btn.dataset.hooked === '1') return;
+    btn.dataset.hooked = '1';
+    btn.addEventListener('click', function(){
+      var collapsed = wrap.classList.toggle('collapsed');
+      btn.textContent = collapsed ? 'Show Metricool insights ▾' : 'Show fewer ▴';
+    });
+  }
   function currentIso(){
     try {
       if (typeof window.activeDate === 'function') return window.activeDate();
@@ -4693,6 +4705,7 @@ renderHeader(); renderToday(); renderWeek(); renderMission();
   var hookAttempts = 0;
   function tryHook(){
     hookAttempts++;
+    hookToggle();
     if (typeof window.renderToday !== 'function') {
       if (hookAttempts < 40) return setTimeout(tryHook, 150);
       renderTiles(currentIso()); renderContentReport(); return;
@@ -4700,7 +4713,7 @@ renderHeader(); renderToday(); renderWeek(); renderMission();
     var original = window.renderToday;
     window.renderToday = function(){
       var result = original.apply(this, arguments);
-      try { renderTiles(currentIso()); renderContentReport(); } catch(e){ console.warn('Metricool render error', e); }
+      try { renderTiles(currentIso()); renderContentReport(); hookToggle(); } catch(e){ console.warn('Metricool render error', e); }
       return result;
     };
     try { renderTiles(currentIso()); renderContentReport(); } catch(e){}
