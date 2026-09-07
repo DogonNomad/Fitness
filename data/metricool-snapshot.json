@@ -1,9 +1,207 @@
 {
-  "generatedAt": "2026-09-07T22:25:17.594Z",
+  "generatedAt": "2026-09-07T22:57:35.376Z",
   "brandId": "5532681",
   "source": "metricool-via-cowork-content-tracker",
   "windowDays": 30,
   "days": {
+    "2026-09-07": {
+      "ytSubscribers": 3,
+      "ytVideos": 0
+    },
+    "2026-09-06": {
+      "igFollowers": 639,
+      "igReach": 33,
+      "ttFollowers": 12,
+      "ytSubscribers": 3
+    },
+    "2026-09-05": {
+      "igFollowers": 639,
+      "igReach": 33,
+      "ttFollowers": 11,
+      "ttViews": 15,
+      "ytSubscribers": 3
+    },
+    "2026-09-04": {
+      "igFollowers": 640,
+      "igReach": 183,
+      "ttFollowers": 10,
+      "ttViews": 179,
+      "ytSubscribers": 2,
+      "ytViews": 52
+    },
+    "2026-09-03": {
+      "igFollowers": 640,
+      "igReels": 1,
+      "igPostsTotal": 1,
+      "igReach": 346,
+      "ttFollowers": 10,
+      "tiktok": 1,
+      "ttViews": 188,
+      "ytSubscribers": 0,
+      "ytViews": 1190,
+      "igFeedPosts": 0
+    },
+    "2026-09-02": {
+      "igFollowers": 641,
+      "igPostsTotal": 1,
+      "igReach": 361,
+      "ttFollowers": 8,
+      "ttViews": 5,
+      "ytSubscribers": 0,
+      "ytViews": 2,
+      "igFeedPosts": 1
+    },
+    "2026-09-01": {
+      "igFollowers": 644,
+      "igReach": 59,
+      "ttFollowers": 8,
+      "ttViews": 3,
+      "ytSubscribers": 0,
+      "ytViews": 2
+    },
+    "2026-08-31": {
+      "igFollowers": 643,
+      "igReels": 1,
+      "igPostsTotal": 1,
+      "igReach": 319,
+      "ttFollowers": 8,
+      "ttViews": 1,
+      "ytSubscribers": 0,
+      "ytViews": 8,
+      "igFeedPosts": 0
+    },
+    "2026-08-30": {
+      "igFollowers": 644,
+      "igReach": 42,
+      "ttFollowers": 8,
+      "ttViews": 7,
+      "ytSubscribers": 0
+    },
+    "2026-08-29": {
+      "igFollowers": 643,
+      "igReach": 61,
+      "ttFollowers": 8,
+      "ttViews": 1,
+      "ytSubscribers": 0,
+      "ytViews": 1
+    },
+    "2026-08-28": {
+      "igFollowers": 641,
+      "igReach": 73,
+      "ttFollowers": 8,
+      "ttViews": 12,
+      "ytSubscribers": 0,
+      "ytViews": 151
+    },
+    "2026-08-27": {
+      "igFollowers": 642,
+      "igReach": 227,
+      "ttFollowers": 8,
+      "tiktok": 1,
+      "ttViews": 187,
+      "ytSubscribers": 0,
+      "ytViews": 183
+    },
+    "2026-08-26": {
+      "igFollowers": 643,
+      "igReels": 2,
+      "igPostsTotal": 2,
+      "igReach": 569,
+      "ttFollowers": 8,
+      "tiktok": 2,
+      "ttViews": 181,
+      "ytSubscribers": 0,
+      "ytViews": 679,
+      "igFeedPosts": 0
+    },
+    "2026-08-25": {
+      "igFollowers": 645,
+      "igPostsTotal": 1,
+      "igReach": 218,
+      "ttFollowers": 7,
+      "ttViews": 2,
+      "ytSubscribers": 0,
+      "igFeedPosts": 1
+    },
+    "2026-08-24": {
+      "igFollowers": 645,
+      "igReels": 1,
+      "igPostsTotal": 1,
+      "igReach": 474,
+      "ttFollowers": 7,
+      "tiktok": 1,
+      "ttViews": 34,
+      "ytSubscribers": 0,
+      "ytViews": 6,
+      "igFeedPosts": 0
+    },
+    "2026-08-23": {
+      "igFollowers": 644,
+      "igReels": 1,
+      "igPostsTotal": 1,
+      "igReach": 461,
+      "ttFollowers": 7,
+      "ttViews": 3,
+      "ytSubscribers": 0,
+      "ytViews": 1,
+      "igFeedPosts": 0
+    },
+    "2026-08-22": {
+      "igReach": 123,
+      "ttFollowers": 7,
+      "ttViews": 44,
+      "ytSubscribers": 0,
+      "ytViews": 13
+    },
+    "2026-08-21": {
+      "igReels": 1,
+      "igPostsTotal": 1,
+      "igReach": 1023,
+      "ttFollowers": 7,
+      "tiktok": 1,
+      "ttViews": 48,
+      "ytSubscribers": 0,
+      "ytViews": 1257,
+      "igFeedPosts": 0
+    },
+    "2026-08-20": {
+      "igFollowers": 645,
+      "igReels": 1,
+      "igPostsTotal": 1,
+      "igReach": 389,
+      "ttFollowers": 7,
+      "ttViews": 11,
+      "ytSubscribers": 0,
+      "ytViews": 59,
+      "igFeedPosts": 0
+    },
+    "2026-08-19": {
+      "igReels": 1,
+      "igPostsTotal": 1,
+      "igReach": 446,
+      "ttFollowers": 7,
+      "tiktok": 1,
+      "ttViews": 93,
+      "ytSubscribers": 0,
+      "ytViews": 560,
+      "igFeedPosts": 0
+    },
+    "2026-08-18": {
+      "igFollowers": 645,
+      "igPostsTotal": 1,
+      "igReach": 249,
+      "ttFollowers": 7,
+      "ttViews": 1,
+      "ytSubscribers": 0,
+      "igFeedPosts": 1
+    },
+    "2026-08-17": {
+      "igFollowers": 644,
+      "igReach": 7,
+      "ttFollowers": 7,
+      "ttViews": 1,
+      "ytSubscribers": 0
+    },
     "2026-08-16": {
       "igFollowers": 643,
       "igReach": 71,
@@ -32,12 +230,6 @@
       "ttViews": 0,
       "ytSubscribers": 0
     },
-    "2026-08-09": {
-      "igFollowers": 642,
-      "igReach": 8,
-      "ttFollowers": 7,
-      "ttViews": 1
-    },
     "2026-08-12": {
       "igFollowers": 641,
       "igReach": 15,
@@ -45,25 +237,11 @@
       "ttViews": 0,
       "ytSubscribers": 0
     },
-    "2026-09-06": {
-      "igFollowers": 639,
-      "igReach": 33,
-      "ttFollowers": 12,
-      "ytSubscribers": 3
-    },
     "2026-08-11": {
       "igFollowers": 641,
       "igReach": 121,
       "ttFollowers": 7,
       "ttViews": 2
-    },
-    "2026-08-29": {
-      "igFollowers": 643,
-      "igReach": 61,
-      "ttFollowers": 8,
-      "ttViews": 1,
-      "ytSubscribers": 0,
-      "ytViews": 1
     },
     "2026-08-10": {
       "igFollowers": 642,
@@ -71,194 +249,51 @@
       "ttFollowers": 7,
       "ttViews": 2
     },
-    "2026-09-05": {
-      "igFollowers": 639,
-      "igReach": 33,
-      "ttFollowers": 11,
-      "ttViews": 15,
-      "ytSubscribers": 3
-    },
-    "2026-08-31": {
-      "igFollowers": 643,
-      "igReels": 1,
-      "igPostsTotal": 1,
-      "igReach": 319,
-      "ttFollowers": 8,
-      "ttViews": 1,
-      "ytSubscribers": 0,
-      "ytViews": 8,
-      "igFeedPosts": 0
-    },
-    "2026-08-28": {
-      "igFollowers": 641,
-      "igReach": 73,
-      "ttFollowers": 8,
-      "ttViews": 12,
-      "ytSubscribers": 0,
-      "ytViews": 151
-    },
-    "2026-08-30": {
-      "igFollowers": 644,
-      "igReach": 42,
-      "ttFollowers": 8,
-      "ttViews": 7,
-      "ytSubscribers": 0
-    },
-    "2026-08-23": {
-      "igFollowers": 644,
-      "igReels": 1,
-      "igPostsTotal": 1,
-      "igReach": 461,
-      "ttFollowers": 7,
-      "ttViews": 3,
-      "ytSubscribers": 0,
-      "ytViews": 1,
-      "igFeedPosts": 0
-    },
-    "2026-08-19": {
-      "igReels": 1,
-      "igPostsTotal": 1,
-      "igReach": 446,
-      "ttFollowers": 7,
-      "tiktok": 1,
-      "ttViews": 93,
-      "ytSubscribers": 0,
-      "ytViews": 560,
-      "igFeedPosts": 0
-    },
-    "2026-08-22": {
-      "igReach": 123,
-      "ttFollowers": 7,
-      "ttViews": 44,
-      "ytSubscribers": 0,
-      "ytViews": 13
-    },
-    "2026-08-21": {
-      "igReels": 1,
-      "igPostsTotal": 1,
-      "igReach": 1023,
-      "ttFollowers": 7,
-      "tiktok": 1,
-      "ttViews": 48,
-      "ytSubscribers": 0,
-      "ytViews": 1257,
-      "igFeedPosts": 0
-    },
-    "2026-08-18": {
-      "igFollowers": 645,
-      "igPostsTotal": 1,
-      "igReach": 249,
-      "ttFollowers": 7,
-      "ttViews": 1,
-      "ytSubscribers": 0,
-      "igFeedPosts": 1
-    },
-    "2026-09-04": {
-      "igFollowers": 640,
-      "igReach": 183,
-      "ttFollowers": 10,
-      "ttViews": 179,
-      "ytSubscribers": 2,
-      "ytViews": 52
-    },
-    "2026-08-20": {
-      "igFollowers": 645,
-      "igReels": 1,
-      "igPostsTotal": 1,
-      "igReach": 389,
-      "ttFollowers": 7,
-      "ttViews": 11,
-      "ytSubscribers": 0,
-      "ytViews": 59,
-      "igFeedPosts": 0
-    },
-    "2026-08-17": {
-      "igFollowers": 644,
-      "igReach": 7,
-      "ttFollowers": 7,
-      "ttViews": 1,
-      "ytSubscribers": 0
-    },
-    "2026-08-27": {
+    "2026-08-09": {
       "igFollowers": 642,
-      "igReach": 227,
-      "ttFollowers": 8,
-      "tiktok": 1,
-      "ttViews": 187,
-      "ytSubscribers": 0,
-      "ytViews": 183
-    },
-    "2026-09-03": {
-      "igFollowers": 640,
-      "igReels": 1,
-      "igPostsTotal": 1,
-      "igReach": 346,
-      "ttFollowers": 10,
-      "tiktok": 1,
-      "ttViews": 188,
-      "ytSubscribers": 0,
-      "ytViews": 1190,
-      "igFeedPosts": 0
-    },
-    "2026-08-26": {
-      "igFollowers": 643,
-      "igReels": 2,
-      "igPostsTotal": 2,
-      "igReach": 569,
-      "ttFollowers": 8,
-      "tiktok": 2,
-      "ttViews": 181,
-      "ytSubscribers": 0,
-      "ytViews": 679,
-      "igFeedPosts": 0
-    },
-    "2026-09-02": {
-      "igFollowers": 641,
-      "igPostsTotal": 1,
-      "igReach": 361,
-      "ttFollowers": 8,
-      "ttViews": 5,
-      "ytSubscribers": 0,
-      "ytViews": 2,
-      "igFeedPosts": 1
-    },
-    "2026-08-25": {
-      "igFollowers": 645,
-      "igPostsTotal": 1,
-      "igReach": 218,
+      "igReach": 8,
       "ttFollowers": 7,
-      "ttViews": 2,
-      "ytSubscribers": 0,
-      "igFeedPosts": 1
-    },
-    "2026-09-01": {
-      "igFollowers": 644,
-      "igReach": 59,
-      "ttFollowers": 8,
-      "ttViews": 3,
-      "ytSubscribers": 0,
-      "ytViews": 2
-    },
-    "2026-08-24": {
-      "igFollowers": 645,
-      "igReels": 1,
-      "igPostsTotal": 1,
-      "igReach": 474,
-      "ttFollowers": 7,
-      "tiktok": 1,
-      "ttViews": 34,
-      "ytSubscribers": 0,
-      "ytViews": 6,
-      "igFeedPosts": 0
-    },
-    "2026-09-07": {
-      "ytSubscribers": 3,
-      "ytVideos": 0
+      "ttViews": 1
     }
   },
   "followers": {
     "ig": 639,
     "tt": 12,
-    "yt": 3
+    "yt": 3,
+    "combined": 654
+  },
+  "report": {
+    "postsThisWeek": {
+      "igReels": 1,
+      "igFeedPosts": 1,
+      "tiktok": 1,
+      "ytVideos": 0,
+      "total": 3
+    },
+    "postsThisMonth": {
+      "igReels": 9,
+      "igFeedPosts": 3,
+      "tiktok": 7,
+      "ytVideos": 0,
+      "total": 19
+    },
+    "streaks": {
+      "current": 0,
+      "longest": 5
+    },
+    "daysPosted30": 12,
+    "peakReach": {
+      "date": "2026-08-21",
+      "reach": 1023
+    },
+    "weeklyRhythm": {
+      "sun": 0.08,
+      "mon": 0.23,
+      "tue": 0.17,
+      "wed": 0.54,
+      "thu": 0.31,
+      "fri": 0.23,
+      "sat": 0.08
+    }
   }
 }
