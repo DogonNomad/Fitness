@@ -1812,6 +1812,18 @@
 <style id="metricool-collapsible-css">
   .metricool-collapsible.collapsed { display: none; }
 </style>
+<style id="patch-css">
+  .metricool-collapsible.collapsed { display: none; }
+  .comment-item { display:flex; gap:10px; align-items:flex-start; background: rgba(0,0,0,0.02); border:1px solid var(--line); border-radius:8px; padding:10px 12px; }
+  :root[data-theme="day"] .comment-item { background: rgba(0,0,0,0.03); }
+  :root[data-theme="sunset"] .comment-item { background: rgba(20,8,40,0.35); }
+  .comment-delete { appearance:none; background:transparent; border:0; color:var(--ink-faint); cursor:pointer; padding:4px 10px; border-radius:4px; font-size:18px; line-height:1; transition: color 120ms; }
+  .comment-delete:hover { color: var(--red); }
+  .comment-input-row { display:flex; gap:8px; }
+  .comment-input-row input { flex:1; padding:8px 12px; border:1px solid var(--line); border-radius:6px; font-family:inherit; font-size:13px; background:var(--surface); color:var(--ink); outline:none; }
+  .comment-input-row input:focus { border-color: var(--gold); }
+  .comment-add-btn { appearance:none; background:var(--gold); color:#fff; border:0; padding:8px 18px; border-radius:6px; font-family:inherit; font-weight:600; font-size:12px; cursor:pointer; }
+</style>
 </head>
 <body>
 
@@ -1916,6 +1928,7 @@
         <label>One sentence — flag pain, sleep, stress, breakthroughs. Log weight/reps here if you want.</label>
         <textarea id="t_note" placeholder="e.g. Bench 165x8, legs heavy, shipped reel #2 from San Andrés."></textarea>
       </div>
+      <div id="comments-container" style="margin-top:14px;"></div>
     </div>
 
     <div class="save-bar" id="saveBar" data-open="false">
@@ -4567,9 +4580,10 @@ renderHeader(); renderToday(); renderWeek(); renderMission();
 
 </script>
 
-<!-- Metricool live snapshot integration v4 (auto-added; safe to remove) -->
+<!-- Metricool integration + Comments feature v5 (auto-added; safe to remove) -->
 <script>
 (function(){
+  /* ============ METRICOOL ============ */
   var METRICOOL_SNAPSHOT = null;
   function fmtNum(n){
     if (n == null || isNaN(n)) return '—';
@@ -4694,6 +4708,81 @@ renderHeader(); renderToday(); renderWeek(); renderMission();
       btn.textContent = collapsed ? 'Show Metricool insights ▾' : 'Show fewer ▴';
     });
   }
+
+  /* ============ COMMENTS ============ */
+  var COMMENTS_KEY = 'walkout_comments_v1';
+  var COMMENTS_BY_DATE = {};
+  function loadComments(){
+    try { COMMENTS_BY_DATE = JSON.parse(localStorage.getItem(COMMENTS_KEY)) || {}; }
+    catch(e){ COMMENTS_BY_DATE = {}; }
+  }
+  function saveComments(){
+    try { localStorage.setItem(COMMENTS_KEY, JSON.stringify(COMMENTS_BY_DATE)); }
+    catch(e){ console.warn('Comment save failed', e); }
+  }
+  function addComment(iso, text){
+    var t = (text || '').trim();
+    if (!t) return;
+    COMMENTS_BY_DATE[iso] = COMMENTS_BY_DATE[iso] || [];
+    COMMENTS_BY_DATE[iso].push({
+      id: 'c' + Date.now() + Math.random().toString(36).substr(2, 5),
+      text: t,
+      ts: Date.now()
+    });
+    saveComments();
+  }
+  function deleteComment(iso, id){
+    if (!COMMENTS_BY_DATE[iso]) return;
+    COMMENTS_BY_DATE[iso] = COMMENTS_BY_DATE[iso].filter(function(c){ return c.id !== id; });
+    if (COMMENTS_BY_DATE[iso].length === 0) delete COMMENTS_BY_DATE[iso];
+    saveComments();
+  }
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function renderComments(iso){
+    var container = document.getElementById('comments-container');
+    if (!container) return;
+    var comments = COMMENTS_BY_DATE[iso] || [];
+    var html = '';
+    html += '<div style="font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:700; margin-bottom:8px;">Comments</div>';
+    if (comments.length === 0) {
+      html += '<div style="font-size:12px; color:var(--ink-faint); font-style:italic; margin-bottom:12px;">No comments yet.</div>';
+    } else {
+      html += '<div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">';
+      comments.forEach(function(c){
+        var time = new Date(c.ts).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+        html += '<div class="comment-item">';
+        html +=   '<div style="flex:1; font-size:13px; color:var(--ink); line-height:1.4;">' + esc(c.text) + '<div style="font-size:10px; color:var(--ink-faint); margin-top:4px;">' + time + '</div></div>';
+        html +=   '<button class="comment-delete" data-delete-id="' + c.id + '" title="Delete comment">×</button>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    html += '<div class="comment-input-row">';
+    html +=   '<input id="comment-input" type="text" placeholder="Add a comment..." autocomplete="off">';
+    html +=   '<button id="comment-add-btn" class="comment-add-btn">Add</button>';
+    html += '</div>';
+    container.innerHTML = html;
+    // Wire handlers
+    var input = document.getElementById('comment-input');
+    var addBtn = document.getElementById('comment-add-btn');
+    if (addBtn) addBtn.addEventListener('click', function(){
+      if (input.value.trim()) {
+        addComment(iso, input.value);
+        renderComments(iso);
+      }
+    });
+    if (input) input.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') { e.preventDefault(); addBtn.click(); }
+    });
+    container.querySelectorAll('[data-delete-id]').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        deleteComment(iso, btn.dataset.deleteId);
+        renderComments(iso);
+      });
+    });
+  }
+
+  /* ============ BOOT + HOOK ============ */
   function currentIso(){
     try {
       if (typeof window.activeDate === 'function') return window.activeDate();
@@ -4708,17 +4797,18 @@ renderHeader(); renderToday(); renderWeek(); renderMission();
     hookToggle();
     if (typeof window.renderToday !== 'function') {
       if (hookAttempts < 40) return setTimeout(tryHook, 150);
-      renderTiles(currentIso()); renderContentReport(); return;
+      renderTiles(currentIso()); renderContentReport(); renderComments(currentIso()); return;
     }
     var original = window.renderToday;
     window.renderToday = function(){
       var result = original.apply(this, arguments);
-      try { renderTiles(currentIso()); renderContentReport(); hookToggle(); } catch(e){ console.warn('Metricool render error', e); }
+      try { renderTiles(currentIso()); renderContentReport(); renderComments(currentIso()); hookToggle(); } catch(e){ console.warn('Patch render error', e); }
       return result;
     };
-    try { renderTiles(currentIso()); renderContentReport(); } catch(e){}
+    try { renderTiles(currentIso()); renderContentReport(); renderComments(currentIso()); } catch(e){}
   }
   function boot(){
+    loadComments();
     loadSnapshot().then(function(){ tryHook(); });
   }
   if (document.readyState === 'loading') {
