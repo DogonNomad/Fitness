@@ -1176,6 +1176,8 @@
 
   /* Collapsible grid: hide tiles past the 4th until expanded */
   .ex-grid.collapsible.collapsed > .ex-deck:nth-child(n+5) { display: none; }
+  /* Content pillar collapses to 2 tiles (it only has 3 total, so show 2 + hide 1 to match other decks' height) */
+  .card.pillar-content .ex-grid.collapsible.collapsed > .ex-deck:nth-child(n+3) { display: none; }
   /* Extra workouts on gym days — hidden while the template grid is collapsed; shown on Show more.
      !important beats the inline display:flex on the +Add exercise dropdown. */
   .workout-card .ex-grid.collapsible.collapsed ~ .extra-workouts-header,
@@ -1887,8 +1889,6 @@
       <div class="lede">Weekly targets: 2+ long-form · 3+ reels · 1+ carousel.</div>
       <div class="content-day-hint" id="contentDayHint">—</div>
       <div class="ex-grid" id="contentGrid"></div>
-      <h3 style="margin-top:18px; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:700;">Actually posted (Metricool live) <span id="metricoolStatus" style="font-size:10px; margin-left:8px; font-weight:400;">—</span></h3>
-      <div id="metricoolTiles" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-top:8px;"></div>
     </div>
 
     <div id="sec-career" class="toc-scroll-target card pillar-career" style="margin-top:18px;">
@@ -2789,7 +2789,10 @@ function renderPillarGrids() {
     PILLAR_METRICS[pillar].forEach(metric => {
       grid.appendChild(renderPillarTile(pillar, metric, dayData));
     });
-    makeCollapsibleGrid(grid);
+    // Content has only 3 tiles — force showN:2 so the collapsible toggle still kicks in
+    // (matches height of other decks: shows 2 tiles + "Show 1 more ▾" when collapsed).
+    const showN = pillar === 'content' ? 2 : 4;
+    makeCollapsibleGrid(grid, { showN });
   });
 }
 
@@ -4552,85 +4555,5 @@ renderHeader(); renderToday(); renderWeek(); renderMission();
 
 </script>
 
-<!-- Metricool live snapshot integration (auto-added; safe to remove) -->
-<script>
-(function(){
-  var METRICOOL_SNAPSHOT = null;
-  function loadSnapshot(){
-    return fetch('./data/metricool-snapshot.json?_=' + Date.now())
-      .then(function(r){ if(!r.ok) throw new Error('not found'); return r.json(); })
-      .then(function(j){ METRICOOL_SNAPSHOT = j; return j; })
-      .catch(function(){ METRICOOL_SNAPSHOT = null; return null; });
-  }
-  function renderTiles(iso){
-    var container = document.getElementById('metricoolTiles');
-    var statusEl  = document.getElementById('metricoolStatus');
-    if (!container) return;
-    container.innerHTML = '';
-    if (!METRICOOL_SNAPSHOT) {
-      if (statusEl) statusEl.innerHTML = '<span style="color:var(--ink-faint);">No snapshot yet</span>';
-      return;
-    }
-    var dayData = (METRICOOL_SNAPSHOT.days || {})[iso] || {};
-    if (statusEl && METRICOOL_SNAPSHOT.generatedAt) {
-      var dt = new Date(METRICOOL_SNAPSHOT.generatedAt);
-      statusEl.innerHTML = '<span style="color:var(--green);">\u25CF snapshot ' + dt.toLocaleDateString() + '</span>';
-    }
-    var tiles = [
-      { label: 'IG Reels',      value: dayData.igReels      || 0 },
-      { label: 'IG Feed posts', value: dayData.igFeedPosts  || 0 },
-      { label: 'TikTok videos', value: dayData.tiktok       || 0 },
-      { label: 'YT videos',     value: dayData.ytVideos     || 0 }
-    ];
-    tiles.forEach(function(t){
-      var tile = document.createElement('div');
-      tile.style.cssText = 'background: rgba(184,138,37,0.06); border: 1px solid rgba(184,138,37,0.25); border-radius: 8px; padding: 10px 12px; text-align: center;';
-      var lbl = document.createElement('div');
-      lbl.style.cssText = 'font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:700;';
-      lbl.textContent = t.label;
-      var val = document.createElement('div');
-      val.style.cssText = 'font-size:22px; font-weight:700; margin-top:4px; color:var(--ink); font-variant-numeric:tabular-nums;';
-      val.textContent = t.value;
-      tile.appendChild(lbl); tile.appendChild(val);
-      container.appendChild(tile);
-    });
-  }
-  function currentIso(){
-    try {
-      if (typeof window.activeDate === 'function') return window.activeDate();
-    } catch(e){}
-    var d = new Date();
-    var pad = function(n){ return String(n).padStart(2,'0'); };
-    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
-  }
-  var hookAttempts = 0;
-  function tryHook(){
-    hookAttempts++;
-    if (typeof window.renderToday !== 'function') {
-      if (hookAttempts < 40) return setTimeout(tryHook, 150);
-      // Give up hooking — still render once at load time.
-      return renderTiles(currentIso());
-    }
-    var original = window.renderToday;
-    window.renderToday = function(){
-      var result = original.apply(this, arguments);
-      try { renderTiles(currentIso()); } catch(e){ console.warn('Metricool tiles error', e); }
-      return result;
-    };
-    // Trigger initial render now that hook is in place.
-    try { renderTiles(currentIso()); } catch(e){}
-  }
-  function boot(){
-    loadSnapshot().then(function(){
-      tryHook();
-    });
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
-  } else {
-    boot();
-  }
-})();
-</script>
 </body>
 </html>
