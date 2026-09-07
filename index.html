@@ -1948,6 +1948,12 @@
       <div class="ex-grid" id="weekCareerGrid"></div>
     </div>
 
+    <div class="card" id="weekRecapPanel" style="margin-top:18px;">
+      <h2>Last week's recap</h2>
+      <div class="lede" id="weekRecapLede">Auto-generated from what you logged.</div>
+      <div id="weekRecapContent"></div>
+    </div>
+
     <div class="card" id="sundayPanel" style="margin-top:18px; display:none;">
       <h2>Sunday review prompt</h2>
       <div class="lede">It's Sunday — close the week.</div>
@@ -3123,40 +3129,40 @@ function renderCaliSetRow(key, s, idx, repLabel, onChange) {
   return row;
 }
 
-/* Exercise catalog for rest-day custom sessions — grouped by movement type */
+/* Exercise catalog — grouped by muscle group. Pull-ups + Pushups live in Calisthenics only (deduped). */
 const EXERCISE_GROUPS = {
-  'Upper body': [
+  'Chest': [
     { name: 'Bench press',         target: '4x8' },
     { name: 'Seated chest fly',    target: '3x10' },
     { name: 'Seated chest press',  target: '3x10' },
-    { name: 'Shoulder press',      target: '3x10' },
-    { name: 'Tricep pull down',    target: '3x10' },
-    { name: 'Tricep extension',    target: '3x10' },
     { name: 'Pec fly',             target: '3x10' },
-    { name: 'Side delt raise',     target: '3x10' },
-    { name: 'Shoulder shrug',      target: '3x15' },
+    { name: 'Dips',                target: 'max reps × 3 sets' }
+  ],
+  'Back': [
+    { name: 'Deadlift',            target: '3x8' },
+    { name: 'Lat pull down',       target: '4x10' },
     { name: 'Seated row',          target: '3x10' },
+    { name: 'Back extension',      target: '3x10' }
+  ],
+  'Shoulders': [
+    { name: 'Shoulder press',      target: '3x10' },
+    { name: 'Side delt raise',     target: '3x10' },
+    { name: 'Shoulder shrug',      target: '3x15' }
+  ],
+  'Arms': [
     { name: 'BB Bicep curl',       target: '3x10' },
     { name: 'Hammer curl',         target: '3x10' },
-    { name: 'Pull-ups',            target: 'max reps × 3 sets' },
-    { name: 'Dips',                target: 'max reps × 3 sets' },
-    { name: 'Push-ups',            target: 'max reps × 3 sets' }
+    { name: 'Tricep pull down',    target: '3x10' },
+    { name: 'Tricep extension',    target: '3x10' }
   ],
-  'Lower body': [
-    { name: 'Deadlift',            target: '3x8' },
+  'Legs': [
     { name: 'Leg press',           target: '3x10' },
     { name: 'Prone leg curl',      target: '3x12' },
     { name: 'Quad extension',      target: '3x10' },
     { name: 'Calf raise',          target: '3x12' },
     { name: 'Glute press',         target: '3x10' },
     { name: 'Hip abduction (int)', target: '3x15' },
-    { name: 'Hip abduction (ext)', target: '3x15' },
-    { name: 'Back extension',      target: '3x10' }
-  ],
-  'Cardio': [
-    { name: 'Jump rope',       target: '20 min' },
-    { name: 'Zone 2 walk/run', target: '30 min' },
-    { name: 'Interval sprint', target: '15 min' }
+    { name: 'Hip abduction (ext)', target: '3x15' }
   ],
   'Core': [
     { name: 'Ab wheel',        target: '3x10' },
@@ -3171,6 +3177,11 @@ const EXERCISE_GROUPS = {
     { name: 'Heel taps',       target: 'max reps × 3 sets' },
     { name: 'Pull-ups',        target: 'max reps × 3 sets' },
     { name: 'Knee raises',     target: 'max reps × 3 sets' }
+  ],
+  'Cardio': [
+    { name: 'Jump rope',       target: '20 min' },
+    { name: 'Zone 2 walk/run', target: '30 min' },
+    { name: 'Interval sprint', target: '15 min' }
   ],
   'Swim / Apnea': [
     { name: 'Static apnea',    target: 'apnea · breath-hold' },
@@ -3784,11 +3795,99 @@ function renderWeek() {
   scoreboard.appendChild(scoretile('Job', `${agg.apps}`, `/ ${APPS_TARGET} apps shipped`, jG, 'job'));
 
   renderWeekPillarGrids(agg, contentShipped, contentTarget);
+  renderWeeklyRecap(wk);
 
   const sunday = document.getElementById('sundayPanel');
   const isSat = (new Date()).getDay() === 6 && iso >= wk.startDate && iso <= wk.endDate;
   sunday.style.display = isSat ? 'block' : 'none';
   if (isSat) document.getElementById('sundayContent').innerHTML = sundayPrompt(wk, agg, fG, cG, nG, jG);
+}
+
+/* Weekly recap — auto-summary of the PREVIOUS week from tracker data */
+function renderWeeklyRecap(currentWeek) {
+  const content = document.getElementById('weekRecapContent');
+  const lede = document.getElementById('weekRecapLede');
+  if (!content) return;
+
+  // "Last week" = previous mission week when possible; otherwise the calendar week before current
+  let prevWk;
+  if (currentWeek && currentWeek.num > 1) prevWk = WEEKS[currentWeek.num - 2];
+  else {
+    const start = new Date(currentWeek ? currentWeek.startDate : todayIso());
+    start.setDate(start.getDate() - 7);
+    const end = new Date(start); end.setDate(start.getDate() + 6);
+    const fmt = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    prevWk = { num: 0, startDate: fmt(start), endDate: fmt(end), dayAtStart: 0, dayAtEnd: 0 };
+  }
+
+  const agg = aggregateWeek(prevWk);
+  const rangeStr = `${fmtFull(prevWk.startDate)} → ${fmtFull(prevWk.endDate)}`;
+  lede.textContent = `Week ${prevWk.num || '—'} · ${rangeStr}`;
+
+  const wins = [];
+  const misses = [];
+  const trends = [];
+
+  // Fitness
+  if (agg.gymCount >= SESSION_TARGET) wins.push(`Hit gym target: <strong>${agg.gymCount}/${SESSION_TARGET}</strong> sessions.`);
+  else if (agg.gymCount === 0) misses.push('Zero gym sessions logged.');
+  else misses.push(`Gym short by <strong>${SESSION_TARGET - agg.gymCount}</strong> (logged ${agg.gymCount}/${SESSION_TARGET}).`);
+
+  const calTotal = (agg.pushups||0) + (agg.mountedCrunches||0) + (agg.heelTaps||0) + (agg.pullups||0) + (agg.kneeRaises||0);
+  const calTarget = CAL_TARGETS.pushups + CAL_TARGETS.mountedCrunches + CAL_TARGETS.heelTaps + CAL_TARGETS.pullups + CAL_TARGETS.kneeRaises;
+  if (calTotal >= calTarget) wins.push(`Calisthenics volume on target: <strong>${calTotal.toLocaleString()}</strong> reps.`);
+  else if (calTotal > 0) trends.push(`Calisthenics: ${calTotal.toLocaleString()} / ${calTarget.toLocaleString()} reps (${Math.round(calTotal/calTarget*100)}%).`);
+  else misses.push('No calisthenics logged.');
+
+  // Sleep
+  if (agg.avgSleep != null) {
+    if (agg.avgSleep >= 7) wins.push(`Avg sleep <strong>${(Math.round(agg.avgSleep*10)/10)} h</strong> — above 7 h target.`);
+    else trends.push(`Avg sleep <strong>${(Math.round(agg.avgSleep*10)/10)} h</strong> · below 7 h floor on ${7 - agg.sleepsOnTarget} nights.`);
+  }
+
+  // Recovery
+  if (agg.saunaMin >= 75) wins.push(`Sauna target hit: <strong>${agg.saunaMin} min</strong>.`);
+  else if (agg.saunaMin > 0) trends.push(`Sauna ${agg.saunaMin} / 75 min.`);
+  if (agg.creatineTotal >= 35) wins.push(`Creatine target hit: <strong>${agg.creatineTotal} g</strong>.`);
+  else if (agg.creatineTotal > 0) trends.push(`Creatine ${agg.creatineTotal} / 35 g.`);
+  if (agg.coldPlungeMin >= 3) wins.push(`Cold plunge target hit: <strong>${agg.coldPlungeMin} min</strong>.`);
+  else if (agg.coldPlungeMin > 0) trends.push(`Cold plunge ${agg.coldPlungeMin} / 3 min.`);
+
+  // Content
+  const contentShipped = (agg.longForm || 0) + (agg.reels || 0) + (agg.carousels || 0);
+  const contentTarget = CONTENT_TARGETS.longForm + CONTENT_TARGETS.reels + CONTENT_TARGETS.carousels;
+  if (contentShipped >= contentTarget) wins.push(`Content shipped: <strong>${contentShipped}/${contentTarget}</strong> posts.`);
+  else if (contentShipped > 0) misses.push(`Content short: ${contentShipped}/${contentTarget} posts (long-form ${agg.longForm}, reels ${agg.reels}, carousels ${agg.carousels}).`);
+  else misses.push('Zero content shipped last week.');
+
+  // Career
+  if (agg.apps >= APPS_TARGET) wins.push(`Apps shipped: <strong>${agg.apps}/${APPS_TARGET}</strong>.`);
+  else if (agg.apps > 0) misses.push(`Apps short by ${APPS_TARGET - agg.apps} (${agg.apps}/${APPS_TARGET}).`);
+  else misses.push('Zero applications shipped.');
+  if (agg.people.length >= PEOPLE_SEEN_TARGET) wins.push(`People IRL: <strong>${agg.people.length}</strong> distinct.`);
+  else if (agg.people.length > 0) trends.push(`People IRL: ${agg.people.length} / ${PEOPLE_SEEN_TARGET}.`);
+  if (agg.dms >= DMS_TARGET) wins.push(`Warm DMs: <strong>${agg.dms}</strong>.`);
+  else if (agg.dms > 0) trends.push(`Warm DMs: ${agg.dms} / ${DMS_TARGET}.`);
+
+  // Suggestions — pick the 2 weakest pillars
+  const suggestions = [];
+  if (agg.gymCount < SESSION_TARGET) suggestions.push('Lock in 5 gym sessions next week — schedule them Sun–Fri now.');
+  if (contentShipped < contentTarget) suggestions.push('Batch-shoot content on Sunday so weekday posting is just publishing.');
+  if (agg.apps < APPS_TARGET) suggestions.push('Ship one application per weekday — 2 hrs blocked, 10am, no exceptions.');
+  if (agg.avgSleep != null && agg.avgSleep < 7) suggestions.push('Hard cutoff at 10:30pm — protect the 7 h sleep floor.');
+  if (agg.people.length < PEOPLE_SEEN_TARGET) suggestions.push('Pick 2 scenes this week (gym, dive club, meetup) — put them on the calendar.');
+
+  const emptyMsg = '<em class="small-help">—</em>';
+  const listHtml = (arr) => arr.length ? '<ul style="margin:6px 0 0; padding-left:20px; line-height:1.75;">' + arr.map(x => `<li>${x}</li>`).join('') + '</ul>' : emptyMsg;
+
+  content.innerHTML = `
+    <div class="grid-2" style="margin-top:10px; gap:16px;">
+      <div><h3 style="margin:0 0 4px; color:var(--green);">Went well</h3>${listHtml(wins)}</div>
+      <div><h3 style="margin:0 0 4px; color:var(--red);">Slipped</h3>${listHtml(misses)}</div>
+    </div>
+    <div style="margin-top:14px;"><h3 style="margin:0 0 4px; color:var(--ink-dim);">Trends</h3>${listHtml(trends)}</div>
+    <div style="margin-top:14px;"><h3 style="margin:0 0 4px; color:var(--gold);">Improve next week</h3>${listHtml(suggestions.slice(0, 3))}</div>
+  `;
 }
 function cadenceRow(label, val, target) {
   const wrap = document.createElement('div'); wrap.className = 'cadence-row';
