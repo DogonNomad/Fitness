@@ -1809,21 +1809,6 @@
   details summary { cursor: pointer; font-size: 13px; color: var(--ink-dim); }
   details[open] summary { color: var(--ink); }
 </style>
-<style id="metricool-collapsible-css">
-  .metricool-collapsible.collapsed { display: none; }
-</style>
-<style id="patch-css">
-  .metricool-collapsible.collapsed { display: none; }
-  .comment-item { display:flex; gap:10px; align-items:flex-start; background: rgba(0,0,0,0.02); border:1px solid var(--line); border-radius:8px; padding:10px 12px; }
-  :root[data-theme="day"] .comment-item { background: rgba(0,0,0,0.03); }
-  :root[data-theme="sunset"] .comment-item { background: rgba(20,8,40,0.35); }
-  .comment-delete { appearance:none; background:transparent; border:0; color:var(--ink-faint); cursor:pointer; padding:4px 10px; border-radius:4px; font-size:18px; line-height:1; transition: color 120ms; }
-  .comment-delete:hover { color: var(--red); }
-  .comment-input-row { display:flex; gap:8px; }
-  .comment-input-row input { flex:1; padding:8px 12px; border:1px solid var(--line); border-radius:6px; font-family:inherit; font-size:13px; background:var(--surface); color:var(--ink); outline:none; }
-  .comment-input-row input:focus { border-color: var(--gold); }
-  .comment-add-btn { appearance:none; background:var(--gold); color:#fff; border:0; padding:8px 18px; border-radius:6px; font-family:inherit; font-weight:600; font-size:12px; cursor:pointer; }
-</style>
 </head>
 <body>
 
@@ -1905,15 +1890,6 @@
       <div class="lede">Weekly targets: 2+ long-form · 3+ reels · 1+ carousel.</div>
       <div class="content-day-hint" id="contentDayHint">—</div>
       <div class="ex-grid" id="contentGrid"></div>
-      <div id="metricoolWrap" class="metricool-collapsible collapsed" style="margin-top:18px;">
-        <h3 style="font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:700; margin:0 0 8px;">Actually posted (Metricool live) <span id="metricoolStatus" style="font-size:10px; margin-left:8px; font-weight:400;">—</span></h3>
-        <div id="metricoolTiles" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px;"></div>
-        <details id="contentReportDetails" style="margin-top:14px; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:12px 16px;">
-          <summary style="cursor:pointer; font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:700;">Content Tracker report</summary>
-          <div id="contentReportBody" style="margin-top:14px;"></div>
-        </details>
-      </div>
-      <button type="button" id="metricoolWrapToggle" class="grid-toggle" style="margin-top:8px;">Show Metricool insights ▾</button>
     </div>
 
     <div id="sec-career" class="toc-scroll-target card pillar-career" style="margin-top:18px;">
@@ -1928,7 +1904,6 @@
         <label>One sentence — flag pain, sleep, stress, breakthroughs. Log weight/reps here if you want.</label>
         <textarea id="t_note" placeholder="e.g. Bench 165x8, legs heavy, shipped reel #2 from San Andrés."></textarea>
       </div>
-      <div id="comments-container" style="margin-top:14px;"></div>
     </div>
 
     <div class="save-bar" id="saveBar" data-open="false">
@@ -2170,10 +2145,10 @@ const STORAGE_KEY = 'walkout_v4';
    input: 'number' | 'check' | 'select' | 'text'  */
 const PILLAR_METRICS = {
   fitness: [
-    { key: 'plankMinutes',    label: 'Plank',         target: Math.round(CAL_TARGETS.plankMinutes/7*10)/10, unit: 'min', input: 'sets', repLabel: 'time', format: 'time', perSetMin: 2.5 },
-    { key: 'pushups',         label: 'Pushups',       target: Math.round(CAL_TARGETS.pushups/7),         input: 'sets', repLabel: 'reps' },
-    { key: 'mountedCrunches', label: 'Crunches',      target: Math.round(CAL_TARGETS.mountedCrunches/7), input: 'sets', repLabel: 'reps' },
-    { key: 'heelTaps',        label: 'Heel taps',     target: Math.round(CAL_TARGETS.heelTaps/7),        input: 'sets', repLabel: 'reps' },
+    { key: 'plankMinutes',    label: 'Plank',         target: 8,   unit: 'min', input: 'sets', repLabel: 'time', timeInput: true },
+    { key: 'pushups',         label: 'Pushups',       target: 100, input: 'sets', repLabel: 'reps' },
+    { key: 'mountedCrunches', label: 'Crunches',      target: 60,  input: 'sets', repLabel: 'reps' },
+    { key: 'heelTaps',        label: 'Heel taps',     target: 75,  input: 'sets', repLabel: 'reps' },
     { key: 'pullups',         label: 'Pull-ups',      target: Math.round(CAL_TARGETS.pullups/7),         input: 'sets', repLabel: 'reps' },
     { key: 'kneeRaises',      label: 'Knee raises',   target: Math.round(CAL_TARGETS.kneeRaises/7),      input: 'sets', repLabel: 'reps' }
   ],
@@ -2700,24 +2675,6 @@ function deleteCaliSet(key, idx) {
   renderDayStrip();
 }
 
-/* Time helpers (used by Plank mm:ss input/display) */
-function fmtMinAsTime(v) {
-  if (v == null || isNaN(v)) return '0:00';
-  const totalSec = Math.round(Number(v) * 60);
-  const m = Math.floor(totalSec / 60);
-  const s = totalSec % 60;
-  return `${m}:${String(s).padStart(2, '0')}`;
-}
-function parseTimeToMin(str) {
-  if (str == null) return NaN;
-  const s = String(str).trim();
-  if (!s) return NaN;
-  const m = s.match(/^(\d+):([0-5]?\d)$/);
-  if (m) return Number(m[1]) + Number(m[2]) / 60;
-  const n = Number(s);
-  return Number.isFinite(n) ? n : NaN;
-}
-
 function pillarMetricValue(metric, dayData) {
   if (metric.input === 'sets') return caliTotalFromDay(dayData || {}, metric.key);
   if (metric.input === 'entries') {
@@ -2797,11 +2754,6 @@ function pillarMetricLabel(metric, value, raw) {
   if (metric.input === 'check') return value ? '✓ Done' : '—';
   if (metric.input === 'select') return raw ? String(raw).replace(/-/g, ' ').toUpperCase() : '—';
   if (metric.input === 'sets') {
-    if (metric.format === 'time') {
-      const dispT = fmtMinAsTime(value);
-      if (metric.target == null) return dispT;
-      return `${dispT} / ${fmtMinAsTime(metric.target)}`;
-    }
     const disp = Math.round(value * 10) / 10;
     if (metric.target == null) return `${disp}${unit}`;
     const tgt = Number.isInteger(metric.target) ? metric.target : Math.round(metric.target * 10) / 10;
@@ -3026,7 +2978,6 @@ function createSetsPillarInput(pillar, metric) {
   const iso = activeDate();
   const day = STATE.days[iso] || {};
   const sets = caliSetsFromDay(day, metric.key);
-  const isTime = metric.format === 'time';
   const repLabel = metric.repLabel || 'reps';
 
   const hint = document.createElement('div');
@@ -3034,30 +2985,26 @@ function createSetsPillarInput(pillar, metric) {
   const updateHint = () => {
     const curSets = caliSetsFromDay(STATE.days[activeDate()] || {}, metric.key);
     const curTotal = curSets.reduce((a, s) => a + (Number(s.reps) || 0), 0);
-    if (isTime) {
-      const tgt = metric.target != null ? ` / ${fmtMinAsTime(metric.target)}` : '';
-      hint.textContent = `${curSets.length} set${curSets.length === 1 ? '' : 's'} · ${fmtMinAsTime(curTotal)}${tgt} total`;
-    } else {
-      hint.textContent = `${curSets.length} set${curSets.length === 1 ? '' : 's'} logged · ${Math.round(curTotal*10)/10} total ${repLabel}`;
-    }
+    const totalStr = metric.timeInput ? formatMinToTime(curTotal) : (Math.round(curTotal*10)/10 + ' total ' + repLabel);
+    hint.textContent = `${curSets.length} set${curSets.length === 1 ? '' : 's'} logged · ${totalStr}${metric.timeInput ? ' total' : ''}`;
   };
   updateHint();
   wrap.appendChild(hint);
 
   const setList = document.createElement('div');
   setList.className = 'set-list';
-  sets.forEach((s, i) => setList.appendChild(renderCaliSetRow(metric.key, s, i, repLabel, updateHint, isTime)));
+  sets.forEach((s, i) => setList.appendChild(renderCaliSetRow(metric.key, s, i, repLabel, updateHint)));
   wrap.appendChild(setList);
 
   const logForm = document.createElement('div');
   logForm.className = 'set-log-form';
   logForm.style.gridTemplateColumns = '1fr auto';
   const rIn = document.createElement('input');
-  if (isTime) {
+  if (metric.timeInput) {
     rIn.type = 'text';
-    rIn.placeholder = 'mm:ss (e.g. 2:45)';
+    rIn.placeholder = 'mm:ss (e.g. 3:30)';
     rIn.inputMode = 'numeric';
-    rIn.autocomplete = 'off';
+    rIn.pattern = '[0-9]{1,2}:[0-5][0-9]';
   } else {
     rIn.type = 'number'; rIn.min = '0'; rIn.placeholder = repLabel;
     if (metric.repStep) rIn.step = metric.repStep;
@@ -3065,12 +3012,18 @@ function createSetsPillarInput(pillar, metric) {
   const logBtn = document.createElement('button');
   logBtn.type = 'button'; logBtn.textContent = '+ Log set';
   logBtn.addEventListener('click', () => {
-    const r = isTime ? parseTimeToMin(rIn.value) : Number(rIn.value);
-    if (!r || r <= 0 || isNaN(r)) { rIn.focus(); return; }
+    let r;
+    if (metric.timeInput) {
+      r = parseTimeToMin(rIn.value);
+      if (!(r > 0)) { rIn.focus(); return; }
+    } else {
+      r = Number(rIn.value);
+      if (!r || r <= 0) { rIn.focus(); return; }
+    }
     logCaliSet(metric.key, r);
     const arr = STATE.days[activeDate()].calisthenics[metric.key];
     const idx = arr.length - 1;
-    setList.appendChild(renderCaliSetRow(metric.key, { reps: r }, idx, repLabel, updateHint, isTime));
+    setList.appendChild(renderCaliSetRow(metric.key, { reps: r }, idx, repLabel, updateHint));
     rIn.value = ''; rIn.focus();
     updatePillarTile(metric.key);
     updateHint();
@@ -3185,12 +3138,34 @@ function renderEntryRow(metric, entry, idx, onChange) {
   return row;
 }
 
-function renderCaliSetRow(key, s, idx, repLabel, onChange, isTime) {
+/* mm:ss <-> decimal minutes helpers (used for plank per-set time entry) */
+function parseTimeToMin(str) {
+  if (str == null) return 0;
+  const t = String(str).trim();
+  if (!t) return 0;
+  if (t.includes(':')) {
+    const [m, s] = t.split(':').map(x => Number(x));
+    if (isNaN(m) || isNaN(s)) return 0;
+    return m + (s || 0) / 60;
+  }
+  const n = Number(t);
+  return isNaN(n) ? 0 : n;
+}
+function formatMinToTime(n) {
+  const total = Math.max(0, Number(n) || 0);
+  const m = Math.floor(total);
+  const s = Math.round((total - m) * 60);
+  if (s === 60) return `${m + 1}:00`;
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
+
+function renderCaliSetRow(key, s, idx, repLabel, onChange) {
   const row = document.createElement('div');
   row.className = 'set-row';
   const num = document.createElement('span'); num.className = 'set-num'; num.textContent = 'Set ' + (idx + 1);
   const det = document.createElement('span'); det.className = 'set-detail';
-  det.textContent = isTime ? fmtMinAsTime(s.reps) : `${s.reps} ${repLabel}`;
+  if (key === 'plankMinutes') det.textContent = formatMinToTime(s.reps);
+  else det.textContent = `${s.reps} ${repLabel}`;
   const del = document.createElement('button');
   del.className = 'set-delete'; del.type = 'button'; del.textContent = '×'; del.title = 'Delete set';
   del.addEventListener('click', () => {
@@ -3251,10 +3226,10 @@ const EXERCISE_GROUPS = {
     { name: 'Leg raise',       target: '3x12' }
   ],
   'Calisthenics': [
-    { name: 'Plank',           target: 'min × sets — free entry' },
-    { name: 'Pushups',         target: 'reps × sets — free entry' },
+    { name: 'Plank',           target: '3 min' },
+    { name: 'Pushups',         target: 'max reps × 3 sets' },
     { name: 'Crunches',        target: 'max reps × 3 sets' },
-    { name: 'Heel taps',       target: 'reps × sets — free entry' },
+    { name: 'Heel taps',       target: 'max reps × 3 sets' },
     { name: 'Pull-ups',        target: 'max reps × 3 sets' },
     { name: 'Knee raises',     target: 'max reps × 3 sets' }
   ],
@@ -3937,8 +3912,8 @@ function renderWeeklyRecap(currentWeek) {
   }
 
   // Recovery
-  if (agg.saunaMin >= 90) wins.push(`Sauna target hit: <strong>${agg.saunaMin} min</strong>.`);
-  else if (agg.saunaMin > 0) trends.push(`Sauna ${agg.saunaMin} / 90 min.`);
+  if (agg.saunaMin >= 75) wins.push(`Sauna target hit: <strong>${agg.saunaMin} min</strong>.`);
+  else if (agg.saunaMin > 0) trends.push(`Sauna ${agg.saunaMin} / 75 min.`);
   if (agg.creatineTotal >= 35) wins.push(`Creatine target hit: <strong>${agg.creatineTotal} g</strong>.`);
   else if (agg.creatineTotal > 0) trends.push(`Creatine ${agg.creatineTotal} / 35 g.`);
   if (agg.coldPlungeMin >= 3) wins.push(`Cold plunge target hit: <strong>${agg.coldPlungeMin} min</strong>.`);
@@ -4616,243 +4591,5 @@ renderHeader(); renderToday(); renderWeek(); renderMission();
 
 </script>
 
-<!-- Metricool integration + Comments feature v5 (auto-added; safe to remove) -->
-<script>
-(function(){
-  /* ============ METRICOOL ============ */
-  var METRICOOL_SNAPSHOT = null;
-  function fmtNum(n){
-    if (n == null || isNaN(n)) return '—';
-    if (n >= 10000) return (n/1000).toFixed(1) + 'k';
-    return Math.round(n).toLocaleString();
-  }
-  function loadSnapshot(){
-    return fetch('./data/metricool-snapshot.json?_=' + Date.now())
-      .then(function(r){ if(!r.ok) throw new Error('not found'); return r.json(); })
-      .then(function(j){ METRICOOL_SNAPSHOT = j; return j; })
-      .catch(function(){ METRICOOL_SNAPSHOT = null; return null; });
-  }
-  function renderTiles(iso){
-    var container = document.getElementById('metricoolTiles');
-    var statusEl  = document.getElementById('metricoolStatus');
-    if (!container) return;
-    container.innerHTML = '';
-    if (!METRICOOL_SNAPSHOT) {
-      if (statusEl) statusEl.innerHTML = '<span style="color:var(--ink-faint);">No snapshot yet</span>';
-      return;
-    }
-    var dayData = (METRICOOL_SNAPSHOT.days || {})[iso] || {};
-    if (statusEl && METRICOOL_SNAPSHOT.generatedAt) {
-      var dt = new Date(METRICOOL_SNAPSHOT.generatedAt);
-      statusEl.innerHTML = '<span style="color:var(--green);">● snapshot ' + dt.toLocaleDateString() + '</span>';
-    }
-    var tiles = [
-      { label: 'IG Reels',      value: dayData.igReels      || 0 },
-      { label: 'IG Feed posts', value: dayData.igFeedPosts  || 0 },
-      { label: 'TikTok videos', value: dayData.tiktok       || 0 },
-      { label: 'YT videos',     value: dayData.ytVideos     || 0 }
-    ];
-    tiles.forEach(function(t){
-      var tile = document.createElement('div');
-      tile.style.cssText = 'background: rgba(184,138,37,0.06); border: 1px solid rgba(184,138,37,0.25); border-radius: 8px; padding: 10px 12px; text-align: center;';
-      var lbl = document.createElement('div');
-      lbl.style.cssText = 'font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:700;';
-      lbl.textContent = t.label;
-      var val = document.createElement('div');
-      val.style.cssText = 'font-size:22px; font-weight:700; margin-top:4px; color:var(--ink); font-variant-numeric:tabular-nums;';
-      val.textContent = t.value;
-      tile.appendChild(lbl); tile.appendChild(val);
-      container.appendChild(tile);
-    });
-  }
-  function renderContentReport(){
-    var body = document.getElementById('contentReportBody');
-    if (!body) return;
-    if (!METRICOOL_SNAPSHOT || !METRICOOL_SNAPSHOT.report || !METRICOOL_SNAPSHOT.followers){
-      body.innerHTML = '<div style="font-size:12px; color:var(--ink-faint);">No report data yet — push a new snapshot from Content Tracker.</div>';
-      return;
-    }
-    var f = METRICOOL_SNAPSHOT.followers;
-    var r = METRICOOL_SNAPSHOT.report;
-    var css = {
-      row: 'display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:10px; margin-bottom:14px;',
-      tile: 'background:rgba(184,138,37,0.05); border:1px solid rgba(184,138,37,0.2); border-radius:8px; padding:10px 12px;',
-      tileLbl: 'font-size:10px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:700;',
-      tileVal: 'font-size:22px; font-weight:700; margin-top:4px; color:var(--ink); font-variant-numeric:tabular-nums;',
-      tileSub: 'font-size:10px; color:var(--ink-faint); margin-top:2px;',
-      section: 'font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:var(--ink-faint); font-weight:700; margin:14px 0 8px;',
-    };
-    function tile(label, value, sub) {
-      var s = sub ? '<div style="' + css.tileSub + '">' + sub + '</div>' : '';
-      return '<div style="' + css.tile + '"><div style="' + css.tileLbl + '">' + label + '</div><div style="' + css.tileVal + '">' + value + '</div>' + s + '</div>';
-    }
-    var html = '';
-    html += '<div style="' + css.section + '">Followers today</div>';
-    html += '<div style="' + css.row + '">';
-    html +=   tile('Instagram', fmtNum(f.ig));
-    html +=   tile('TikTok', fmtNum(f.tt));
-    html +=   tile('YouTube', fmtNum(f.yt));
-    html +=   tile('Combined', fmtNum(f.combined));
-    html += '</div>';
-    html += '<div style="' + css.section + '">Posts shipped</div>';
-    html += '<div style="' + css.row + '">';
-    html +=   tile('This week', fmtNum(r.postsThisWeek.total), 'IG ' + (r.postsThisWeek.igReels + r.postsThisWeek.igFeedPosts) + ' · TT ' + r.postsThisWeek.tiktok + ' · YT ' + r.postsThisWeek.ytVideos);
-    html +=   tile('This month', fmtNum(r.postsThisMonth.total), 'IG ' + (r.postsThisMonth.igReels + r.postsThisMonth.igFeedPosts) + ' · TT ' + r.postsThisMonth.tiktok + ' · YT ' + r.postsThisMonth.ytVideos);
-    html += '</div>';
-    html += '<div style="' + css.section + '">Consistency</div>';
-    html += '<div style="' + css.row + '">';
-    html +=   tile('Current streak', fmtNum(r.streaks.current), r.streaks.current > 0 ? 'ending today' : 'nothing today');
-    html +=   tile('Longest streak', fmtNum(r.streaks.longest), 'last 90 days');
-    html +=   tile('Days posted', fmtNum(r.daysPosted30) + ' / 30', 'of last 30 days');
-    html += '</div>';
-    if (r.peakReach && r.peakReach.date && r.peakReach.reach > 0) {
-      var pd = new Date(r.peakReach.date + 'T00:00:00');
-      var pdStr = pd.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
-      html += '<div style="' + css.section + '">Peak reach this month</div>';
-      html += '<div style="' + css.row + '">';
-      html +=   tile(pdStr, fmtNum(r.peakReach.reach), 'IG accounts reached');
-      html += '</div>';
-    }
-    html += '<div style="' + css.section + '">Weekly rhythm · avg posts/day</div>';
-    var dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    var dayKeys = ['sun','mon','tue','wed','thu','fri','sat'];
-    var vals = dayKeys.map(function(k){ return r.weeklyRhythm[k] || 0; });
-    var maxV = Math.max.apply(null, vals) || 1;
-    html += '<div style="display:flex; align-items:flex-end; justify-content:space-around; height:80px; gap:6px; padding:0 4px; margin-bottom:4px;">';
-    vals.forEach(function(v){
-      var h = Math.max(4, (v / maxV) * 66);
-      html += '<div style="flex:1; max-width:36px; height:' + h + 'px; background:linear-gradient(180deg, var(--gold), rgba(184,138,37,0.6)); border-radius:4px 4px 2px 2px; position:relative;">';
-      html += '<div style="position:absolute; top:-16px; left:0; right:0; text-align:center; font-size:10px; color:var(--ink); font-weight:700; font-variant-numeric:tabular-nums;">' + v.toFixed(1) + '</div>';
-      html += '</div>';
-    });
-    html += '</div>';
-    html += '<div style="display:flex; justify-content:space-around; padding:0 4px;">';
-    dayNames.forEach(function(n){
-      html += '<div style="flex:1; max-width:36px; text-align:center; font-size:10px; color:var(--ink-dim);">' + n + '</div>';
-    });
-    html += '</div>';
-    body.innerHTML = html;
-  }
-  function hookToggle(){
-    var btn = document.getElementById('metricoolWrapToggle');
-    var wrap = document.getElementById('metricoolWrap');
-    if (!btn || !wrap) return;
-    if (btn.dataset.hooked === '1') return;
-    btn.dataset.hooked = '1';
-    btn.addEventListener('click', function(){
-      var collapsed = wrap.classList.toggle('collapsed');
-      btn.textContent = collapsed ? 'Show Metricool insights ▾' : 'Show fewer ▴';
-    });
-  }
-
-  /* ============ COMMENTS ============ */
-  var COMMENTS_KEY = 'walkout_comments_v1';
-  var COMMENTS_BY_DATE = {};
-  function loadComments(){
-    try { COMMENTS_BY_DATE = JSON.parse(localStorage.getItem(COMMENTS_KEY)) || {}; }
-    catch(e){ COMMENTS_BY_DATE = {}; }
-  }
-  function saveComments(){
-    try { localStorage.setItem(COMMENTS_KEY, JSON.stringify(COMMENTS_BY_DATE)); }
-    catch(e){ console.warn('Comment save failed', e); }
-  }
-  function addComment(iso, text){
-    var t = (text || '').trim();
-    if (!t) return;
-    COMMENTS_BY_DATE[iso] = COMMENTS_BY_DATE[iso] || [];
-    COMMENTS_BY_DATE[iso].push({
-      id: 'c' + Date.now() + Math.random().toString(36).substr(2, 5),
-      text: t,
-      ts: Date.now()
-    });
-    saveComments();
-  }
-  function deleteComment(iso, id){
-    if (!COMMENTS_BY_DATE[iso]) return;
-    COMMENTS_BY_DATE[iso] = COMMENTS_BY_DATE[iso].filter(function(c){ return c.id !== id; });
-    if (COMMENTS_BY_DATE[iso].length === 0) delete COMMENTS_BY_DATE[iso];
-    saveComments();
-  }
-  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
-  function renderComments(iso){
-    var container = document.getElementById('comments-container');
-    if (!container) return;
-    var comments = COMMENTS_BY_DATE[iso] || [];
-    var html = '';
-    html += '<div style="font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:700; margin-bottom:8px;">Comments</div>';
-    if (comments.length === 0) {
-      html += '<div style="font-size:12px; color:var(--ink-faint); font-style:italic; margin-bottom:12px;">No comments yet.</div>';
-    } else {
-      html += '<div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">';
-      comments.forEach(function(c){
-        var time = new Date(c.ts).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
-        html += '<div class="comment-item">';
-        html +=   '<div style="flex:1; font-size:13px; color:var(--ink); line-height:1.4;">' + esc(c.text) + '<div style="font-size:10px; color:var(--ink-faint); margin-top:4px;">' + time + '</div></div>';
-        html +=   '<button class="comment-delete" data-delete-id="' + c.id + '" title="Delete comment">×</button>';
-        html += '</div>';
-      });
-      html += '</div>';
-    }
-    html += '<div class="comment-input-row">';
-    html +=   '<input id="comment-input" type="text" placeholder="Add a comment..." autocomplete="off">';
-    html +=   '<button id="comment-add-btn" class="comment-add-btn">Add</button>';
-    html += '</div>';
-    container.innerHTML = html;
-    // Wire handlers
-    var input = document.getElementById('comment-input');
-    var addBtn = document.getElementById('comment-add-btn');
-    if (addBtn) addBtn.addEventListener('click', function(){
-      if (input.value.trim()) {
-        addComment(iso, input.value);
-        renderComments(iso);
-      }
-    });
-    if (input) input.addEventListener('keydown', function(e){
-      if (e.key === 'Enter') { e.preventDefault(); addBtn.click(); }
-    });
-    container.querySelectorAll('[data-delete-id]').forEach(function(btn){
-      btn.addEventListener('click', function(){
-        deleteComment(iso, btn.dataset.deleteId);
-        renderComments(iso);
-      });
-    });
-  }
-
-  /* ============ BOOT + HOOK ============ */
-  function currentIso(){
-    try {
-      if (typeof window.activeDate === 'function') return window.activeDate();
-    } catch(e){}
-    var d = new Date();
-    var pad = function(n){ return String(n).padStart(2,'0'); };
-    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
-  }
-  var hookAttempts = 0;
-  function tryHook(){
-    hookAttempts++;
-    hookToggle();
-    if (typeof window.renderToday !== 'function') {
-      if (hookAttempts < 40) return setTimeout(tryHook, 150);
-      renderTiles(currentIso()); renderContentReport(); renderComments(currentIso()); return;
-    }
-    var original = window.renderToday;
-    window.renderToday = function(){
-      var result = original.apply(this, arguments);
-      try { renderTiles(currentIso()); renderContentReport(); renderComments(currentIso()); hookToggle(); } catch(e){ console.warn('Patch render error', e); }
-      return result;
-    };
-    try { renderTiles(currentIso()); renderContentReport(); renderComments(currentIso()); } catch(e){}
-  }
-  function boot(){
-    loadComments();
-    loadSnapshot().then(function(){ tryHook(); });
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', boot);
-  } else {
-    boot();
-  }
-})();
-</script>
 </body>
 </html>
