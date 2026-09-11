@@ -2061,7 +2061,7 @@ const MISSION_START = '2026-08-23'; // Sun, Day 1
 const MISSION_END   = '2026-10-03'; // Sat, Day 42
 const MISSION_DAYS  = 42;
 
-const CAL_TARGETS = { plankMinutes: 50, pushups: 500, mountedCrunches: 250, heelTaps: 250, pullups: 60, kneeRaises: 250 };
+const CAL_TARGETS = { plankMinutes: 32, pushups: 500, mountedCrunches: 240, heelTaps: 300, pullups: 60, kneeRaises: 250 };
 const CAL_LABELS = { plankMinutes: 'Plank (min)', pushups: 'Pushups', mountedCrunches: 'Crunches', heelTaps: 'Heel taps', pullups: 'Pull-ups', kneeRaises: 'Knee raises' };
 const CAL_KEYS = ['plankMinutes', 'pushups', 'mountedCrunches', 'heelTaps', 'pullups', 'kneeRaises'];
 
@@ -2170,7 +2170,7 @@ const STORAGE_KEY = 'walkout_v4';
    input: 'number' | 'check' | 'select' | 'text'  */
 const PILLAR_METRICS = {
   fitness: [
-    { key: 'plankMinutes',    label: 'Plank',         target: Math.round(CAL_TARGETS.plankMinutes/7*10)/10, unit: 'min', input: 'sets', repLabel: 'min', repStep: 0.5 },
+    { key: 'plankMinutes',    label: 'Plank',         target: Math.round(CAL_TARGETS.plankMinutes/7*10)/10, unit: 'min', input: 'sets', repLabel: 'time', format: 'time', perSetMin: 2.5 },
     { key: 'pushups',         label: 'Pushups',       target: Math.round(CAL_TARGETS.pushups/7),         input: 'sets', repLabel: 'reps' },
     { key: 'mountedCrunches', label: 'Crunches',      target: Math.round(CAL_TARGETS.mountedCrunches/7), input: 'sets', repLabel: 'reps' },
     { key: 'heelTaps',        label: 'Heel taps',     target: Math.round(CAL_TARGETS.heelTaps/7),        input: 'sets', repLabel: 'reps' },
@@ -2180,7 +2180,7 @@ const PILLAR_METRICS = {
   recovery: [
     { key: 'sleepHours', label: 'Sleep',       target: 7,    unit: 'h',   input: 'number', step: 0.1 },
     { key: 'weightLbs',  label: 'Bodyweight',  target: null, unit: 'lbs', input: 'number', step: 0.2 },
-    { key: 'steamMin',   label: 'Sauna',       target: 15,   unit: 'min', input: 'number' },
+    { key: 'steamMin',   label: 'Sauna',       target: 18,   unit: 'min', input: 'number' },
     { key: 'coldPlunge', label: 'Cold plunge', target: 3,    unit: 'min', input: 'number', step: 0.5 },
     { key: 'creatineG',  label: 'Creatine',    target: 5,    unit: 'g',   input: 'number', step: 0.5 }
   ],
@@ -2700,6 +2700,24 @@ function deleteCaliSet(key, idx) {
   renderDayStrip();
 }
 
+/* Time helpers (used by Plank mm:ss input/display) */
+function fmtMinAsTime(v) {
+  if (v == null || isNaN(v)) return '0:00';
+  const totalSec = Math.round(Number(v) * 60);
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
+function parseTimeToMin(str) {
+  if (str == null) return NaN;
+  const s = String(str).trim();
+  if (!s) return NaN;
+  const m = s.match(/^(\d+):([0-5]?\d)$/);
+  if (m) return Number(m[1]) + Number(m[2]) / 60;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : NaN;
+}
+
 function pillarMetricValue(metric, dayData) {
   if (metric.input === 'sets') return caliTotalFromDay(dayData || {}, metric.key);
   if (metric.input === 'entries') {
@@ -2779,6 +2797,11 @@ function pillarMetricLabel(metric, value, raw) {
   if (metric.input === 'check') return value ? '✓ Done' : '—';
   if (metric.input === 'select') return raw ? String(raw).replace(/-/g, ' ').toUpperCase() : '—';
   if (metric.input === 'sets') {
+    if (metric.format === 'time') {
+      const dispT = fmtMinAsTime(value);
+      if (metric.target == null) return dispT;
+      return `${dispT} / ${fmtMinAsTime(metric.target)}`;
+    }
     const disp = Math.round(value * 10) / 10;
     if (metric.target == null) return `${disp}${unit}`;
     const tgt = Number.isInteger(metric.target) ? metric.target : Math.round(metric.target * 10) / 10;
@@ -3003,6 +3026,7 @@ function createSetsPillarInput(pillar, metric) {
   const iso = activeDate();
   const day = STATE.days[iso] || {};
   const sets = caliSetsFromDay(day, metric.key);
+  const isTime = metric.format === 'time';
   const repLabel = metric.repLabel || 'reps';
 
   const hint = document.createElement('div');
@@ -3010,31 +3034,43 @@ function createSetsPillarInput(pillar, metric) {
   const updateHint = () => {
     const curSets = caliSetsFromDay(STATE.days[activeDate()] || {}, metric.key);
     const curTotal = curSets.reduce((a, s) => a + (Number(s.reps) || 0), 0);
-    hint.textContent = `${curSets.length} set${curSets.length === 1 ? '' : 's'} logged · ${Math.round(curTotal*10)/10} total ${repLabel}`;
+    if (isTime) {
+      const tgt = metric.target != null ? ` / ${fmtMinAsTime(metric.target)}` : '';
+      hint.textContent = `${curSets.length} set${curSets.length === 1 ? '' : 's'} · ${fmtMinAsTime(curTotal)}${tgt} total`;
+    } else {
+      hint.textContent = `${curSets.length} set${curSets.length === 1 ? '' : 's'} logged · ${Math.round(curTotal*10)/10} total ${repLabel}`;
+    }
   };
   updateHint();
   wrap.appendChild(hint);
 
   const setList = document.createElement('div');
   setList.className = 'set-list';
-  sets.forEach((s, i) => setList.appendChild(renderCaliSetRow(metric.key, s, i, repLabel, updateHint)));
+  sets.forEach((s, i) => setList.appendChild(renderCaliSetRow(metric.key, s, i, repLabel, updateHint, isTime)));
   wrap.appendChild(setList);
 
   const logForm = document.createElement('div');
   logForm.className = 'set-log-form';
   logForm.style.gridTemplateColumns = '1fr auto';
   const rIn = document.createElement('input');
-  rIn.type = 'number'; rIn.min = '0'; rIn.placeholder = repLabel;
-  if (metric.repStep) rIn.step = metric.repStep;
+  if (isTime) {
+    rIn.type = 'text';
+    rIn.placeholder = 'mm:ss (e.g. 2:45)';
+    rIn.inputMode = 'numeric';
+    rIn.autocomplete = 'off';
+  } else {
+    rIn.type = 'number'; rIn.min = '0'; rIn.placeholder = repLabel;
+    if (metric.repStep) rIn.step = metric.repStep;
+  }
   const logBtn = document.createElement('button');
   logBtn.type = 'button'; logBtn.textContent = '+ Log set';
   logBtn.addEventListener('click', () => {
-    const r = Number(rIn.value);
-    if (!r || r <= 0) { rIn.focus(); return; }
+    const r = isTime ? parseTimeToMin(rIn.value) : Number(rIn.value);
+    if (!r || r <= 0 || isNaN(r)) { rIn.focus(); return; }
     logCaliSet(metric.key, r);
     const arr = STATE.days[activeDate()].calisthenics[metric.key];
     const idx = arr.length - 1;
-    setList.appendChild(renderCaliSetRow(metric.key, { reps: r }, idx, repLabel, updateHint));
+    setList.appendChild(renderCaliSetRow(metric.key, { reps: r }, idx, repLabel, updateHint, isTime));
     rIn.value = ''; rIn.focus();
     updatePillarTile(metric.key);
     updateHint();
@@ -3149,12 +3185,12 @@ function renderEntryRow(metric, entry, idx, onChange) {
   return row;
 }
 
-function renderCaliSetRow(key, s, idx, repLabel, onChange) {
+function renderCaliSetRow(key, s, idx, repLabel, onChange, isTime) {
   const row = document.createElement('div');
   row.className = 'set-row';
   const num = document.createElement('span'); num.className = 'set-num'; num.textContent = 'Set ' + (idx + 1);
   const det = document.createElement('span'); det.className = 'set-detail';
-  det.textContent = `${s.reps} ${repLabel}`;
+  det.textContent = isTime ? fmtMinAsTime(s.reps) : `${s.reps} ${repLabel}`;
   const del = document.createElement('button');
   del.className = 'set-delete'; del.type = 'button'; del.textContent = '×'; del.title = 'Delete set';
   del.addEventListener('click', () => {
@@ -3215,10 +3251,10 @@ const EXERCISE_GROUPS = {
     { name: 'Leg raise',       target: '3x12' }
   ],
   'Calisthenics': [
-    { name: 'Plank',           target: '3 min' },
-    { name: 'Pushups',         target: 'max reps × 3 sets' },
+    { name: 'Plank',           target: 'min × sets — free entry' },
+    { name: 'Pushups',         target: 'reps × sets — free entry' },
     { name: 'Crunches',        target: 'max reps × 3 sets' },
-    { name: 'Heel taps',       target: 'max reps × 3 sets' },
+    { name: 'Heel taps',       target: 'reps × sets — free entry' },
     { name: 'Pull-ups',        target: 'max reps × 3 sets' },
     { name: 'Knee raises',     target: 'max reps × 3 sets' }
   ],
@@ -3901,8 +3937,8 @@ function renderWeeklyRecap(currentWeek) {
   }
 
   // Recovery
-  if (agg.saunaMin >= 75) wins.push(`Sauna target hit: <strong>${agg.saunaMin} min</strong>.`);
-  else if (agg.saunaMin > 0) trends.push(`Sauna ${agg.saunaMin} / 75 min.`);
+  if (agg.saunaMin >= 90) wins.push(`Sauna target hit: <strong>${agg.saunaMin} min</strong>.`);
+  else if (agg.saunaMin > 0) trends.push(`Sauna ${agg.saunaMin} / 90 min.`);
   if (agg.creatineTotal >= 35) wins.push(`Creatine target hit: <strong>${agg.creatineTotal} g</strong>.`);
   else if (agg.creatineTotal > 0) trends.push(`Creatine ${agg.creatineTotal} / 35 g.`);
   if (agg.coldPlungeMin >= 3) wins.push(`Cold plunge target hit: <strong>${agg.coldPlungeMin} min</strong>.`);
@@ -3983,7 +4019,7 @@ function renderWeekPillarGrids(agg, contentShipped, contentTarget) {
     ],
     recovery: [
       { label: 'Sleep hours',  val: agg.sleepHoursTotal,      target: 49,     unit: 'h',   breakdown: (d) => Number(d.sleepHours) || 0, breakdownUnit: 'h' },
-      { label: 'Sauna',        val: agg.saunaMin,             target: 75,     unit: 'min', breakdown: (d) => Number(d.steamMin) || 0,   breakdownUnit: 'min' },
+      { label: 'Sauna',        val: agg.saunaMin,             target: 90,     unit: 'min', breakdown: (d) => Number(d.steamMin) || 0,   breakdownUnit: 'min' },
       { label: 'Creatine',     val: agg.creatineTotal,        target: 35,     unit: 'g',   breakdown: (d) => Number(d.creatineG) || 0,  breakdownUnit: 'g'   },
       { label: 'Cold plunge',  val: agg.coldPlungeMin,        target: 3,      unit: 'min', breakdown: (d) => Number(d.coldPlunge) || 0, breakdownUnit: 'min' },
     ],
