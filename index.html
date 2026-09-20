@@ -60,6 +60,7 @@
   :root[data-theme="day"] .ex-details { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.08); }
   :root[data-theme="day"] .field-mini input,
   :root[data-theme="day"] .set-log-form input,
+  :root[data-theme="day"] .note-log-form textarea,
   :root[data-theme="day"] .entry-form input {
     background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.1); color: var(--ink);
   }
@@ -457,6 +458,7 @@
   :root[data-theme="sunset"] .ex-details { background: rgba(20, 8, 40, 0.35); border-color: var(--line); }
   :root[data-theme="sunset"] .field-mini input,
   :root[data-theme="sunset"] .set-log-form input,
+  :root[data-theme="sunset"] .note-log-form textarea,
   :root[data-theme="sunset"] .entry-form input {
     background: rgba(20, 8, 40, 0.4); border-color: var(--line); color: var(--ink);
   }
@@ -1388,6 +1390,11 @@
     .set-log-form::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.25); border-radius: 2px; }
     .set-log-form::-webkit-scrollbar-track { background: transparent; }
 
+    /* Notes form stacks full-width on mobile instead of the horizontal-scroll set-log-form treatment */
+    .note-log-form { flex-wrap: wrap; }
+    .note-log-form textarea { flex: 1 1 100%; }
+    .note-log-form button { flex: 1 1 100%; }
+
     /* ---- Mobile: compact ex-details dropdown (further -25%) ---- */
     .ex-details {
       padding: 4px 5px !important;
@@ -1555,6 +1562,33 @@
   }
   .set-log-form button:hover { background: #ff8863; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(255,107,61,0.42); }
   .set-log-form button:active { transform: translateY(0) scale(0.97); }
+
+  /* Comment-style daily notes: add + delete, same visual language as set logs */
+  .note-list .set-row { align-items: start; }
+  .note-list .set-detail { white-space: normal; word-break: break-word; line-height: 1.4; }
+  .note-list .set-num { white-space: nowrap; }
+  .note-list:empty::after { content: 'No notes yet today.'; }
+  .note-log-form { display: flex; gap: 8px; margin-bottom: 12px; align-items: flex-end; }
+  .note-log-form textarea {
+    flex: 1; resize: vertical; min-height: 40px; max-height: 160px;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--ink);
+    padding: 10px 14px; border-radius: 10px; font: inherit; font-size: 14px; outline: none;
+    letter-spacing: -0.005em;
+    transition: border-color 260ms var(--ease), background 260ms var(--ease), box-shadow 260ms var(--ease);
+  }
+  .note-log-form textarea:focus {
+    border-color: var(--fitness); background: rgba(255,107,61,0.06);
+    box-shadow: 0 0 0 4px rgba(255,107,61,0.15);
+  }
+  .note-log-form button {
+    appearance: none; background: var(--fitness); color: #fff; border: 0;
+    padding: 10px 18px; border-radius: 980px; font: inherit; font-weight: 500; font-size: 13px;
+    letter-spacing: -0.005em; cursor: pointer; white-space: nowrap; flex: 0 0 auto;
+    box-shadow: 0 4px 14px rgba(255,107,61,0.32);
+    transition: background 260ms var(--ease), transform 200ms var(--ease), box-shadow 260ms var(--ease);
+  }
+  .note-log-form button:hover { background: #ff8863; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(255,107,61,0.42); }
+  .note-log-form button:active { transform: translateY(0) scale(0.97); }
   .note-row { margin-top: 4px; }
   .note-row label { font-size: 10px; color: var(--ink-faint); letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 3px; }
   .note-row input {
@@ -1899,10 +1933,12 @@
     </div>
 
     <div class="card" style="margin-top:18px;">
-      <h2>Note for today</h2>
-      <div class="field">
-        <label>One sentence — flag pain, sleep, stress, breakthroughs. Log weight/reps here if you want.</label>
-        <textarea id="t_note" placeholder="e.g. Bench 165x8, legs heavy, shipped reel #2 from San Andrés."></textarea>
+      <h2>Notes for today</h2>
+      <div class="lede">Flag pain, sleep, stress, breakthroughs — add as many as you want.</div>
+      <div class="set-list note-list" id="todayNotesList"></div>
+      <div class="note-log-form">
+        <textarea id="t_note" rows="2" placeholder="e.g. Bench 165x8, legs heavy, shipped reel #2 from San Andrés."></textarea>
+        <button type="button" id="btnAddNote">+ Add note</button>
       </div>
     </div>
 
@@ -2374,6 +2410,7 @@ function renderToday() {
   if (secFitness) secFitness.style.display = (tplToday && tplToday.type === 'gym') ? '' : 'none';
   renderPillarGrids();
   renderSleepBanner();
+  renderTodayNotes();
   updateSavedLabel(iso);
   renderDayStrip();
   updateBackTodayButton();
@@ -2404,6 +2441,79 @@ function renderSleepBanner() {
   };
   inp.addEventListener('blur', persist);
   inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') inp.blur(); });
+})();
+
+/* Notes for today — comment-style: add as many as you want, delete any of them.
+   Stored per-day as day.notes = [{ text, ts }], newest first. */
+function todayNotesFromDay(day) {
+  return Array.isArray(day && day.notes) ? day.notes : [];
+}
+function addTodayNote(text) {
+  const clean = (text || '').trim();
+  if (!clean) return;
+  const iso = activeDate();
+  const day = STATE.days[iso] || {};
+  if (!Array.isArray(day.notes)) day.notes = [];
+  day.notes.unshift({ text: clean, ts: new Date().toISOString() });
+  day.savedAt = new Date().toISOString();
+  STATE.days[iso] = day;
+  saveAll(STATE);
+  updateSavedLabel(iso);
+  renderDayStrip();
+  renderTodayNotes();
+}
+function deleteTodayNote(idx) {
+  const iso = activeDate();
+  const day = STATE.days[iso];
+  if (!day || !Array.isArray(day.notes)) return;
+  day.notes.splice(idx, 1);
+  day.savedAt = new Date().toISOString();
+  saveAll(STATE);
+  updateSavedLabel(iso);
+  renderTodayNotes();
+}
+function fmtNoteTime(ts) {
+  try { return new Date(ts).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); }
+  catch (e) { return ''; }
+}
+function renderTodayNotes() {
+  const list = document.getElementById('todayNotesList');
+  if (!list) return;
+  list.innerHTML = '';
+  const iso = activeDate();
+  const notes = todayNotesFromDay(STATE.days[iso]);
+  notes.forEach((n, i) => {
+    const row = document.createElement('div');
+    row.className = 'set-row';
+    const time = document.createElement('span');
+    time.className = 'set-num';
+    time.textContent = fmtNoteTime(n.ts);
+    const det = document.createElement('span');
+    det.className = 'set-detail';
+    det.textContent = n.text;
+    const del = document.createElement('button');
+    del.className = 'set-delete'; del.type = 'button'; del.textContent = '×'; del.title = 'Delete note';
+    del.addEventListener('click', () => {
+      if (!confirm('Delete this note?')) return;
+      deleteTodayNote(i);
+    });
+    row.appendChild(time); row.appendChild(det); row.appendChild(del);
+    list.appendChild(row);
+  });
+}
+(function wireTodayNoteForm() {
+  const inp = document.getElementById('t_note');
+  const btn = document.getElementById('btnAddNote');
+  if (!inp || !btn) return;
+  const submit = () => {
+    if (!inp.value.trim()) { inp.focus(); return; }
+    addTodayNote(inp.value);
+    inp.value = '';
+    inp.focus();
+  };
+  btn.addEventListener('click', submit);
+  // Cmd/Ctrl+Enter submits; plain Enter stays a newline since notes can be multi-line.
+  inp.addEventListener('keydown', (e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); submit(); } });
 })();
 
 function renderWorkoutCard(iso, dayData) {
@@ -3027,8 +3137,8 @@ function createSetsPillarInput(pillar, metric) {
   const updateHint = () => {
     const curSets = caliSetsFromDay(STATE.days[activeDate()] || {}, metric.key);
     const curTotal = curSets.reduce((a, s) => a + (Number(s.reps) || 0), 0);
-    const totalStr = metric.timeInput ? formatMinToTime(curTotal) : (Math.round(curTotal*10)/10 + ' total ' + repLabel);
-    hint.textContent = `${curSets.length} set${curSets.length === 1 ? '' : 's'} logged · ${totalStr}${metric.timeInput ? ' total' : ''}`;
+    const totalStr = metric.timeInput ? `${Math.round(curTotal*10)/10} min total` : (Math.round(curTotal*10)/10 + ' total ' + repLabel);
+    hint.textContent = `${curSets.length} set${curSets.length === 1 ? '' : 's'} logged · ${totalStr}`;
   };
   updateHint();
   wrap.appendChild(hint);
@@ -3043,10 +3153,9 @@ function createSetsPillarInput(pillar, metric) {
   logForm.style.gridTemplateColumns = '1fr auto';
   const rIn = document.createElement('input');
   if (metric.timeInput) {
-    rIn.type = 'text';
-    rIn.placeholder = 'mm:ss (e.g. 3:30)';
-    rIn.inputMode = 'numeric';
-    rIn.pattern = '[0-9]{1,2}:[0-5][0-9]';
+    // Plain decimal minutes, same native number keyboard as every other duration/weight
+    // input in the app — so 3.5, 4.5, 2.5, 2 etc. type in directly.
+    rIn.type = 'number'; rIn.min = '0'; rIn.step = '0.1'; rIn.placeholder = 'Minutes (e.g. 3.5)';
   } else {
     rIn.type = 'number'; rIn.min = '0'; rIn.placeholder = repLabel;
     if (metric.repStep) rIn.step = metric.repStep;
@@ -3206,7 +3315,7 @@ function renderCaliSetRow(key, s, idx, repLabel, onChange) {
   row.className = 'set-row';
   const num = document.createElement('span'); num.className = 'set-num'; num.textContent = 'Set ' + (idx + 1);
   const det = document.createElement('span'); det.className = 'set-detail';
-  if (key === 'plankMinutes') det.textContent = formatMinToTime(s.reps);
+  if (key === 'plankMinutes') det.textContent = `${Math.round((Number(s.reps) || 0) * 10) / 10} min`;
   else det.textContent = `${s.reps} ${repLabel}`;
   const del = document.createElement('button');
   del.className = 'set-delete'; del.type = 'button'; del.textContent = '×'; del.title = 'Delete set';
@@ -3818,6 +3927,7 @@ document.getElementById('btnClearToday').addEventListener('click', () => {
   delete STATE.days[iso]; saveAll(STATE);
   renderWorkoutCard(iso, {});
   renderPillarGrids();
+  renderTodayNotes();
   updateSavedLabel(iso); renderDayStrip();
 });
 
