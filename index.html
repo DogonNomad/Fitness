@@ -2104,7 +2104,7 @@ const WORKOUT_TEMPLATE = {
   // Sun · workout
   0: { name: 'Back + Posterior chain', type: 'gym', exercises: [
     { name: 'Deadlift', target: '3x8 · progressive' },
-    { name: 'Lat pull down', target: '4x10' },
+    { name: 'Lat pull down', target: '3x10' },
     { name: 'Seated row', target: '3x10' },
     { name: 'Back extension', target: '3x10' },
     { name: 'Seated chest fly', target: '3x10' },
@@ -2112,7 +2112,7 @@ const WORKOUT_TEMPLATE = {
   ]},
   // Mon · workout
   1: { name: 'Push · Chest + Shoulders + Triceps', type: 'gym', exercises: [
-    { name: 'Bench press', target: '4x8 · progressive' },
+    { name: 'Bench press', target: '3x8 · progressive' },
     { name: 'Seated chest fly', target: '3x10' },
     { name: 'Seated chest press', target: '3x10' },
     { name: 'Shoulder press', target: '3x10' },
@@ -3337,14 +3337,14 @@ function renderCaliSetRow(key, s, idx, repLabel, onChange) {
 /* Exercise catalog — grouped by muscle group. Pull-ups + Pushups live in Calisthenics only (deduped). */
 const EXERCISE_GROUPS = {
   'Chest': [
-    { name: 'Bench press',         target: '4x8' },
+    { name: 'Bench press',         target: '3x8' },
     { name: 'Seated chest fly',    target: '3x10' },
     { name: 'Seated chest press',  target: '3x10' },
     { name: 'Pec fly',             target: '3x10' }
   ],
   'Back': [
     { name: 'Deadlift',            target: '3x8' },
-    { name: 'Lat pull down',       target: '4x10' },
+    { name: 'Lat pull down',       target: '3x10' },
     { name: 'Seated row',          target: '3x10' },
     { name: 'Low row',             target: '3x10' },
     { name: 'Back extension',      target: '3x10' }
