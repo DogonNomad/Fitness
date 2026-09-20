@@ -3412,15 +3412,14 @@ function renderCustomExerciseDeck(ex, idx) {
   svg.appendChild(makeRingSvg(pct, getPillarVar('weight'), 56));
   const setsLbl = document.createElement('div');
   setsLbl.className = 'sets-label';
-  // Subtle "prev <weight>" for weighted custom exercises too
+  // Subtle "prev <weight>" for weighted custom exercises too — computed once and reused
+  // below for the full progression-history panel.
   let _prevW = null;
-  if (mode === 'weighted') {
-    const _last = findLastLog(ex.name, activeDate());
-    if (_last && Array.isArray(_last.sets) && _last.sets.length) {
-      const lastSet = _last.sets[_last.sets.length - 1];
-      const w = Number(lastSet && lastSet.weight);
-      if (w > 0) _prevW = w;
-    }
+  const _last = findLastLog(ex.name, activeDate());
+  if (mode === 'weighted' && _last && Array.isArray(_last.sets) && _last.sets.length) {
+    const lastSet = _last.sets[_last.sets.length - 1];
+    const w = Number(lastSet && lastSet.weight);
+    if (w > 0) _prevW = w;
   }
   setsLbl.textContent = _prevW != null
     ? `${doneSets}/${targetSets} · prev ${_prevW}`
@@ -3434,6 +3433,24 @@ function renderCustomExerciseDeck(ex, idx) {
 
   const details = document.createElement('div');
   details.className = 'ex-details';
+
+  // Progression history — same treatment as fixed template tiles, so any exercise
+  // logged via the +Add dropdown builds the same historical record.
+  const hist = document.createElement('div');
+  hist.className = 'set-history';
+  const best = findBestSet(ex.name);
+  if (_last) {
+    const setsStr = _last.sets.map(s => `${s.weight || 'BW'}×${s.reps}`).join(', ');
+    hist.innerHTML = `<div><strong>Last session (${fmtShort(_last.iso)}):</strong> ${setsStr}</div>`;
+  } else {
+    hist.innerHTML = `<div class="empty">No prior sessions logged for this exercise.</div>`;
+  }
+  if (best) {
+    const bLine = document.createElement('div');
+    bLine.innerHTML = `<strong>Best set:</strong> ${best.weight || 'BW'} lbs × ${best.reps} reps · ${fmtShort(best.iso)}`;
+    hist.appendChild(bLine);
+  }
+  details.appendChild(hist);
 
   const setList = document.createElement('div');
   setList.className = 'set-list';
@@ -3664,20 +3681,33 @@ function renderSetRow(exName, s, idx, mode) {
   row.appendChild(num); row.appendChild(det); row.appendChild(del);
   return row;
 }
+/* Look up an exercise's sets for a given day, regardless of whether it was logged as a
+   fixed template exercise (day.exercises[name]) or added via the +Add exercise dropdown
+   (day.customExercises[]) — so history/prev-weight is shared across both storage shapes. */
+function findExerciseSetsOnDay(day, exName) {
+  if (!day) return null;
+  const tpl = day.exercises && day.exercises[exName];
+  if (tpl && Array.isArray(tpl.sets) && tpl.sets.length) return tpl.sets;
+  if (Array.isArray(day.customExercises)) {
+    const custom = day.customExercises.find(c => c.name === exName);
+    if (custom && Array.isArray(custom.sets) && custom.sets.length) return custom.sets;
+  }
+  return null;
+}
 function findLastLog(exName, beforeIso) {
   const dates = Object.keys(STATE.days).filter(iso => iso < beforeIso).sort().reverse();
   for (const iso of dates) {
-    const ex = STATE.days[iso].exercises && STATE.days[iso].exercises[exName];
-    if (ex && Array.isArray(ex.sets) && ex.sets.length) return { iso, sets: ex.sets };
+    const sets = findExerciseSetsOnDay(STATE.days[iso], exName);
+    if (sets) return { iso, sets };
   }
   return null;
 }
 function findBestSet(exName) {
   let best = null;
   Object.keys(STATE.days).forEach(iso => {
-    const ex = STATE.days[iso].exercises && STATE.days[iso].exercises[exName];
-    if (!ex || !Array.isArray(ex.sets)) return;
-    ex.sets.forEach(s => {
+    const sets = findExerciseSetsOnDay(STATE.days[iso], exName);
+    if (!sets) return;
+    sets.forEach(s => {
       const vol = (Number(s.weight) || 0) * (Number(s.reps) || 0);
       if (!best || vol > best.vol) best = { vol, weight: s.weight, reps: s.reps, iso };
     });
