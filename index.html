@@ -2481,7 +2481,18 @@ function renderWorkoutCard(iso, dayData) {
       svgContainer.appendChild(makeRingSvg(pct, getPillarVar('weight'), 76));
       const setsLbl = document.createElement('div');
       setsLbl.className = 'sets-label';
-      setsLbl.textContent = `${doneSets} / ${targetSets} sets`;
+      // Show "prev <weight>" as a subtle suffix so Roland doesn't have to remember last session's load
+      const _mode = exerciseInputMode(ex.target);
+      const _last = findLastLog(ex.name, iso);
+      let _prevWeight = null;
+      if (_mode === 'weighted' && _last && Array.isArray(_last.sets) && _last.sets.length) {
+        const lastSet = _last.sets[_last.sets.length - 1];
+        const w = Number(lastSet && lastSet.weight);
+        if (w > 0) _prevWeight = w;
+      }
+      setsLbl.textContent = _prevWeight != null
+        ? `${doneSets}/${targetSets} · prev ${_prevWeight}`
+        : `${doneSets} / ${targetSets} sets`;
       const exLbl = document.createElement('div');
       exLbl.className = 'ex-label';
       exLbl.innerHTML = `${escapeHtml(ex.name)} <span class="ex-target-inline">· ${escapeHtml(ex.target)}</span>`;
@@ -2498,7 +2509,7 @@ function renderWorkoutCard(iso, dayData) {
       // Progression history
       const hist = document.createElement('div');
       hist.className = 'set-history';
-      const last = findLastLog(ex.name, iso);
+      const last = _last;
       const best = findBestSet(ex.name);
       if (last) {
         const setsStr = last.sets.map(s => `${s.weight || 'BW'}×${s.reps}`).join(', ');
@@ -3401,7 +3412,19 @@ function renderCustomExerciseDeck(ex, idx) {
   svg.appendChild(makeRingSvg(pct, getPillarVar('weight'), 56));
   const setsLbl = document.createElement('div');
   setsLbl.className = 'sets-label';
-  setsLbl.textContent = `${doneSets} / ${targetSets} sets`;
+  // Subtle "prev <weight>" for weighted custom exercises too
+  let _prevW = null;
+  if (mode === 'weighted') {
+    const _last = findLastLog(ex.name, activeDate());
+    if (_last && Array.isArray(_last.sets) && _last.sets.length) {
+      const lastSet = _last.sets[_last.sets.length - 1];
+      const w = Number(lastSet && lastSet.weight);
+      if (w > 0) _prevW = w;
+    }
+  }
+  setsLbl.textContent = _prevW != null
+    ? `${doneSets}/${targetSets} · prev ${_prevW}`
+    : `${doneSets} / ${targetSets} sets`;
   const nameLbl = document.createElement('div');
   nameLbl.className = 'ex-label';
   nameLbl.innerHTML = `${escapeHtml(ex.name)} <span class="ex-target-inline">· ${escapeHtml(ex.target)}</span>`;
