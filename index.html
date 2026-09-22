@@ -2154,6 +2154,18 @@ const WORKOUT_TEMPLATE = {
   ]}
 };
 
+// One-off date-specific swaps — override the recurring WORKOUT_TEMPLATE for specific
+// calendar dates only. WORKOUT_TEMPLATE itself is untouched, so every other week (past
+// and future) keeps the normal Sun–Sat rotation; only the exact dates listed here change.
+const TEMPLATE_OVERRIDES = {
+  // Week of Sep 20–26, 2026 only: Monday's Push/Chest day moved to Tuesday.
+  '2026-09-21': WORKOUT_TEMPLATE[2], // this Mon only → Swim (was Push · Chest+Shoulders+Triceps)
+  '2026-09-22': WORKOUT_TEMPLATE[1], // this Tue only → Push · Chest+Shoulders+Triceps (was Swim)
+};
+function templateForDate(iso) {
+  return TEMPLATE_OVERRIDES[iso] || WORKOUT_TEMPLATE[dayOfWeekIndex(iso)];
+}
+
 const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 // Weeks: Sun→Sat, 6 weeks total
@@ -2312,7 +2324,7 @@ function renderDayStrip() {
     d.setDate(sunDate.getDate() + i);
     const iso = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     days.push({ iso, d, dow: i });
-    const tpl = WORKOUT_TEMPLATE[i];
+    const tpl = templateForDate(iso);
     const isToday = iso === today;
     const isSelected = iso === activeDate();
     const inMission = iso >= MISSION_START && iso <= MISSION_END;
@@ -2404,8 +2416,7 @@ function renderToday() {
   renderWorkoutCard(iso, existing || {});
   // On non-gym days (swim/hike/optional/rest), hide the Calisthenics deck —
   // user can log calisthenics via the "+ Add exercise" dropdown in the workout section instead.
-  const dowIdx = dayOfWeekIndex(iso);
-  const tplToday = WORKOUT_TEMPLATE[dowIdx];
+  const tplToday = templateForDate(iso);
   const secFitness = document.getElementById('sec-fitness');
   if (secFitness) secFitness.style.display = (tplToday && tplToday.type === 'gym') ? '' : 'none';
   renderPillarGrids();
@@ -2520,7 +2531,7 @@ function renderWorkoutCard(iso, dayData) {
   const root = document.getElementById('workoutCard');
   root.innerHTML = '';
   const dow = dayOfWeekIndex(iso);
-  const tpl = WORKOUT_TEMPLATE[dow];
+  const tpl = templateForDate(iso);
   // Section h2 swaps title based on day type
   const TITLES = { gym: 'Weight training', rest: 'Rest / active recovery', swim: 'Swim', hike: 'Hike', optional: 'Optional session' };
   const SUBS   = { gym: 'Training day',    rest: 'Recovery',               swim: 'Pool day', hike: 'Trail day', optional: 'Your call' };
