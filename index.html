@@ -4269,10 +4269,12 @@ function renderWeekPillarGrids(agg, contentShipped, contentTarget) {
 }
 
 /* ---------- Season 2 weekly goals (session counts, Sun–Sat) ----------
-   Jog: 3x/wk, 3+ mi each · Swim: 2x · Core plank: 1x · Calisthenics + core: 3x · Intense jump rope: 2x.
+   Cardio first, then strength. Jog 3x (3+ mi each) · Swim 2x · Intense jump rope 2x ·
+   Calisthenics 3x (pushups, pull-ups, dips) · Core 3x (crunches, heel taps, planks, ab work) · Plank 1x (counts toward Core too).
    Counted from what you log (Add-exercise dropdown, templates, calisthenics tiles). */
 const JOG_MIN_MILES = 3;
-const CORE_CALI_NAMES = ['Plank','Pushups','Crunches','Heel taps','Pull-ups','Dips','Ab wheel','Weighted crunch','Russian twist','Leg raise','Core work (twist / crunch / plank)'];
+const CALI_NAMES = ['Pushups','Pull-ups','Dips'];
+const CORE_NAMES = ['Plank','Crunches','Heel taps','Ab wheel','Weighted crunch','Russian twist','Leg raise','Core work (twist / crunch / plank)'];
 function goalSetsFor(d, names) {
   const out = [];
   names.forEach(n => { const t = d.exercises && d.exercises[n]; if (t && Array.isArray(t.sets)) out.push(...t.sets); });
@@ -4282,9 +4284,10 @@ function goalSetsFor(d, names) {
 const WEEKLY_GOALS = [
   { label: 'Jog 3+ mi',          target: 3, unit: 'mi',      fn: d => Math.max(0, ...goalSetsFor(d, ['Jog']).map(s => Number(s.weight) || 0).filter(m => m >= JOG_MIN_MILES)) },
   { label: 'Swim',               target: 2, unit: 'session', fn: d => goalSetsFor(d, ['Swim laps','Open-water swim']).length ? 1 : 0 },
-  { label: 'Core plank',         target: 1, unit: 'session', fn: d => (Number(d.plankMinutes) > 0 || goalSetsFor(d, ['Plank']).length) ? 1 : 0 },
-  { label: 'Calisthenics + core',target: 3, unit: 'session', fn: d => ((Number(d.pushups) || 0) + (Number(d.mountedCrunches) || 0) + (Number(d.heelTaps) || 0) + (Number(d.pullups) || 0) + (Number(d.dips) || 0) + (Number(d.plankMinutes) || 0) > 0 || goalSetsFor(d, CORE_CALI_NAMES).length) ? 1 : 0 },
-  { label: 'Intense jump rope',  target: 2, unit: 'session', fn: d => goalSetsFor(d, ['Jump rope']).length ? 1 : 0 }
+  { label: 'Intense jump rope',  target: 2, unit: 'session', fn: d => goalSetsFor(d, ['Jump rope']).length ? 1 : 0 },
+  { label: 'Calisthenics',       target: 3, unit: 'session', fn: d => ((Number(d.pushups) || 0) + (Number(d.pullups) || 0) + (Number(d.dips) || 0) > 0 || goalSetsFor(d, CALI_NAMES).length) ? 1 : 0 },
+  { label: 'Core',               target: 3, unit: 'session', fn: d => ((Number(d.mountedCrunches) || 0) + (Number(d.heelTaps) || 0) + (Number(d.plankMinutes) || 0) > 0 || goalSetsFor(d, CORE_NAMES).length) ? 1 : 0 },
+  { label: 'Plank',              target: 1, unit: 'session', fn: d => (Number(d.plankMinutes) > 0 || goalSetsFor(d, ['Plank']).length) ? 1 : 0 }
 ];
 function renderWeeklyGoals(gridId, ledeId, anchorIso) {
   const grid = document.getElementById(gridId);
