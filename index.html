@@ -2014,6 +2014,32 @@
     .scroll-grid { overscroll-behavior-y: auto; }
   }
   html.force-mobile main .card, html.force-mobile .card { width: 75% !important; margin-left: auto !important; margin-right: auto !important; box-sizing: border-box; }
+
+  /* ===== Tiles pulled to the card edges: left tile flush under the header, right tile flush right ===== */
+  #fitnessGrid,
+  #recoveryGrid,
+  #careerGrid,
+  #workoutCard .workout-card > .ex-grid { margin-left: 4px !important; margin-right: 4px !important; }
+  #fitnessGrid > .ex-deck:not([open]),
+  #recoveryGrid > .ex-deck:not([open]),
+  #careerGrid > .ex-deck:not([open]),
+  #workoutCard .workout-card > .ex-grid > .ex-deck:not([open]) { width: fit-content; min-width: 82px; }
+  #fitnessGrid > .ex-deck:not([open]):nth-child(odd),
+  #recoveryGrid > .ex-deck:not([open]):nth-child(odd),
+  #careerGrid > .ex-deck:not([open]):nth-child(odd),
+  #workoutCard .workout-card > .ex-grid > .ex-deck:not([open]):nth-child(odd) { justify-self: start; }
+  #fitnessGrid > .ex-deck:not([open]):nth-child(even),
+  #recoveryGrid > .ex-deck:not([open]):nth-child(even),
+  #careerGrid > .ex-deck:not([open]):nth-child(even),
+  #workoutCard .workout-card > .ex-grid > .ex-deck:not([open]):nth-child(even) { justify-self: end; }
+
+  /* ===== Dropdowns 30% smaller (form + the ring inside the open tile) ===== */
+  #fitnessGrid .ex-deck[open] .ex-details,
+  #recoveryGrid .ex-deck[open] .ex-details,
+  #workoutCard .ex-grid .ex-deck[open] .ex-details { zoom: 0.7; }
+  #fitnessGrid .ex-deck[open] summary,
+  #recoveryGrid .ex-deck[open] summary,
+  #workoutCard .ex-grid .ex-deck[open] summary { zoom: 0.75; }
 </style>
 </head>
 <body>
