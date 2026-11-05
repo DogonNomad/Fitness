@@ -3581,12 +3581,6 @@ const EXERCISE_GROUPS = {
     { name: 'Hip abduction (int)', target: '3x15' },
     { name: 'Hip abduction (ext)', target: '3x15' }
   ],
-  'Core': [
-    { name: 'Ab wheel',        target: '3x10' },
-    { name: 'Weighted crunch', target: '3x12' },
-    { name: 'Russian twist',   target: '3x20' },
-    { name: 'Leg raise',       target: '3x12' }
-  ],
   'Calisthenics': [
     { name: 'Plank',           target: '3 min' },
     { name: 'Pushups',         target: 'max reps × 3 sets' },
@@ -3653,6 +3647,7 @@ const AUTO_FOCUS = {
   'Arms':      [['Biceps', 2], ['Triceps', 2], ['Shoulders', 1], ['Core', 1]]
 };
 function autoPool(g) {
+  if (g === 'Core') return EXERCISE_GROUPS['Calisthenics'].filter(e => /^(Plank|Crunches|Heel taps)$/.test(e.name)).map(e => ({ name: e.name, target: e.target, pool: 'Core', group: 'Calisthenics' }));
   const base = (g === 'Biceps' || g === 'Triceps') ? EXERCISE_GROUPS['Arms'].filter(e => new RegExp(g.slice(0, -1), 'i').test(e.name))
              : (EXERCISE_GROUPS[g] || []).filter(e => !/^Hip abduction/.test(e.name));
   return base.map(e => ({ name: e.name, target: e.target, pool: g, group: (g === 'Biceps' || g === 'Triceps') ? 'Arms' : g }));
