@@ -1978,12 +1978,18 @@
   #fitnessGrid > .ex-deck:not([open]):nth-child(odd),
   #recoveryGrid > .ex-deck:not([open]):nth-child(odd),
   #careerGrid > .ex-deck:not([open]):nth-child(odd),
-  #workoutCard .workout-card > .ex-grid > .ex-deck:not([open]):nth-child(odd) { justify-self: start; }
+  #workoutCard .workout-card > .ex-grid > .ex-deck:not([open]):nth-child(odd) { justify-self: end; }
   #fitnessGrid > .ex-deck:not([open]):nth-child(even),
   #recoveryGrid > .ex-deck:not([open]):nth-child(even),
   #careerGrid > .ex-deck:not([open]):nth-child(even),
-  #workoutCard .workout-card > .ex-grid > .ex-deck:not([open]):nth-child(even) { justify-self: end; }
+  #workoutCard .workout-card > .ex-grid > .ex-deck:not([open]):nth-child(even) { justify-self: start; }
 
+
+  /* ===== Tiles centered as a pair with ~50% less space between them ===== */
+  #fitnessGrid,
+  #recoveryGrid,
+  #careerGrid,
+  #workoutCard .workout-card > .ex-grid { column-gap: 58px !important; }
 </style>
 </head>
 <body>
