@@ -3645,6 +3645,120 @@ function createAddExerciseDropdown(onAdd) {
   dropdown.appendChild(sel);
   return dropdown;
 }
+
+/* ===== Auto-plan: pick a focus (Legs / Chest / Back / Shoulders / Arms) and get a balanced session
+   built from the exercise catalog, favoring whatever you haven't done lately. ===== */
+const AUTO_FOCUS = {
+  'Legs':      [['Legs', 3], ['Back', 1], ['Core', 1]],
+  'Chest':     [['Chest', 3], ['Shoulders', 1], ['Triceps', 1], ['Biceps', 1]],
+  'Back':      [['Back', 3], ['Chest', 1], ['Biceps', 1], ['Triceps', 1]],
+  'Shoulders': [['Shoulders', 3], ['Triceps', 1], ['Core', 1]],
+  'Arms':      [['Biceps', 2], ['Triceps', 2], ['Shoulders', 1], ['Core', 1]]
+};
+function autoPool(g) {
+  const base = (g === 'Biceps' || g === 'Triceps') ? EXERCISE_GROUPS['Arms'].filter(e => new RegExp(g.slice(0, -1), 'i').test(e.name))
+             : (EXERCISE_GROUPS[g] || []).filter(e => !/^Hip abduction/.test(e.name));
+  return base.map(e => ({ name: e.name, target: e.target, pool: g, group: (g === 'Biceps' || g === 'Triceps') ? 'Arms' : g }));
+}
+function autoLastDone(names, uptoIso) {
+  const out = {};
+  Object.keys(STATE.days).filter(k => k < uptoIso).sort().forEach(iso => {
+    names.forEach(n => { const sets = findExerciseSetsOnDay(STATE.days[iso], n); if (sets && sets.length) out[n] = iso; });
+  });
+  return out;
+}
+function autoDaysAgo(iso, fromIso) { return Math.round((parseIso(fromIso) - parseIso(iso)) / 86400000); }
+function buildAutoPlan(focus, dayData, iso, jitter, keep) {
+  const taken = new Set([...(dayData.customExercises || []).map(c => c.name), ...Object.keys(dayData.exercises || {})]);
+  const spec = AUTO_FOCUS[focus] || [];
+  const allNames = spec.flatMap(([g]) => autoPool(g).map(e => e.name));
+  const last = autoLastDone(allNames, iso);
+  const plan = [];
+  spec.forEach(([g, n]) => {
+    const picked = (keep || []).filter(k => k.pool === g);
+    picked.forEach(k => plan.push(k));
+    const have = new Set([...taken, ...plan.map(x => x.name)]);
+    const cands = autoPool(g).filter(e => !have.has(e.name)).map(e => ({
+      e, score: (last[e.name] ? autoDaysAgo(last[e.name], iso) : 999) + Math.random() * (jitter || 0)
+    })).sort((a, b) => b.score - a.score);
+    for (let i = 0; i < n - picked.length && i < cands.length; i++) plan.push(cands[i].e);
+  });
+  return { plan, last };
+}
+function renderAutoPlanner(wrap, container) {
+  const box = document.createElement('div');
+  box.style.cssText = 'margin:12px 0 4px; padding:10px; border:1px dashed var(--line); border-radius:12px;';
+  const title = document.createElement('div');
+  title.textContent = 'Auto-plan a session';
+  title.style.cssText = 'font-size:12px; letter-spacing:.06em; text-transform:uppercase; opacity:.75; margin-bottom:8px;';
+  box.appendChild(title);
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex; flex-wrap:wrap; gap:6px;';
+  const preview = document.createElement('div');
+  preview.style.cssText = 'margin-top:10px;';
+  const btnCss = 'background:var(--bg-2); border:1px solid var(--line); color:var(--ink); padding:7px 12px; border-radius:999px; font:inherit; font-size:13px; cursor:pointer;';
+  let plan = [], last = {}, focus = null;
+
+  const refreshCont = () => { wrap.remove(); renderCustomSession(container, activeDate(), STATE.days[activeDate()] || {}); };
+  const draw = () => {
+    preview.innerHTML = '';
+    if (!focus) return;
+    const iso = activeDate();
+    const hd = document.createElement('div');
+    hd.textContent = `${focus} focus · ${plan.length} exercises`;
+    hd.style.cssText = 'font-size:13px; font-weight:600; margin-bottom:6px;';
+    preview.appendChild(hd);
+    if (!plan.length) {
+      const e = document.createElement('div'); e.textContent = 'Nothing left to suggest — everything in this mix is already on today.'; e.style.cssText = 'font-size:13px; opacity:.8;';
+      preview.appendChild(e);
+    }
+    plan.forEach((ex, i) => {
+      const r = document.createElement('div');
+      r.style.cssText = 'display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:8px; background:var(--bg-2); margin-bottom:4px; font-size:13px;';
+      const ago = last[ex.name] ? autoDaysAgo(last[ex.name], iso) : null;
+      const info = document.createElement('div'); info.style.cssText = 'flex:1; min-width:0;';
+      info.innerHTML = `<div>${ex.name} <span style="opacity:.6">· ${ex.target}</span></div><div style="font-size:11px; opacity:.6;">${ex.pool} · ${ago == null ? 'not logged yet' : ago + ' day' + (ago === 1 ? '' : 's') + ' ago'}</div>`;
+      const sw = document.createElement('button'); sw.type = 'button'; sw.textContent = '⟳'; sw.title = 'Swap for another';
+      const rm = document.createElement('button'); rm.type = 'button'; rm.textContent = '✕'; rm.title = 'Remove';
+      [sw, rm].forEach(b => b.style.cssText = 'background:none; border:1px solid var(--line); color:var(--ink); width:28px; height:28px; border-radius:8px; cursor:pointer;');
+      sw.addEventListener('click', () => {
+        const dd = STATE.days[iso] || {};
+        const keep = plan.filter((_, k) => k !== i);
+        const taken = new Set([...(dd.customExercises || []).map(c => c.name), ...Object.keys(dd.exercises || {}), ...plan.map(x => x.name)]);
+        const alts = autoPool(ex.pool).filter(e => !taken.has(e.name));
+        if (!alts.length) { sw.textContent = '–'; sw.disabled = true; return; }
+        alts.sort((a, b) => (last[b.name] ? autoDaysAgo(last[b.name], iso) : 999) - (last[a.name] ? autoDaysAgo(last[a.name], iso) : 999));
+        plan[i] = alts[0]; draw();
+      });
+      rm.addEventListener('click', () => { plan.splice(i, 1); draw(); });
+      r.appendChild(info); r.appendChild(sw); r.appendChild(rm);
+      preview.appendChild(r);
+    });
+    const act = document.createElement('div');
+    act.style.cssText = 'display:flex; gap:6px; margin-top:8px; flex-wrap:wrap;';
+    const add = document.createElement('button'); add.type = 'button'; add.textContent = 'Add to day'; add.disabled = !plan.length;
+    add.style.cssText = btnCss + 'background:var(--accent); color:#fff; border-color:transparent;';
+    const shuf = document.createElement('button'); shuf.type = 'button'; shuf.textContent = 'Shuffle'; shuf.style.cssText = btnCss;
+    const cancel = document.createElement('button'); cancel.type = 'button'; cancel.textContent = 'Cancel'; cancel.style.cssText = btnCss;
+    add.addEventListener('click', () => { plan.forEach(ex => addCustomExercise({ name: ex.name, target: ex.target, group: ex.group })); refreshCont(); });
+    shuf.addEventListener('click', () => { const r = buildAutoPlan(focus, STATE.days[iso] || {}, iso, 8); plan = r.plan; last = r.last; draw(); });
+    cancel.addEventListener('click', () => { focus = null; plan = []; draw(); });
+    act.appendChild(add); act.appendChild(shuf); act.appendChild(cancel);
+    preview.appendChild(act);
+  };
+
+  Object.keys(AUTO_FOCUS).forEach(f => {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = f; b.style.cssText = btnCss;
+    b.addEventListener('click', () => {
+      const iso = activeDate();
+      const r = buildAutoPlan(f, STATE.days[iso] || {}, iso, 0);
+      focus = f; plan = r.plan; last = r.last; draw();
+    });
+    row.appendChild(b);
+  });
+  box.appendChild(row); box.appendChild(preview);
+  return box;
+}
 function renderCustomSession(container, iso, dayData) {
   const wrap = document.createElement('div');
   wrap.style.cssText = 'margin-top:14px;';
@@ -3652,6 +3766,7 @@ function renderCustomSession(container, iso, dayData) {
     wrap.remove();
     renderCustomSession(container, activeDate(), STATE.days[activeDate()] || {});
   });
+  wrap.appendChild(renderAutoPlanner(wrap, container));
   wrap.appendChild(dropdown);
   // Render existing custom exercises
   const customList = (dayData.customExercises || []);
