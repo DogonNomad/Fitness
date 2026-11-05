@@ -1990,6 +1990,20 @@
   #recoveryGrid,
   #careerGrid,
   #workoutCard .workout-card > .ex-grid { column-gap: 58px !important; }
+
+  /* ===== Aligned grid: every closed tile is the same fixed width so columns line up top to bottom ===== */
+  #fitnessGrid > .ex-deck:not([open]),
+  #recoveryGrid > .ex-deck:not([open]),
+  #careerGrid > .ex-deck:not([open]),
+  #workoutCard .workout-card > .ex-grid > .ex-deck:not([open]) { width: min(100px, 100%) !important; min-width: 0 !important; }
+  #fitnessGrid .ex-tile,
+  #recoveryGrid .ex-tile,
+  #careerGrid .ex-tile,
+  #workoutCard .workout-card > .ex-grid .ex-tile { grid-template-rows: 68px 12px 22px !important; row-gap: 2px !important; width: 100% !important; }
+  #fitnessGrid .ex-tile .ex-label,
+  #recoveryGrid .ex-tile .ex-label,
+  #careerGrid .ex-tile .ex-label,
+  #workoutCard .workout-card > .ex-grid .ex-tile .ex-label { height: 22px !important; font-size: 8.5px !important; letter-spacing: 0.03em !important; line-height: 1.2 !important; -webkit-line-clamp: 2; word-break: normal; overflow-wrap: break-word; }
 </style>
 </head>
 <body>
