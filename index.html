@@ -1959,55 +1959,6 @@
     -webkit-mask-size: cover; mask-size: cover; -webkit-mask-position: center; mask-position: center; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; }
   :root[data-theme="sunset"] body::after { opacity: .6; }
 
-  /* ===== Compact log dropdowns (Calisthenics, Weight training, Body & Recovery; People & Career untouched) =====
-     An open tile no longer spans the whole row: it stays one column wide (about half the old width),
-     fields wrap instead of scrolling sideways, and the inputs are bigger and easier to type into. */
-  #fitnessGrid .ex-deck[open],
-  #recoveryGrid .ex-deck[open],
-  #workoutCard .ex-grid .ex-deck[open] { grid-column: auto !important; padding: 2px !important; min-width: 0; }
-  #fitnessGrid .ex-details,
-  #recoveryGrid .ex-details,
-  #workoutCard .ex-grid .ex-details { padding: 6px !important; font-size: 12px !important; }
-  #fitnessGrid .ex-details label,
-  #recoveryGrid .ex-details label,
-  #workoutCard .ex-grid .ex-details label { font-size: 10px !important; letter-spacing: .03em !important; margin-bottom: 3px !important; }
-  #fitnessGrid .ex-details input,
-  #recoveryGrid .ex-details input,
-  #workoutCard .ex-grid .ex-details input,
-  #fitnessGrid .ex-details select,
-  #recoveryGrid .ex-details select,
-  #workoutCard .ex-grid .ex-details select {
-    font-size: 16px !important; padding: 6px 8px !important; border-radius: 8px !important;
-    width: 100% !important; min-width: 0 !important; height: 36px; box-sizing: border-box;
-  }
-  #fitnessGrid .ex-details .set-log-form,
-  #recoveryGrid .ex-details .set-log-form,
-  #workoutCard .ex-grid .ex-details .set-log-form,
-  #fitnessGrid .ex-details .entry-form,
-  #recoveryGrid .ex-details .entry-form,
-  #workoutCard .ex-grid .ex-details .entry-form { display: flex !important; flex-wrap: wrap !important; overflow: visible !important; gap: 6px !important; padding: 2px 0 4px !important; margin-bottom: 4px !important; }
-  #fitnessGrid .ex-details .set-log-form input,
-  #recoveryGrid .ex-details .set-log-form input,
-  #workoutCard .ex-grid .ex-details .set-log-form input { flex: 1 1 52px !important; min-width: 0 !important; width: auto !important; }
-  #fitnessGrid .ex-details .set-log-form button,
-  #recoveryGrid .ex-details .set-log-form button,
-  #workoutCard .ex-grid .ex-details .set-log-form button { flex: 1 1 100% !important; min-width: 0 !important; padding: 8px !important; font-size: 13px !important; }
-  #fitnessGrid .ex-details .entry-form .field-mini,
-  #recoveryGrid .ex-details .entry-form .field-mini,
-  #workoutCard .ex-grid .ex-details .entry-form .field-mini { flex: 1 1 100% !important; min-width: 0 !important; }
-  #fitnessGrid .ex-details .set-row,
-  #recoveryGrid .ex-details .set-row,
-  #workoutCard .ex-grid .ex-details .set-row { padding: 4px 6px !important; font-size: 12px !important; grid-template-columns: 40px 1fr auto !important; gap: 4px !important; }
-  #fitnessGrid .ex-details .set-row .set-num,
-  #recoveryGrid .ex-details .set-row .set-num,
-  #workoutCard .ex-grid .ex-details .set-row .set-num { font-size: 10px !important; }
-  #fitnessGrid .ex-details .set-row .set-delete,
-  #recoveryGrid .ex-details .set-row .set-delete,
-  #workoutCard .ex-grid .ex-details .set-row .set-delete { width: 22px !important; height: 22px !important; font-size: 12px !important; }
-  #fitnessGrid .ex-details .set-history,
-  #recoveryGrid .ex-details .set-history,
-  #workoutCard .ex-grid .ex-details .set-history { font-size: 10px !important; padding: 4px 6px !important; }
-
   /* ===== Mobile: cards 25% narrower, centered, so there is page margin to scroll the page itself ===== */
   @media (max-width: 720px) {
     main .card, .card { width: 75% !important; margin-left: auto !important; margin-right: auto !important; box-sizing: border-box; }
@@ -2033,13 +1984,6 @@
   #careerGrid > .ex-deck:not([open]):nth-child(even),
   #workoutCard .workout-card > .ex-grid > .ex-deck:not([open]):nth-child(even) { justify-self: end; }
 
-  /* ===== Dropdowns 30% smaller (form + the ring inside the open tile) ===== */
-  #fitnessGrid .ex-deck[open] .ex-details,
-  #recoveryGrid .ex-deck[open] .ex-details,
-  #workoutCard .ex-grid .ex-deck[open] .ex-details { zoom: 0.7; }
-  #fitnessGrid .ex-deck[open] summary,
-  #recoveryGrid .ex-deck[open] summary,
-  #workoutCard .ex-grid .ex-deck[open] summary { zoom: 0.75; }
 </style>
 </head>
 <body>
