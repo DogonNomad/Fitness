@@ -2007,6 +2007,13 @@
   #fitnessGrid .ex-details .set-history,
   #recoveryGrid .ex-details .set-history,
   #workoutCard .ex-grid .ex-details .set-history { font-size: 10px !important; padding: 4px 6px !important; }
+
+  /* ===== Mobile: cards 25% narrower, centered, so there is page margin to scroll the page itself ===== */
+  @media (max-width: 720px) {
+    main .card, .card { width: 75% !important; margin-left: auto !important; margin-right: auto !important; box-sizing: border-box; }
+    .scroll-grid { overscroll-behavior-y: auto; }
+  }
+  html.force-mobile main .card, html.force-mobile .card { width: 75% !important; margin-left: auto !important; margin-right: auto !important; box-sizing: border-box; }
 </style>
 </head>
 <body>
