@@ -3,33 +3,39 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<title>PROJECT 35 · Classified · 6-Week Tracker</title>
+<title>PROJECT 35 · Season 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
 <style>
   :root {
     /* Night theme (default) — softened from pure black to a warmer navy-charcoal */
-    --bg: #10131b;
-    --bg-2: #171a24;
-    --surface: #1c2029;
-    --surface-2: #262a35;
+    --bg: #0a0d12;
+    --bg-2: #0f1319;
+    --surface: #11161d;
+    --surface-2: #171e28;
     --surface-3: rgba(255,255,255,0.02);
-    --line: rgba(255,255,255,0.09);
-    --line-2: rgba(255,255,255,0.18);
-    --ink: #eef1f5;
-    --ink-dim: #a8adb6;
-    --ink-faint: #71767f;
+    --line: rgba(255,255,255,0.08);
+    --line-2: rgba(255,255,255,0.16);
+    --ink: #eaf0f7;
+    --ink-dim: #a3aebd;
+    --ink-faint: #6f7b8b;
     --gold: #ffd60a;
     --green: #30d158;
     --yellow: #ffd60a;
     --red: #ff453a;
     /* Pillar palette — rainbow spectrum walk in section order */
-    --fitness:  #e14b4b;  /* Calisthenics    — red */
-    --weight:   #f39038;  /* Weight training — orange */
-    --recovery: #e8b628;  /* Body & Recovery — amber-yellow */
-    --content:  #3d8ce8;  /* Content         — blue */
-    --career:   #8b5cf6;  /* People & Career — violet (merged network + job) */
-    --network:  #8b5cf6;  /* legacy alias, matches career */
-    --job:      #8b5cf6;  /* legacy alias, matches career */
-    --accent: #2997ff;
+    /* Season 2 pillar family — softer, distinct from the electric-blue accent */
+    --fitness:  #ff6b4a;  /* Calisthenics    — coral */
+    --weight:   #a78bfa;  /* Weight training — violet */
+    --recovery: #f2c14e;  /* Body & Recovery — amber */
+    --content:  #3d7bff;  /* (retired pillar, kept for legacy refs) */
+    --career:   #34d3c1;  /* People & Career — teal */
+    --network:  #34d3c1;  /* legacy alias, matches career */
+    --job:      #34d3c1;  /* legacy alias, matches career */
+    --accent: #3d7bff;    /* Season 2 — electric blue */
+    --font-display: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, monospace;
     --ring-track: rgba(255,255,255,0.1);
     --tint-hi: rgba(255,255,255,0.045);
     --tint-lo: rgba(255,255,255,0.01);
@@ -74,28 +80,28 @@
 
   /* Day theme — warm off-white, gentle depth, easy midday reading */
   :root[data-theme="day"] {
-    --bg: #f4f5f7;
-    --bg-2: #eceef2;
+    --bg: #f4f1ea;
+    --bg-2: #ece8de;
     --surface: #ffffff;
     --surface-2: #f6f7f9;
     --surface-3: rgba(0,0,0,0.02);
     --line: rgba(0,0,0,0.08);
     --line-2: rgba(0,0,0,0.16);
-    --ink: #1d1d1f;
-    --ink-dim: #545862;
-    --ink-faint: #86868b;
+    --ink: #14181f;
+    --ink-dim: #4a525e;
+    --ink-faint: #7b8492;
     --gold: #d19a00;
     --green: #22a54b;
     --yellow: #c78900;
     --red: #e5352c;
-    --fitness:  #c73030;  /* red — deeper for white */
-    --weight:   #d97706;  /* orange */
-    --recovery: #b45309;  /* deeper amber */
-    --content:  #1d4ed8;  /* deeper blue */
-    --career:   #6d28d9;  /* deeper violet */
-    --network:  #6d28d9;
-    --job:      #6d28d9;
-    --accent: #0071e3;
+    --fitness:  #e04a2b;  /* coral — deeper for paper */
+    --weight:   #7c5ce0;  /* violet */
+    --recovery: #b7791f;  /* amber */
+    --content:  #1f5fff;
+    --career:   #0f9f8e;  /* teal */
+    --network:  #0f9f8e;
+    --job:      #0f9f8e;
+    --accent: #1f5fff;
     --ring-track: rgba(0,0,0,0.08);
     --tint-hi: rgba(0,0,0,0.02);
     --tint-lo: rgba(0,0,0,0.006);
@@ -121,14 +127,14 @@
     --green: #4dd4a8;
     --yellow: #ffcc4d;
     --red: #ff5e62;
-    --fitness:  #ff5e62;  /* coral red      — hibiscus */
-    --weight:   #ff9f43;  /* mango orange   — sunset */
-    --recovery: #00d2d3;  /* Caribbean aqua — sea */
-    --content:  #ff6b9d;  /* hibiscus pink  — coral */
-    --career:   #ffca3a;  /* sunset gold    — horizon sun */
-    --network:  #ffca3a;
-    --job:      #ffca3a;
-    --accent: #00d2d3;
+    --fitness:  #ff7a5c;  /* coral */
+    --weight:   #b79bff;  /* violet */
+    --recovery: #ffc94d;  /* sunset gold */
+    --content:  #5b9bff;
+    --career:   #3ee0c8;  /* Caribbean teal */
+    --network:  #3ee0c8;
+    --job:      #3ee0c8;
+    --accent: #5b9bff;
     --ring-track: rgba(255, 202, 149, 0.20);
     --tint-hi: rgba(255, 195, 130, 0.055);
     --tint-lo: rgba(255, 195, 130, 0.018);
@@ -1047,11 +1053,11 @@
     .card.pillar-content .ex-grid,
     .card.pillar-career .ex-grid { min-height: 240px; }
   }
-  .card.pillar-fitness  { background: linear-gradient(to top right, #ffffff 0%, #fecaca 100%); border-color: rgba(225,75,75,0.35); }
-  .card.pillar-weight   { background: linear-gradient(to top right, #ffffff 0%, #fed7aa 100%); border-color: rgba(243,144,56,0.35); }
-  .card.pillar-recovery { background: linear-gradient(to top right, #ffffff 0%, #fef3c7 100%); border-color: rgba(232,182,40,0.42); }
+  .card.pillar-fitness  { background: linear-gradient(to top right, #ffffff 0%, #ffd9cf 100%); border-color: rgba(255,107,74,0.38); }
+  .card.pillar-weight   { background: linear-gradient(to top right, #ffffff 0%, #e4dcff 100%); border-color: rgba(167,139,250,0.42); }
+  .card.pillar-recovery { background: linear-gradient(to top right, #ffffff 0%, #fdf0c9 100%); border-color: rgba(242,193,78,0.5); }
   .card.pillar-content  { background: linear-gradient(to top right, #ffffff 0%, #bfdbfe 100%); border-color: rgba(61,140,232,0.35); }
-  .card.pillar-career   { background: linear-gradient(to top right, #ffffff 0%, #ddd6fe 100%); border-color: rgba(139,92,246,0.35); }
+  .card.pillar-career   { background: linear-gradient(to top right, #ffffff 0%, #cdf3ee 100%); border-color: rgba(52,211,193,0.42); }
   /* Text + inner surfaces inside light cards */
   .card.pillar-fitness .lede, .card.pillar-weight .lede,
   .card.pillar-recovery .lede, .card.pillar-content .lede,
@@ -1842,6 +1848,35 @@
   details + details { margin-top: 8px; }
   details summary { cursor: pointer; font-size: 13px; color: var(--ink-dim); }
   details[open] summary { color: var(--ink); }
+
+  /* ================= SEASON 2 REFRESH — Stage 1: type, header chip, Today's plan ================= */
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif; }
+  h1, h2, .scoretile .lead, .ring-svg-container svg text, .day-pill .num, .stat .v, .brand .sub { font-family: var(--font-display); }
+  h2 { letter-spacing: -0.01em; font-weight: 600; }
+  .ring-svg-container svg text { font-weight: 600; }
+  /* Header chip: quiet electric-blue pill replaces the pulsing classified box */
+  .brand.project35 .p35-classified,
+  :root[data-theme="sunset"] .brand.project35 .p35-classified {
+    font-family: var(--font-mono);
+    font-size: 11px; letter-spacing: 0.16em; font-weight: 500;
+    color: var(--accent); -webkit-text-fill-color: var(--accent);
+    border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    padding: 3px 11px;
+    box-shadow: none; animation: none;
+  }
+  .brand.project35 .mark, .brand.project35 .mark .p35-num { font-family: var(--font-mono); }
+  .brand.project35 .p35-sub { font-family: var(--font-mono); border-top: 1px solid var(--line); }
+  /* Today's plan */
+  .today-plan {
+    margin: 4px 0 14px; padding: 14px 16px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    border-left: 3px solid var(--accent);
+  }
+  .tp-kicker { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; color: var(--accent); font-weight: 500; }
+  .tp-title { font-family: var(--font-display); font-size: 22px; font-weight: 600; letter-spacing: -0.015em; color: var(--ink); margin-top: 4px; line-height: 1.2; }
+  .tp-sub { font-size: 13px; color: var(--ink-dim); margin-top: 4px; line-height: 1.45; }
 </style>
 </head>
 <body>
@@ -1858,9 +1893,9 @@
   <header class="top">
     <div>
       <div class="brand project35">
-        <div class="p35-classified">TOP SECRET // OPERATIONAL</div>
+        <div class="p35-classified">SEASON 2</div>
         <div class="mark">PROJECT<span class="p35-num">35</span></div>
-        <div class="p35-sub">Classified · 6-Week Tracker · Eyes Only</div>
+        <div class="p35-sub">6-Week Tracker · Season 2</div>
       </div>
       <div class="sub" id="dateLine">— · Day —/42</div>
     </div>
@@ -1887,6 +1922,12 @@
   </nav>
 
   <section id="view-today" class="view show">
+
+    <div class="today-plan" id="todayPlan">
+      <div class="tp-kicker" id="tpKicker">TODAY'S PLAN</div>
+      <div class="tp-title" id="tpTitle">—</div>
+      <div class="tp-sub" id="tpSub"></div>
+    </div>
 
     <div class="today-hero" id="todayHero">
       <div class="day-strip-meta">
@@ -1923,13 +1964,6 @@
       <h2><span class="accent"></span> Body &amp; Recovery</h2>
       <div class="lede">Bodyweight, sauna, cold plunge, creatine. Log the daily signals.</div>
       <div class="ex-grid" id="recoveryGrid"></div>
-    </div>
-
-    <div id="sec-content" class="toc-scroll-target card pillar-content" style="margin-top:18px;">
-      <h2><span class="accent"></span> Content</h2>
-      <div class="lede">Weekly targets: 2+ long-form · 3+ reels · 1+ carousel.</div>
-      <div class="content-day-hint" id="contentDayHint">—</div>
-      <div class="ex-grid" id="contentGrid"></div>
     </div>
 
     <div id="sec-career" class="toc-scroll-target card pillar-career" style="margin-top:18px;">
@@ -1985,12 +2019,6 @@
       <h2><span class="accent"></span> Fitness — calisthenics floor</h2>
       <div class="lede">Weekly totals vs weekly target. Tap any tile for per-day breakdown.</div>
       <div class="ex-grid" id="weekFitnessGrid"></div>
-    </div>
-
-    <div class="card pillar-content" style="margin-top:18px;">
-      <h2><span class="accent"></span> Content — cadence</h2>
-      <div class="lede">6 posts per week: 2+ long-form (3+ min) · 3+ reels (≤30s) · 1+ carousel.</div>
-      <div class="ex-grid" id="weekContentGrid"></div>
     </div>
 
     <div class="card pillar-career" style="margin-top:18px;">
@@ -2448,10 +2476,33 @@ function renderToday() {
   renderPillarGrids();
   renderSleepBanner();
   renderTodayNotes();
+  renderTodayPlan();
   renderWeeklyGoals('todayGoalsGrid', 'todayGoalsLede', iso);
   updateSavedLabel(iso);
   renderDayStrip();
   updateBackTodayButton();
+}
+
+function renderTodayPlan() {
+  const iso = activeDate();
+  const tpl = templateForDate(iso);
+  const t = document.getElementById('tpTitle');
+  if (!t) return;
+  const dow = dayOfWeekIndex(iso);
+  const FULL = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const isToday = iso === todayIso();
+  document.getElementById('tpKicker').textContent = isToday ? "TODAY'S PLAN" : `PLAN · ${fmtShort(iso).toUpperCase()}`;
+  t.textContent = `${FULL[dow]} · ${tpl.name}`;
+  let sub = '';
+  if (tpl.type === 'gym') {
+    const names = tpl.exercises.map(e => e.name);
+    sub = `${names.length} exercises · ${names.slice(0, 3).join(', ')}${names.length > 3 ? '…' : ''}`;
+  } else if (tpl.type === 'outdoor') sub = 'Pick a hike or a swim from "+ Add exercise" and log it.';
+  else if (tpl.type === 'optional') sub = 'Wildcard day — a workout or a swim, your call.';
+  else if (tpl.type === 'swim') sub = 'Swim day — log laps or open-water time.';
+  else if (tpl.type === 'hike') sub = 'Hike day — log miles and minutes.';
+  else sub = 'Recovery day.';
+  document.getElementById('tpSub').textContent = sub;
 }
 
 function renderSleepBanner() {
@@ -2964,14 +3015,7 @@ function renderPillarGrids() {
   const iso = activeDate();
   const dayData = STATE.days[iso] || {};
 
-  // Content day-of-week hint
-  const hintEl = document.getElementById('contentDayHint');
-  if (hintEl) {
-    const dow = parseIso(iso).getDay();
-    hintEl.textContent = CONTENT_SCHEDULE[dow] || '';
-  }
-
-  ['fitness', 'recovery', 'content', 'career'].forEach(pillar => {
+  ['fitness', 'recovery', 'career'].forEach(pillar => {
     const grid = document.getElementById(pillar + 'Grid');
     if (!grid) return;
     grid.innerHTML = '';
@@ -2981,9 +3025,7 @@ function renderPillarGrids() {
     PILLAR_METRICS[pillar].forEach(metric => {
       grid.appendChild(renderPillarTile(pillar, metric, dayData));
     });
-    // Content collapses fully — all 3 tiles hidden by default, Show more reveals the whole metric dashboard.
-    const showN = pillar === 'content' ? 0 : 4;
-    makeCollapsibleGrid(grid, { showN });
+    makeCollapsibleGrid(grid, { showN: 4 });
   });
 }
 
@@ -4080,27 +4122,21 @@ function renderWeek() {
 
   const scoreboard = document.getElementById('weekScoreboard');
   scoreboard.innerHTML = '';
-  const contentShipped = (agg.longForm || 0) + (agg.reels || 0) + (agg.carousels || 0);
-  const contentTarget = CONTENT_TARGETS.longForm + CONTENT_TARGETS.reels + CONTENT_TARGETS.carousels;
-  const prevContentShipped = prevAgg ? ((prevAgg.longForm || 0) + (prevAgg.reels || 0) + (prevAgg.carousels || 0)) : null;
-
   const fG = gradeFor(agg.gymCount, SESSION_TARGET, prevAgg ? prevAgg.gymCount : null);
-  const cG = gradeFor(contentShipped, contentTarget, prevContentShipped);
   const nG = gradeFor(agg.people.length, PEOPLE_SEEN_TARGET, prevAgg ? prevAgg.people.length : null);
   const jG = gradeFor(agg.apps, APPS_TARGET, prevAgg ? prevAgg.apps : null);
   scoreboard.appendChild(scoretile('Fitness', `${agg.gymCount}`, `/ ${SESSION_TARGET} gym days`, fG, 'fitness'));
-  scoreboard.appendChild(scoretile('Content', `${contentShipped}`, `/ ${contentTarget} posts`, cG, 'content'));
   scoreboard.appendChild(scoretile('Network', `${agg.people.length}`, `people seen IRL`, nG, 'network'));
   scoreboard.appendChild(scoretile('Job', `${agg.apps}`, `/ ${APPS_TARGET} apps shipped`, jG, 'job'));
 
-  renderWeekPillarGrids(agg, contentShipped, contentTarget);
+  renderWeekPillarGrids(agg);
   renderWeeklyGoals('weekGoalsGrid', 'weekGoalsLede', todayIso());
   renderWeeklyRecap(wk);
 
   const sunday = document.getElementById('sundayPanel');
   const isSat = (new Date()).getDay() === 6 && iso >= wk.startDate && iso <= wk.endDate;
   sunday.style.display = isSat ? 'block' : 'none';
-  if (isSat) document.getElementById('sundayContent').innerHTML = sundayPrompt(wk, agg, fG, cG, nG, jG);
+  if (isSat) document.getElementById('sundayContent').innerHTML = sundayPrompt(wk, agg, fG, nG, jG);
 }
 
 /* Weekly recap — auto-summary of the PREVIOUS week from tracker data */
@@ -4153,13 +4189,6 @@ function renderWeeklyRecap(currentWeek) {
   if (agg.coldPlungeMin >= 3) wins.push(`Cold plunge target hit: <strong>${agg.coldPlungeMin} min</strong>.`);
   else if (agg.coldPlungeMin > 0) trends.push(`Cold plunge ${agg.coldPlungeMin} / 3 min.`);
 
-  // Content
-  const contentShipped = (agg.longForm || 0) + (agg.reels || 0) + (agg.carousels || 0);
-  const contentTarget = CONTENT_TARGETS.longForm + CONTENT_TARGETS.reels + CONTENT_TARGETS.carousels;
-  if (contentShipped >= contentTarget) wins.push(`Content shipped: <strong>${contentShipped}/${contentTarget}</strong> posts.`);
-  else if (contentShipped > 0) misses.push(`Content short: ${contentShipped}/${contentTarget} posts (long-form ${agg.longForm}, reels ${agg.reels}, carousels ${agg.carousels}).`);
-  else misses.push('Zero content shipped last week.');
-
   // Career
   if (agg.apps >= APPS_TARGET) wins.push(`Apps shipped: <strong>${agg.apps}/${APPS_TARGET}</strong>.`);
   else if (agg.apps > 0) misses.push(`Apps short by ${APPS_TARGET - agg.apps} (${agg.apps}/${APPS_TARGET}).`);
@@ -4172,7 +4201,6 @@ function renderWeeklyRecap(currentWeek) {
   // Suggestions — pick the 2 weakest pillars
   const suggestions = [];
   if (agg.gymCount < SESSION_TARGET) suggestions.push('Lock in 5 gym sessions next week — schedule them Sun–Fri now.');
-  if (contentShipped < contentTarget) suggestions.push('Batch-shoot content on Sunday so weekday posting is just publishing.');
   if (agg.apps < APPS_TARGET) suggestions.push('Ship one application per weekday — 2 hrs blocked, 10am, no exceptions.');
   if (agg.avgSleep != null && agg.avgSleep < 7) suggestions.push('Hard cutoff at 10:30pm — protect the 7 h sleep floor.');
   if (agg.people.length < PEOPLE_SEEN_TARGET) suggestions.push('Pick 2 scenes this week (gym, dive club, meetup) — put them on the calendar.');
@@ -4211,7 +4239,7 @@ function stat(label, value, meta) {
 }
 
 /* ---------- Week-tab pillar tiles (mirror Today-tab ring-tile format) ---------- */
-function renderWeekPillarGrids(agg, contentShipped, contentTarget) {
+function renderWeekPillarGrids(agg) {
   const specs = {
     fitness: [
       { label: 'Plank',        val: agg.plankMinutes,    target: CAL_TARGETS.plankMinutes,    unit: 'min', breakdown: (d) => Number(d.plankMinutes) || 0 },
@@ -4231,12 +4259,6 @@ function renderWeekPillarGrids(agg, contentShipped, contentTarget) {
       { label: 'Sauna',        val: agg.saunaMin,             target: 90,     unit: 'min', breakdown: (d) => Number(d.steamMin) || 0,   breakdownUnit: 'min' },
       { label: 'Creatine',     val: agg.creatineTotal,        target: 35,     unit: 'g',   breakdown: (d) => Number(d.creatineG) || 0,  breakdownUnit: 'g'   },
       { label: 'Cold plunge',  val: agg.coldPlungeMin,        target: 3,      unit: 'min', breakdown: (d) => Number(d.coldPlunge) || 0, breakdownUnit: 'min' },
-    ],
-    content: [
-      { label: 'Long-form', val: agg.longForm,   target: CONTENT_TARGETS.longForm,  breakdown: (d) => Number(d.longForm) || 0 },
-      { label: 'Reels',     val: agg.reels,      target: CONTENT_TARGETS.reels,     breakdown: (d) => Number(d.reels) || 0 },
-      { label: 'Carousels', val: agg.carousels,  target: CONTENT_TARGETS.carousels, breakdown: (d) => Number(d.carousels) || 0 },
-      { label: 'Total posts', val: contentShipped, target: contentTarget,           breakdown: (d) => (Number(d.longForm)||0)+(Number(d.reels)||0)+(Number(d.carousels)||0) },
     ],
     career: [
       { label: 'People seen',  val: agg.people.length, target: PEOPLE_SEEN_TARGET, breakdown: (d) => {
@@ -4404,12 +4426,12 @@ function scoretile(name, value, sub, grade, pillarKey) {
   return el;
 }
 function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function sundayPrompt(wk, agg, fG, cG, nG, jG) {
-  const greens = [fG,cG,nG,jG].filter(g => g.grade === 'green').length;
-  const reds = [fG,cG,nG,jG].filter(g => g.grade === 'red').length;
+function sundayPrompt(wk, agg, fG, nG, jG) {
+  const greens = [fG,nG,jG].filter(g => g.grade === 'green').length;
+  const reds = [fG,nG,jG].filter(g => g.grade === 'red').length;
   let stance = '';
   if (reds >= 2) stance = '<strong>Triage mode candidate.</strong> Two pillars red — drop new inputs and rebuild base.';
-  else if (greens >= 3) stance = '<strong>Add load.</strong> Three pillars green — pick the one with most slack and raise its bar next week.';
+  else if (greens >= 3) stance = '<strong>Add load.</strong> All pillars green — pick the one with most slack and raise its bar next week.';
   else stance = 'Pick <strong>one</strong> adjustment for next week. One only.';
   return `<p>${stance}</p>
     <div class="grid-2" style="margin-top:8px;">
@@ -4464,21 +4486,15 @@ function renderMission() {
     const hasCustomSets   = Array.isArray(d.customExercises) && d.customExercises.some(ex => Array.isArray(ex.sets) && ex.sets.length > 0);
     return a + ((hasTemplateSets || hasCustomSets) ? 1 : 0);
   }, 0);
-  const totalContent = allDays.reduce((a, iso) => {
-    const d = STATE.days[iso];
-    return a + (Number(d.longForm) || 0) + (Number(d.reels) || 0) + (Number(d.carousels) || 0);
-  }, 0);
   const totalCalisthenics = allDays.reduce((a, iso) => {
     const d = STATE.days[iso];
     return a + (Number(d.pushups) || 0) + (Number(d.mountedCrunches) || 0) + (Number(d.heelTaps) || 0) + (Number(d.pullups) || 0);
   }, 0);
-  const contentWeeklyTarget = CONTENT_TARGETS.longForm + CONTENT_TARGETS.reels + CONTENT_TARGETS.carousels;
   const totalApps = allDays.reduce((a, iso) => a + (Number(STATE.days[iso].apps) || 0), 0);
   const calWeeklyTarget = CAL_TARGETS.pushups + CAL_TARGETS.mountedCrunches + CAL_TARGETS.heelTaps + CAL_TARGETS.pullups;
   summary.appendChild(stat('Days logged', `${totalLogged}/${day}`, `${day - totalLogged} unlogged`));
   summary.appendChild(stat('Gym sessions', totalGym, `target ${SESSION_TARGET * 6} = 30`));
   summary.appendChild(stat('Calisthenics reps', totalCalisthenics.toLocaleString(), `target ${(calWeeklyTarget * 6).toLocaleString()}`));
-  summary.appendChild(stat('Posts total', totalContent, `target ${contentWeeklyTarget * 6}`));
   summary.appendChild(stat('Apps total', totalApps, `target ${APPS_TARGET * 6} = ${APPS_TARGET * 6}`));
 
   const tg = document.getElementById('templateGrid');
@@ -4503,14 +4519,9 @@ function renderMission() {
   const sparkGrid = document.getElementById('sparkGrid');
   sparkGrid.innerHTML = '';
   const fitnessSeries = WEEKS.map(w => aggregateWeek(w).gymCount);
-  const contentSeries = WEEKS.map(w => {
-    const a = aggregateWeek(w);
-    return (a.longForm || 0) + (a.reels || 0) + (a.carousels || 0);
-  });
   const networkSeries = WEEKS.map(w => aggregateWeek(w).people.length);
   const jobSeries = WEEKS.map(w => aggregateWeek(w).apps);
   sparkGrid.appendChild(sparkCard('Fitness — gym days/wk', fitnessSeries, SESSION_TARGET, getPillarVar('fitness')));
-  sparkGrid.appendChild(sparkCard('Content — posts/wk', contentSeries, contentWeeklyTarget, getPillarVar('content')));
   sparkGrid.appendChild(sparkCard('Network — people IRL/wk', networkSeries, PEOPLE_SEEN_TARGET, getPillarVar('network')));
   sparkGrid.appendChild(sparkCard('Job — apps/wk', jobSeries, APPS_TARGET, getPillarVar('job')));
 }
