@@ -1901,6 +1901,12 @@
 
     </div>
 
+    <div id="sec-goals" class="card pillar-fitness" style="margin-top:18px;">
+      <h2><span class="accent"></span> Weekly goals</h2>
+      <div class="lede" id="todayGoalsLede">Sessions this week. Tap a tile to see which days counted.</div>
+      <div class="ex-grid" id="todayGoalsGrid"></div>
+    </div>
+
     <div id="sec-fitness" class="toc-scroll-target card pillar-fitness" style="margin-top:18px;">
       <h2><span class="accent"></span> Calisthenics</h2>
       <div class="lede">Bodyweight sets. Tap any tile to log.</div>
@@ -1961,6 +1967,12 @@
       <h2>Week scoreboard</h2>
       <div class="lede" id="weekRangeLede">—</div>
       <div class="scoreboard" id="weekScoreboard"></div>
+    </div>
+
+    <div class="card pillar-fitness" style="margin-top:18px;">
+      <h2><span class="accent"></span> Weekly goals</h2>
+      <div class="lede" id="weekGoalsLede">Sessions this week. Tap a tile to see which days counted.</div>
+      <div class="ex-grid" id="weekGoalsGrid"></div>
     </div>
 
     <div class="card pillar-recovery" style="margin-top:18px;">
@@ -2118,8 +2130,7 @@ const WORKOUT_TEMPLATE = {
     { name: 'Shoulder press', target: '3x10' },
     { name: 'Side delt raise', target: '3x10' },
     { name: 'Shoulder shrug', target: '3x15' },
-    { name: 'Tricep pull down', target: '3x10' },
-    { name: 'Dips', target: 'max reps × 3 sets' }
+    { name: 'Tricep pull down', target: '3x10' }
   ]},
   // Tue · swim
   2: { name: 'Swim', type: 'swim', exercises: [] },
@@ -2160,8 +2171,24 @@ const TEMPLATE_OVERRIDES = {
   '2026-09-21': WORKOUT_TEMPLATE[2], // this Mon only → Swim (was Push · Chest+Shoulders+Triceps)
   '2026-09-22': WORKOUT_TEMPLATE[1], // this Tue only → Push · Chest+Shoulders+Triceps (was Swim)
 };
+/* Season 2 cadence (from Sun 2026-11-08): workout days alternate with hike-or-swim days.
+   Sun weights · Mon hike/swim · Tue workout · Wed hike/swim · Thu workout · Fri hike/swim · Sat wildcard.
+   Season 1 dates keep the original WORKOUT_TEMPLATE so past weeks still display correctly. */
+const SEASON2_START = '2026-11-08';
+const OUTDOOR_DAY = { name: 'Hike or Swim', type: 'outdoor', exercises: [] };
+const WORKOUT_TEMPLATE_S2 = {
+  0: WORKOUT_TEMPLATE[0],
+  1: OUTDOOR_DAY,
+  2: WORKOUT_TEMPLATE[1],
+  3: OUTDOOR_DAY,
+  4: WORKOUT_TEMPLATE[4],
+  5: OUTDOOR_DAY,
+  6: { name: 'Wildcard · Workout or Swim', type: 'optional', exercises: WORKOUT_TEMPLATE[6].exercises }
+};
 function templateForDate(iso) {
-  return TEMPLATE_OVERRIDES[iso] || WORKOUT_TEMPLATE[dayOfWeekIndex(iso)];
+  if (TEMPLATE_OVERRIDES[iso]) return TEMPLATE_OVERRIDES[iso];
+  const set = iso >= SEASON2_START ? WORKOUT_TEMPLATE_S2 : WORKOUT_TEMPLATE;
+  return set[dayOfWeekIndex(iso)];
 }
 
 const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -2195,7 +2222,8 @@ const PILLAR_METRICS = {
     { key: 'pushups',         label: 'Pushups',       target: 100, input: 'sets', repLabel: 'reps' },
     { key: 'mountedCrunches', label: 'Crunches',      target: 60,  input: 'sets', repLabel: 'reps' },
     { key: 'heelTaps',        label: 'Heel taps',     target: 75,  input: 'sets', repLabel: 'reps' },
-    { key: 'pullups',         label: 'Pull-ups',      target: Math.round(CAL_TARGETS.pullups/7),         input: 'sets', repLabel: 'reps' }
+    { key: 'pullups',         label: 'Pull-ups',      target: Math.round(CAL_TARGETS.pullups/7),         input: 'sets', repLabel: 'reps' },
+    { key: 'dips',            label: 'Dips',          target: null,                                      input: 'sets', repLabel: 'reps' }
   ],
   recovery: [
     { key: 'sleepHours', label: 'Sleep',       target: 7,    unit: 'h',   input: 'number', step: 0.1 },
@@ -2280,6 +2308,7 @@ function saveAll(data) {
   data.version = 4;
   data.updatedAt = new Date().toISOString();
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
+  if (typeof refreshTodayGoalsSoon === 'function' && typeof document !== 'undefined' && document.getElementById('todayGoalsGrid')) refreshTodayGoalsSoon();
 }
 let STATE = loadAll();
 
@@ -2331,12 +2360,12 @@ function renderDayStrip() {
     el.className = 'day-strip-day'
       + (isToday ? ' today' : '')
       + (isSelected ? ' selected' : '')
-      + (tpl.type === 'rest' ? ' rest' : '')
+      + ((tpl.type === 'rest' || tpl.type === 'outdoor') ? ' rest' : '')
       + (inMission ? '' : ' out-of-mission');
     el.innerHTML =
       `<div class="dow">${DAY_NAMES[i]}</div>` +
       `<div class="date-num">${d.getDate()}</div>` +
-      `<div class="type-tag">${tpl.type === 'rest' ? 'REST' : 'GYM'}</div>` +
+      `<div class="type-tag">${({ rest: 'REST', swim: 'SWIM', hike: 'HIKE', outdoor: 'H/S', optional: 'WILD' })[tpl.type] || 'GYM'}</div>` +
       (hasData ? '<div class="saved-dot" title="Day has data"></div>' : '');
     el.addEventListener('click', () => setSelectedDate(iso));
     strip.appendChild(el);
@@ -2419,6 +2448,7 @@ function renderToday() {
   renderPillarGrids();
   renderSleepBanner();
   renderTodayNotes();
+  renderWeeklyGoals('todayGoalsGrid', 'todayGoalsLede', iso);
   updateSavedLabel(iso);
   renderDayStrip();
   updateBackTodayButton();
@@ -2530,8 +2560,8 @@ function renderWorkoutCard(iso, dayData) {
   const dow = dayOfWeekIndex(iso);
   const tpl = templateForDate(iso);
   // Section h2 swaps title based on day type
-  const TITLES = { gym: 'Weight training', rest: 'Rest / active recovery', swim: 'Swim', hike: 'Hike', optional: 'Optional session' };
-  const SUBS   = { gym: 'Training day',    rest: 'Recovery',               swim: 'Pool day', hike: 'Trail day', optional: 'Your call' };
+  const TITLES = { gym: 'Weight training', rest: 'Rest / active recovery', swim: 'Swim', hike: 'Hike', outdoor: 'Hike or Swim', optional: 'Wildcard session' };
+  const SUBS   = { gym: 'Training day',    rest: 'Recovery',               swim: 'Pool day', hike: 'Trail day', outdoor: 'Hike or swim day', optional: 'Wildcard day' };
   const secTitle = document.getElementById('workoutSectionTitle');
   if (secTitle) secTitle.textContent = TITLES[tpl.type] || 'Weight training';
   const card = document.createElement('div');
@@ -2551,7 +2581,8 @@ function renderWorkoutCard(iso, dayData) {
       rest:     'Recovery day. Sleep, mobility, sauna, cold plunge. If you did any training anyway, log it below.',
       swim:     'Swim day. Log distance (m/yd), pool time, laps, or an open-water session below.',
       hike:     'Hike day. Log distance (km/mi), elevation, or total time below.',
-      optional: 'Optional day — full-body + cardio if you feel like it, or take the rest. Log whatever you did below.'
+      outdoor:  'Hike or swim day — pick Hike or a Swim from the dropdown below and log miles/time or laps.',
+      optional: 'Wildcard day — a workout or a swim, your call. Log whatever you did below.'
     };
     rn.innerHTML = notes[tpl.type] || notes.rest;
     card.appendChild(rn);
@@ -3366,8 +3397,7 @@ const EXERCISE_GROUPS = {
     { name: 'BB Bicep curl',       target: '3x10' },
     { name: 'Dumbbell bicep curl', target: '3x10' },
     { name: 'Tricep pull down',    target: '3x10' },
-    { name: 'Tricep extension',    target: '3x10' },
-    { name: 'Dips',                target: 'max reps × 3 sets' }
+    { name: 'Tricep extension',    target: '3x10' }
   ],
   'Legs': [
     { name: 'Leg press',           target: '3x10' },
@@ -3389,9 +3419,11 @@ const EXERCISE_GROUPS = {
     { name: 'Pushups',         target: 'max reps × 3 sets' },
     { name: 'Crunches',        target: 'max reps × 3 sets' },
     { name: 'Heel taps',       target: 'max reps × 3 sets' },
-    { name: 'Pull-ups',        target: 'max reps × 3 sets' }
+    { name: 'Pull-ups',        target: 'max reps × 3 sets' },
+    { name: 'Dips',            target: 'max reps × 3 sets' }
   ],
   'Cardio': [
+    { name: 'Jog',             target: '3 miles · 30 min' },
     { name: 'Jump rope',       target: '20 min' },
     { name: 'Zone 2 walk/run', target: '30 min' },
     { name: 'Interval sprint', target: '15 min' }
@@ -4006,7 +4038,7 @@ function aggregateWeek(week) {
   return {
     week, days,
     pushups: sum('pushups'), mountedCrunches: sum('mountedCrunches'), heelTaps: sum('heelTaps'),
-    plankMinutes: sum('plankMinutes'), pullups: sum('pullups'),
+    plankMinutes: sum('plankMinutes'), pullups: sum('pullups'), dips: sum('dips'),
     gymCount, cardioCount, sessionsTotal: gymCount + cardioCount,
     creatineDays, creatineTotal, saunaMin, saunaDays, coldPlungeMin, coldPlungeDays,
     avgSleep, sleepHoursTotal, sleepsOnTarget, closingWeight, closingWeightUnit,
@@ -4062,6 +4094,7 @@ function renderWeek() {
   scoreboard.appendChild(scoretile('Job', `${agg.apps}`, `/ ${APPS_TARGET} apps shipped`, jG, 'job'));
 
   renderWeekPillarGrids(agg, contentShipped, contentTarget);
+  renderWeeklyGoals('weekGoalsGrid', 'weekGoalsLede', todayIso());
   renderWeeklyRecap(wk);
 
   const sunday = document.getElementById('sundayPanel');
@@ -4186,6 +4219,7 @@ function renderWeekPillarGrids(agg, contentShipped, contentTarget) {
       { label: 'Crunches',     val: agg.mountedCrunches, target: CAL_TARGETS.mountedCrunches, breakdown: (d) => Number(d.mountedCrunches) || 0 },
       { label: 'Heel taps',    val: agg.heelTaps,        target: CAL_TARGETS.heelTaps,        breakdown: (d) => Number(d.heelTaps) || 0 },
       { label: 'Pull-ups',     val: agg.pullups,         target: CAL_TARGETS.pullups,         breakdown: (d) => Number(d.pullups) || 0 },
+      { label: 'Dips',         val: agg.dips,            target: 0, display: `${agg.dips || 0} reps`, breakdown: (d) => Number(d.dips) || 0 },
       { label: 'Gym sessions', val: agg.gymCount,        target: SESSION_TARGET,              breakdown: (d) => {
           const hasT = d.exercises && Object.values(d.exercises).some(ex => Array.isArray(ex.sets) && ex.sets.length > 0);
           const hasC = Array.isArray(d.customExercises) && d.customExercises.some(ex => Array.isArray(ex.sets) && ex.sets.length > 0);
@@ -4232,6 +4266,60 @@ function renderWeekPillarGrids(agg, contentShipped, contentTarget) {
     // Match Today-tab behavior: 4 tiles visible, rest hidden behind "Show N more ▾"
     makeCollapsibleGrid(grid);
   });
+}
+
+/* ---------- Season 2 weekly goals (session counts, Sun–Sat) ----------
+   Jog: 3x/wk, 3+ mi each · Swim: 2x · Core plank: 1x · Calisthenics + core: 3x · Intense jump rope: 2x.
+   Counted from what you log (Add-exercise dropdown, templates, calisthenics tiles). */
+const JOG_MIN_MILES = 3;
+const CORE_CALI_NAMES = ['Plank','Pushups','Crunches','Heel taps','Pull-ups','Dips','Ab wheel','Weighted crunch','Russian twist','Leg raise','Core work (twist / crunch / plank)'];
+function goalSetsFor(d, names) {
+  const out = [];
+  names.forEach(n => { const t = d.exercises && d.exercises[n]; if (t && Array.isArray(t.sets)) out.push(...t.sets); });
+  (d.customExercises || []).forEach(c => { if (names.includes(c.name) && Array.isArray(c.sets)) out.push(...c.sets); });
+  return out;
+}
+const WEEKLY_GOALS = [
+  { label: 'Jog 3+ mi',          target: 3, unit: 'mi',      fn: d => Math.max(0, ...goalSetsFor(d, ['Jog']).map(s => Number(s.weight) || 0).filter(m => m >= JOG_MIN_MILES)) },
+  { label: 'Swim',               target: 2, unit: 'session', fn: d => goalSetsFor(d, ['Swim laps','Open-water swim']).length ? 1 : 0 },
+  { label: 'Core plank',         target: 1, unit: 'session', fn: d => (Number(d.plankMinutes) > 0 || goalSetsFor(d, ['Plank']).length) ? 1 : 0 },
+  { label: 'Calisthenics + core',target: 3, unit: 'session', fn: d => ((Number(d.pushups) || 0) + (Number(d.mountedCrunches) || 0) + (Number(d.heelTaps) || 0) + (Number(d.pullups) || 0) + (Number(d.dips) || 0) + (Number(d.plankMinutes) || 0) > 0 || goalSetsFor(d, CORE_CALI_NAMES).length) ? 1 : 0 },
+  { label: 'Intense jump rope',  target: 2, unit: 'session', fn: d => goalSetsFor(d, ['Jump rope']).length ? 1 : 0 }
+];
+function renderWeeklyGoals(gridId, ledeId, anchorIso) {
+  const grid = document.getElementById(gridId);
+  if (!grid) return;
+  const anchor = parseIso(anchorIso);
+  const sun = new Date(anchor); sun.setDate(anchor.getDate() - anchor.getDay());
+  const days = [];
+  let first = null, last = null;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(sun); d.setDate(sun.getDate() + i);
+    const iso = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if (i === 0) first = d; if (i === 6) last = d;
+    if (STATE.days[iso]) days.push({ iso, ...STATE.days[iso] });
+  }
+  const lede = document.getElementById(ledeId);
+  if (lede) lede.textContent = `${first.toLocaleDateString('en-US',{month:'short',day:'numeric'})} – ${last.toLocaleDateString('en-US',{month:'short',day:'numeric'})} · tap a tile to see which days counted.`;
+  const wasOpen = Array.from(grid.querySelectorAll('details[open] .ex-label')).map(e => e.textContent);
+  grid.innerHTML = '';
+  WEEKLY_GOALS.forEach(g => {
+    const val = days.filter(d => g.fn(d) > 0).length;
+    const deck = renderWeekPillarTile('fitness', {
+      label: g.label, val, target: g.target, unit: '',
+      breakdown: g.fn, breakdownUnit: g.unit
+    }, days);
+    if (wasOpen.includes(g.label)) deck.open = true;
+    grid.appendChild(deck);
+  });
+}
+/* Keep the Today-tab goal tiles live as you log sets (saveAll runs on every change). */
+let _goalsTimer = null;
+function refreshTodayGoalsSoon() {
+  clearTimeout(_goalsTimer);
+  _goalsTimer = setTimeout(() => {
+    try { renderWeeklyGoals('todayGoalsGrid', 'todayGoalsLede', activeDate()); } catch (e) {}
+  }, 150);
 }
 
 function renderWeekPillarTile(pillar, sp, days) {
@@ -4394,13 +4482,14 @@ function renderMission() {
   tg.innerHTML = '';
   const grid = document.createElement('div'); grid.className = 'grid-3';
   [0,1,2,3,4,5,6].forEach(dow => {
-    const tpl = WORKOUT_TEMPLATE[dow];
+    const tpl = WORKOUT_TEMPLATE_S2[dow];
     const c = document.createElement('div');
     c.style.background = 'var(--surface-2)'; c.style.border = '1px solid var(--line)'; c.style.borderRadius = '10px'; c.style.padding = '12px 14px';
     const isRest = tpl.type === 'rest';
     c.innerHTML = `<div style="font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:${isRest ? 'var(--content)' : 'var(--fitness)'}; margin-bottom:2px;">${DAY_NAMES[dow]}</div>
       <div style="font-size:13px; font-weight:600; color:var(--ink); margin-bottom:6px;">${tpl.name}</div>
       ${isRest ? '<div style="font-size:12px; color:var(--ink-faint);">Recovery / mobility</div>' :
+        !tpl.exercises.length ? '<div style="font-size:12px; color:var(--ink-faint);">Log hike or swim</div>' :
         '<ul style="margin:0; padding-left:16px; font-size:12px; color:var(--ink-dim); line-height:1.6;">' +
         tpl.exercises.map(e => `<li>${e.name} <span style="color:var(--ink-faint);">— ${e.target}</span></li>`).join('') +
         '</ul>'}`;
