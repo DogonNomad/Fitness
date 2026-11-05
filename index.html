@@ -2072,9 +2072,9 @@ const MISSION_START = '2026-08-23'; // Sun, Day 1
 const MISSION_END   = '2026-10-03'; // Sat, Day 42
 const MISSION_DAYS  = 42;
 
-const CAL_TARGETS = { plankMinutes: 32, pushups: 500, mountedCrunches: 240, heelTaps: 300, pullups: 60, kneeRaises: 250 };
-const CAL_LABELS = { plankMinutes: 'Plank (min)', pushups: 'Pushups', mountedCrunches: 'Crunches', heelTaps: 'Heel taps', pullups: 'Pull-ups', kneeRaises: 'Knee raises' };
-const CAL_KEYS = ['plankMinutes', 'pushups', 'mountedCrunches', 'heelTaps', 'pullups', 'kneeRaises'];
+const CAL_TARGETS = { plankMinutes: 32, pushups: 500, mountedCrunches: 240, heelTaps: 300, pullups: 60 };
+const CAL_LABELS = { plankMinutes: 'Plank (min)', pushups: 'Pushups', mountedCrunches: 'Crunches', heelTaps: 'Heel taps', pullups: 'Pull-ups' };
+const CAL_KEYS = ['plankMinutes', 'pushups', 'mountedCrunches', 'heelTaps', 'pullups'];
 
 // Weekly content targets by FORMAT (not platform).
 // Minimums; going over is fine.
@@ -2131,9 +2131,7 @@ const WORKOUT_TEMPLATE = {
     { name: 'Prone leg curl', target: '3x12' },
     { name: 'Quad extension', target: '3x10' },
     { name: 'Calf raise', target: '3x12' },
-    { name: 'Glute press', target: '3x10' },
-    { name: 'Hip abduction (int)', target: '3x15' },
-    { name: 'Jump rope', target: '15 min' }
+    { name: 'Glute press', target: '3x10' }
   ]},
   // Fri · workout (pull + arms)
   5: { name: 'Pull + Arms', type: 'gym', exercises: [
@@ -2197,8 +2195,7 @@ const PILLAR_METRICS = {
     { key: 'pushups',         label: 'Pushups',       target: 100, input: 'sets', repLabel: 'reps' },
     { key: 'mountedCrunches', label: 'Crunches',      target: 60,  input: 'sets', repLabel: 'reps' },
     { key: 'heelTaps',        label: 'Heel taps',     target: 75,  input: 'sets', repLabel: 'reps' },
-    { key: 'pullups',         label: 'Pull-ups',      target: Math.round(CAL_TARGETS.pullups/7),         input: 'sets', repLabel: 'reps' },
-    { key: 'kneeRaises',      label: 'Knee raises',   target: Math.round(CAL_TARGETS.kneeRaises/7),      input: 'sets', repLabel: 'reps' }
+    { key: 'pullups',         label: 'Pull-ups',      target: Math.round(CAL_TARGETS.pullups/7),         input: 'sets', repLabel: 'reps' }
   ],
   recovery: [
     { key: 'sleepHours', label: 'Sleep',       target: 7,    unit: 'h',   input: 'number', step: 0.1 },
@@ -3392,8 +3389,7 @@ const EXERCISE_GROUPS = {
     { name: 'Pushups',         target: 'max reps × 3 sets' },
     { name: 'Crunches',        target: 'max reps × 3 sets' },
     { name: 'Heel taps',       target: 'max reps × 3 sets' },
-    { name: 'Pull-ups',        target: 'max reps × 3 sets' },
-    { name: 'Knee raises',     target: 'max reps × 3 sets' }
+    { name: 'Pull-ups',        target: 'max reps × 3 sets' }
   ],
   'Cardio': [
     { name: 'Jump rope',       target: '20 min' },
@@ -4010,7 +4006,7 @@ function aggregateWeek(week) {
   return {
     week, days,
     pushups: sum('pushups'), mountedCrunches: sum('mountedCrunches'), heelTaps: sum('heelTaps'),
-    plankMinutes: sum('plankMinutes'), kneeRaises: sum('kneeRaises'), pullups: sum('pullups'),
+    plankMinutes: sum('plankMinutes'), pullups: sum('pullups'),
     gymCount, cardioCount, sessionsTotal: gymCount + cardioCount,
     creatineDays, creatineTotal, saunaMin, saunaDays, coldPlungeMin, coldPlungeDays,
     avgSleep, sleepHoursTotal, sleepsOnTarget, closingWeight, closingWeightUnit,
@@ -4104,8 +4100,8 @@ function renderWeeklyRecap(currentWeek) {
   else if (agg.gymCount === 0) misses.push('Zero gym sessions logged.');
   else misses.push(`Gym short by <strong>${SESSION_TARGET - agg.gymCount}</strong> (logged ${agg.gymCount}/${SESSION_TARGET}).`);
 
-  const calTotal = (agg.pushups||0) + (agg.mountedCrunches||0) + (agg.heelTaps||0) + (agg.pullups||0) + (agg.kneeRaises||0);
-  const calTarget = CAL_TARGETS.pushups + CAL_TARGETS.mountedCrunches + CAL_TARGETS.heelTaps + CAL_TARGETS.pullups + CAL_TARGETS.kneeRaises;
+  const calTotal = (agg.pushups||0) + (agg.mountedCrunches||0) + (agg.heelTaps||0) + (agg.pullups||0);
+  const calTarget = CAL_TARGETS.pushups + CAL_TARGETS.mountedCrunches + CAL_TARGETS.heelTaps + CAL_TARGETS.pullups;
   if (calTotal >= calTarget) wins.push(`Calisthenics volume on target: <strong>${calTotal.toLocaleString()}</strong> reps.`);
   else if (calTotal > 0) trends.push(`Calisthenics: ${calTotal.toLocaleString()} / ${calTarget.toLocaleString()} reps (${Math.round(calTotal/calTarget*100)}%).`);
   else misses.push('No calisthenics logged.');
@@ -4190,7 +4186,6 @@ function renderWeekPillarGrids(agg, contentShipped, contentTarget) {
       { label: 'Crunches',     val: agg.mountedCrunches, target: CAL_TARGETS.mountedCrunches, breakdown: (d) => Number(d.mountedCrunches) || 0 },
       { label: 'Heel taps',    val: agg.heelTaps,        target: CAL_TARGETS.heelTaps,        breakdown: (d) => Number(d.heelTaps) || 0 },
       { label: 'Pull-ups',     val: agg.pullups,         target: CAL_TARGETS.pullups,         breakdown: (d) => Number(d.pullups) || 0 },
-      { label: 'Knee raises',  val: agg.kneeRaises,      target: CAL_TARGETS.kneeRaises,      breakdown: (d) => Number(d.kneeRaises) || 0 },
       { label: 'Gym sessions', val: agg.gymCount,        target: SESSION_TARGET,              breakdown: (d) => {
           const hasT = d.exercises && Object.values(d.exercises).some(ex => Array.isArray(ex.sets) && ex.sets.length > 0);
           const hasC = Array.isArray(d.customExercises) && d.customExercises.some(ex => Array.isArray(ex.sets) && ex.sets.length > 0);
@@ -4384,11 +4379,11 @@ function renderMission() {
   }, 0);
   const totalCalisthenics = allDays.reduce((a, iso) => {
     const d = STATE.days[iso];
-    return a + (Number(d.pushups) || 0) + (Number(d.mountedCrunches) || 0) + (Number(d.heelTaps) || 0) + (Number(d.kneeRaises) || 0) + (Number(d.pullups) || 0);
+    return a + (Number(d.pushups) || 0) + (Number(d.mountedCrunches) || 0) + (Number(d.heelTaps) || 0) + (Number(d.pullups) || 0);
   }, 0);
   const contentWeeklyTarget = CONTENT_TARGETS.longForm + CONTENT_TARGETS.reels + CONTENT_TARGETS.carousels;
   const totalApps = allDays.reduce((a, iso) => a + (Number(STATE.days[iso].apps) || 0), 0);
-  const calWeeklyTarget = CAL_TARGETS.pushups + CAL_TARGETS.mountedCrunches + CAL_TARGETS.heelTaps + CAL_TARGETS.kneeRaises + CAL_TARGETS.pullups;
+  const calWeeklyTarget = CAL_TARGETS.pushups + CAL_TARGETS.mountedCrunches + CAL_TARGETS.heelTaps + CAL_TARGETS.pullups;
   summary.appendChild(stat('Days logged', `${totalLogged}/${day}`, `${day - totalLogged} unlogged`));
   summary.appendChild(stat('Gym sessions', totalGym, `target ${SESSION_TARGET * 6} = 30`));
   summary.appendChild(stat('Calisthenics reps', totalCalisthenics.toLocaleString(), `target ${(calWeeklyTarget * 6).toLocaleString()}`));
