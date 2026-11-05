@@ -1899,6 +1899,41 @@
   .card.pillar-fitness, .card.pillar-weight, .card.pillar-recovery, .card.pillar-career { min-height: 0 !important; }
   /* Weekly goals: half-height window, two tiles visible, scroll for the rest */
   #todayGoalsGrid, #weekGoalsGrid { grid-template-columns: 1fr 1fr !important; }
+
+  /* ===== Uniform tile windows: Calisthenics, Weight training, Body & Recovery, People & Career =====
+     Same tile size everywhere, four across, no gaps left/right/between/below. Scroll for the rest. */
+  #fitnessGrid, #recoveryGrid, #careerGrid, #workoutCard .workout-card > .ex-grid {
+    --tile-h: 118px;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    column-gap: 2px !important; row-gap: 0 !important;
+    grid-auto-rows: minmax(var(--tile-h), auto) !important;
+    align-items: stretch !important;
+    padding: 0 !important; margin: 2px 0 0 !important;
+  }
+  @media (max-width: 720px) {
+    #fitnessGrid, #recoveryGrid, #careerGrid, #workoutCard .workout-card > .ex-grid { --tile-h: 104px; }
+  }
+  html.force-mobile #fitnessGrid, html.force-mobile #recoveryGrid, html.force-mobile #careerGrid,
+  html.force-mobile #workoutCard .workout-card > .ex-grid { --tile-h: 104px; }
+  #fitnessGrid > .ex-deck:not([open]), #recoveryGrid > .ex-deck:not([open]), #careerGrid > .ex-deck:not([open]),
+  #workoutCard .workout-card > .ex-grid > .ex-deck:not([open]) { height: var(--tile-h); }
+  #fitnessGrid .ex-tile, #recoveryGrid .ex-tile, #careerGrid .ex-tile, #workoutCard .workout-card > .ex-grid .ex-tile {
+    height: var(--tile-h) !important; min-height: var(--tile-h) !important; padding: 2px 0 !important;
+  }
+  #fitnessGrid .ex-deck summary, #recoveryGrid .ex-deck summary, #careerGrid .ex-deck summary,
+  #workoutCard .workout-card > .ex-grid .ex-deck summary { padding: 0 !important; }
+  #fitnessGrid .ex-deck[open] .ex-tile, #recoveryGrid .ex-deck[open] .ex-tile, #careerGrid .ex-deck[open] .ex-tile,
+  #workoutCard .workout-card > .ex-grid .ex-deck[open] .ex-tile { height: auto !important; min-height: 0 !important; }
+
+  /* Weekly goals dropdown: smaller panel, but readable */
+  #todayGoalsGrid .ex-deck[open], #weekGoalsGrid .ex-deck[open] { padding: 2px !important; }
+  #todayGoalsGrid .ex-details, #weekGoalsGrid .ex-details {
+    padding: 6px 8px !important; font-size: 13px !important;
+    max-height: 104px; overflow-y: auto;
+  }
+  #todayGoalsGrid .wk-bd, #weekGoalsGrid .wk-bd { gap: 3px; }
+  #todayGoalsGrid .wk-bd-row, #weekGoalsGrid .wk-bd-row { padding: 4px 8px !important; font-size: 13px !important; border-radius: 6px !important; }
+  #todayGoalsGrid .wk-bd-empty, #weekGoalsGrid .wk-bd-empty { padding: 6px !important; font-size: 13px !important; }
 </style>
 </head>
 <body>
@@ -2855,7 +2890,7 @@ function renderWorkoutCard(iso, dayData) {
     card.appendChild(addDropdown);
 
     // Collapsible: 4 tiles visible by default, "Show N more ▾" toggle at the very bottom.
-    makeCollapsibleGrid(list, { visible: 4, zoom: 0.75 });
+    makeCollapsibleGrid(list, { visible: 4, expand: true, peek: 0, fade: false });
     // Move the toggle button to be the LAST child so it appears after both grid + dropdown.
     const gridToggleBtn = card.querySelector(':scope > .grid-toggle');
     if (gridToggleBtn) card.appendChild(gridToggleBtn);
@@ -3066,7 +3101,7 @@ function renderPillarGrids() {
     PILLAR_METRICS[pillar].forEach(metric => {
       grid.appendChild(renderPillarTile(pillar, metric, dayData));
     });
-    makeCollapsibleGrid(grid, { showN: 4 });
+    makeCollapsibleGrid(grid, { visible: 4, expand: true, peek: 0, fade: false });
   });
 }
 
@@ -3079,18 +3114,23 @@ function makeCollapsibleGrid(grid, opts) {
   grid.classList.add('scroll-grid');
   if (opts && opts.visible) grid.dataset.visible = opts.visible;
   if (opts && opts.zoom) grid.dataset.zoom = opts.zoom;
+  grid.dataset.peek = (opts && opts.peek != null) ? opts.peek : 24;
+  grid.dataset.fade = (opts && opts.fade === false) ? '0' : '1';
+  grid.dataset.expand = (opts && opts.expand) ? '1' : '0';
   let sib = grid.nextElementSibling;
   while (sib && sib.classList && sib.classList.contains('grid-toggle')) { const n = sib.nextElementSibling; sib.remove(); sib = n; }
 
   const updateEdges = () => {
     const max = grid.scrollHeight - grid.clientHeight;
     const scrollable = max > 4;
-    grid.style.setProperty('--fade-top', scrollable && grid.scrollTop > 4 ? '26px' : '0px');
-    grid.style.setProperty('--fade-bottom', scrollable && grid.scrollTop < max - 4 ? '30px' : '0px');
+    const fade = grid.dataset.fade !== '0';
+    grid.style.setProperty('--fade-top', fade && scrollable && grid.scrollTop > 4 ? '26px' : '0px');
+    grid.style.setProperty('--fade-bottom', fade && scrollable && grid.scrollTop < max - 4 ? '30px' : '0px');
   };
   const fit = () => {
     const kids = Array.from(grid.children).filter(k => k.offsetParent !== null);
     if (!kids.length) return;
+    if (grid.dataset.expand === '1' && grid.querySelector('details.ex-deck[open]')) return;   // log forms need room
     const visible = Number(grid.dataset.visible) || 4;
     let z = Number(grid.dataset.zoom) || 1;
     if (z !== 1 && !(window.CSS && CSS.supports && CSS.supports('zoom', '1'))) z = 1;
@@ -3101,7 +3141,7 @@ function makeCollapsibleGrid(grid, opts) {
     const tops = Array.from(new Set(rects.map(r => Math.round(r.top)))).sort((a, b) => a - b);
     if (tops.length <= rows) { grid.style.maxHeight = ''; grid.classList.remove('is-scrollable'); updateEdges(); return; }
     const rowBottom = Math.max(...rects.filter(r => Math.round(r.top) === tops[rows - 1]).map(r => r.bottom));
-    grid.style.maxHeight = ((rowBottom - tops[0]) / z + 24) + 'px';   // +24px peek of the next row signals "scroll"
+    grid.style.maxHeight = ((rowBottom - tops[0]) / z + (Number(grid.dataset.peek) || 0)) + 'px';   // +24px peek of the next row signals "scroll"
     grid.classList.add('is-scrollable');
     updateEdges();
     if (!grid.dataset.nudged && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -3112,6 +3152,16 @@ function makeCollapsibleGrid(grid, opts) {
   if (!grid.dataset.scrollWired) {
     grid.dataset.scrollWired = '1';
     grid.addEventListener('scroll', updateEdges, { passive: true });
+    grid.addEventListener('toggle', (e) => {
+      const d = e.target;
+      if (!d || !d.matches || !d.matches('details.ex-deck')) return;
+      if (grid.dataset.expand === '1') {
+        if (grid.querySelector('details.ex-deck[open]')) { grid.style.maxHeight = ''; grid.classList.remove('is-scrollable'); updateEdges(); }
+        else requestAnimationFrame(fit);
+      } else if (d.open) {
+        setTimeout(() => d.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 40);
+      }
+    }, true);
     window.addEventListener('resize', () => requestAnimationFrame(fit));
   }
   requestAnimationFrame(() => requestAnimationFrame(fit));
