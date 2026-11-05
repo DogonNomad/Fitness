@@ -1877,6 +1877,26 @@
   .tp-kicker { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; color: var(--accent); font-weight: 500; }
   .tp-title { font-family: var(--font-display); font-size: 22px; font-weight: 600; letter-spacing: -0.015em; color: var(--ink); margin-top: 4px; line-height: 1.2; }
   .tp-sub { font-size: 13px; color: var(--ink-dim); margin-top: 4px; line-height: 1.45; }
+
+  /* Season 2: compact scroll window instead of "Show more" — about 4 tiles visible, scroll for the rest */
+  .scroll-grid {
+    position: relative;
+    overflow-y: auto; overflow-x: hidden;
+    overscroll-behavior: contain;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--accent) 45%, transparent) transparent;
+    min-height: 0 !important;
+    padding: 2px 4px 2px 0;
+    --fade-top: 0px; --fade-bottom: 0px;
+  }
+  .scroll-grid.is-scrollable {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--fade-top), #000 calc(100% - var(--fade-bottom)), transparent 100%);
+            mask-image: linear-gradient(to bottom, transparent 0, #000 var(--fade-top), #000 calc(100% - var(--fade-bottom)), transparent 100%);
+  }
+  .scroll-grid::-webkit-scrollbar { width: 4px; }
+  .scroll-grid::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--accent) 45%, transparent); border-radius: 4px; }
+  .card.pillar-fitness, .card.pillar-weight, .card.pillar-recovery, .card.pillar-career { min-height: 0 !important; }
 </style>
 </head>
 <body>
@@ -2051,7 +2071,7 @@
 
     <div class="card" style="margin-top:18px;">
       <h2>Weekly workout template</h2>
-      <div class="lede">Fixed 5-day split. Same days, same exercises, week after week.</div>
+      <div class="lede">Season 2 cadence: workouts alternate with hike or swim days. Saturday is the wildcard.</div>
       <div id="templateGrid"></div>
     </div>
 
@@ -2059,6 +2079,12 @@
       <h2>Per-pillar trend (week-over-week)</h2>
       <div class="lede">Leading metric for each pillar across the 6 logging weeks.</div>
       <div class="spark-grid" id="sparkGrid"></div>
+    </div>
+
+    <div class="card" id="season1Archive" style="margin-top:18px;">
+      <h2>Season 1 archive</h2>
+      <div class="lede">Aug 23 – Oct 3, 2026. Your history and stats are kept.</div>
+      <div class="grid-4" id="season1Stats"></div>
     </div>
 
     <div class="card" style="margin-top:18px;">
@@ -2108,8 +2134,12 @@
 
 <script>
 /* CONSTANTS */
-const MISSION_START = '2026-08-23'; // Sun, Day 1
-const MISSION_END   = '2026-10-03'; // Sat, Day 42
+/* Season 1 (archived, history + stats kept): Aug 23 – Oct 3, 2026 */
+const SEASON1_START = '2026-08-23';
+const SEASON1_END   = '2026-10-03';
+/* Season 2 (active): Sun Nov 8 – Sat Dec 19, 2026 */
+const MISSION_START = '2026-11-08'; // Sun, Day 1 of Season 2
+const MISSION_END   = '2026-12-19'; // Sat, Day 42
 const MISSION_DAYS  = 42;
 
 const CAL_TARGETS = { plankMinutes: 32, pushups: 500, mountedCrunches: 240, heelTaps: 300, pullups: 60 };
@@ -2221,15 +2251,24 @@ function templateForDate(iso) {
 
 const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
-// Weeks: Sun→Sat, 6 weeks total
-const WEEKS = [
-  { num: 1, startDate: '2026-08-23', endDate: '2026-08-29', dayAtStart: 1,  dayAtEnd: 7  },
-  { num: 2, startDate: '2026-08-30', endDate: '2026-09-05', dayAtStart: 8,  dayAtEnd: 14 },
-  { num: 3, startDate: '2026-09-06', endDate: '2026-09-12', dayAtStart: 15, dayAtEnd: 21 },
-  { num: 4, startDate: '2026-09-13', endDate: '2026-09-19', dayAtStart: 22, dayAtEnd: 28 },
-  { num: 5, startDate: '2026-09-20', endDate: '2026-09-26', dayAtStart: 29, dayAtEnd: 35 },
-  { num: 6, startDate: '2026-09-27', endDate: '2026-10-03', dayAtStart: 36, dayAtEnd: 42 }
+// Weeks: Sun→Sat, 6 weeks per season
+const WEEKS_S1 = [
+  { season: 1, num: 1, startDate: '2026-08-23', endDate: '2026-08-29', dayAtStart: 1,  dayAtEnd: 7  },
+  { season: 1, num: 2, startDate: '2026-08-30', endDate: '2026-09-05', dayAtStart: 8,  dayAtEnd: 14 },
+  { season: 1, num: 3, startDate: '2026-09-06', endDate: '2026-09-12', dayAtStart: 15, dayAtEnd: 21 },
+  { season: 1, num: 4, startDate: '2026-09-13', endDate: '2026-09-19', dayAtStart: 22, dayAtEnd: 28 },
+  { season: 1, num: 5, startDate: '2026-09-20', endDate: '2026-09-26', dayAtStart: 29, dayAtEnd: 35 },
+  { season: 1, num: 6, startDate: '2026-09-27', endDate: '2026-10-03', dayAtStart: 36, dayAtEnd: 42 }
 ];
+const WEEKS = [   // active season (Season 2)
+  { season: 2, num: 1, startDate: '2026-11-08', endDate: '2026-11-14', dayAtStart: 1,  dayAtEnd: 7  },
+  { season: 2, num: 2, startDate: '2026-11-15', endDate: '2026-11-21', dayAtStart: 8,  dayAtEnd: 14 },
+  { season: 2, num: 3, startDate: '2026-11-22', endDate: '2026-11-28', dayAtStart: 15, dayAtEnd: 21 },
+  { season: 2, num: 4, startDate: '2026-11-29', endDate: '2026-12-05', dayAtStart: 22, dayAtEnd: 28 },
+  { season: 2, num: 5, startDate: '2026-12-06', endDate: '2026-12-12', dayAtStart: 29, dayAtEnd: 35 },
+  { season: 2, num: 6, startDate: '2026-12-13', endDate: '2026-12-19', dayAtStart: 36, dayAtEnd: 42 }
+];
+const WEEKS_ALL = WEEKS_S1.concat(WEEKS);
 
 const MILESTONES = [
   { day: 1,  label: 'Launch' },
@@ -2317,8 +2356,8 @@ function todayIso() {
 }
 function parseIso(iso) { return new Date(iso + 'T00:00:00'); }
 function dayDiff(a, b) { return Math.round((parseIso(b) - parseIso(a)) / 86400000); }
-function missionDayFor(iso) { return dayDiff(MISSION_START, iso) + 1; }
-function weekForDate(iso) { return WEEKS.find(w => iso >= w.startDate && iso <= w.endDate) || null; }
+function missionDayFor(iso) { return dayDiff(iso <= SEASON1_END ? SEASON1_START : MISSION_START, iso) + 1; }
+function weekForDate(iso) { return WEEKS_ALL.find(w => iso >= w.startDate && iso <= w.endDate) || null; }
 function fmtFull(iso) { return parseIso(iso).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }); }
 function dayOfWeekIndex(iso) { return parseIso(iso).getDay(); }
 
@@ -2381,7 +2420,7 @@ function renderDayStrip() {
     const tpl = templateForDate(iso);
     const isToday = iso === today;
     const isSelected = iso === activeDate();
-    const inMission = iso >= MISSION_START && iso <= MISSION_END;
+    const inMission = (iso >= SEASON1_START && iso <= SEASON1_END) || (iso >= MISSION_START && iso <= MISSION_END);
     const hasData = !!STATE.days[iso];
 
     const el = document.createElement('div');
@@ -2407,7 +2446,7 @@ function renderDayStrip() {
     ? `${firstMonth} ${first.getDate()} – ${last.getDate()}`
     : `${firstMonth} ${first.getDate()} – ${lastMonth} ${last.getDate()}`;
   const wk = weekForDate(days[0].iso) || weekForDate(days[6].iso);
-  label.textContent = wk ? `${range} · Mission Week ${wk.num}` : `${range}`;
+  label.textContent = wk ? `${range} · Season ${wk.season} · Week ${wk.num}` : `${range}`;
 }
 
 /* FORM <-> DAY OBJECT */
@@ -3031,32 +3070,44 @@ function renderPillarGrids() {
 
 /* Collapsible grid — show first 4 tiles, hide the rest behind a "Show N more" toggle.
    Auto-expands if any hidden tile has logged data for the active day. */
-function makeCollapsibleGrid(grid, opts) {
+function makeCollapsibleGrid(grid) {
+  // Season 2: no more "Show more" — grids are a compact scroll window (about 4 tiles visible).
   if (!grid) return;
-  const showN = (opts && opts.showN) || 4;
-  const kids = Array.from(grid.children);
-  if (kids.length <= showN) {
-    grid.classList.remove('collapsible', 'collapsed');
-    return;
-  }
-  grid.classList.add('collapsible');
-  // Always start collapsed on load/refresh — user expands manually via Show more
-  grid.classList.add('collapsed');
+  grid.classList.remove('collapsible', 'collapsed');
+  grid.classList.add('scroll-grid');
+  let sib = grid.nextElementSibling;
+  while (sib && sib.classList && sib.classList.contains('grid-toggle')) { const n = sib.nextElementSibling; sib.remove(); sib = n; }
 
-  const btn = document.createElement('button');
-  btn.type = 'button';
-  btn.className = 'grid-toggle';
-  const updateBtn = () => {
-    const hiddenCount = kids.length - showN;
-    if (grid.classList.contains('collapsed')) btn.textContent = `Show ${hiddenCount} more ▾`;
-    else btn.textContent = 'Show fewer ▴';
+  const updateEdges = () => {
+    const max = grid.scrollHeight - grid.clientHeight;
+    const scrollable = max > 4;
+    grid.style.setProperty('--fade-top', scrollable && grid.scrollTop > 4 ? '26px' : '0px');
+    grid.style.setProperty('--fade-bottom', scrollable && grid.scrollTop < max - 4 ? '30px' : '0px');
   };
-  updateBtn();
-  btn.addEventListener('click', () => {
-    grid.classList.toggle('collapsed');
-    updateBtn();
-  });
-  grid.parentNode.insertBefore(btn, grid.nextSibling);
+  const fit = () => {
+    const kids = Array.from(grid.children).filter(k => k.offsetParent !== null);
+    if (!kids.length) return;
+    const cols = Math.max(1, getComputedStyle(grid).gridTemplateColumns.split(' ').length);
+    const rows = Math.max(1, Math.ceil(4 / cols));   // always about 4 tiles visible
+    const tops = Array.from(new Set(kids.map(k => k.offsetTop))).sort((a, b) => a - b);
+    if (tops.length <= rows) { grid.style.maxHeight = ''; grid.classList.remove('is-scrollable'); updateEdges(); return; }
+    const lastRow = kids.filter(k => k.offsetTop === tops[rows - 1]);
+    const bottom = Math.max(...lastRow.map(k => k.offsetTop + k.offsetHeight));
+    grid.style.maxHeight = (bottom - tops[0] + 24) + 'px';   // +24px peek of the next row signals "scroll"
+    grid.classList.add('is-scrollable');
+    updateEdges();
+    if (!grid.dataset.nudged && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      grid.dataset.nudged = '1';   // one gentle nudge so you can see it scrolls
+      setTimeout(() => { grid.scrollTo({ top: 18, behavior: 'smooth' }); setTimeout(() => grid.scrollTo({ top: 0, behavior: 'smooth' }), 520); }, 700);
+    }
+  };
+  if (!grid.dataset.scrollWired) {
+    grid.dataset.scrollWired = '1';
+    grid.addEventListener('scroll', updateEdges, { passive: true });
+    window.addEventListener('resize', () => requestAnimationFrame(fit));
+  }
+  requestAnimationFrame(() => requestAnimationFrame(fit));
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => requestAnimationFrame(fit));
 }
 
 function renderPillarTile(pillar, metric, dayData) {
@@ -4337,6 +4388,7 @@ function renderWeeklyGoals(gridId, ledeId, anchorIso) {
     if (wasOpen.includes(g.label)) deck.open = true;
     grid.appendChild(deck);
   });
+  makeCollapsibleGrid(grid);
 }
 /* Keep the Today-tab goal tiles live as you log sets (saveAll runs on every change). */
 let _goalsTimer = null;
@@ -4447,8 +4499,32 @@ function sundayPrompt(wk, agg, fG, nG, jG) {
     </div>`;
 }
 
+/* Season 1 archive — totals across the six archived weeks */
+function renderSeason1Archive() {
+  const root = document.getElementById('season1Stats');
+  if (!root) return;
+  root.innerHTML = '';
+  const aggs = WEEKS_S1.map(w => aggregateWeek(w));
+  const sum = (f) => aggs.reduce((a, g) => a + (Number(f(g)) || 0), 0);
+  const logged = sum(g => g.days.length);
+  const sleepDays = aggs.reduce((a, g) => a + g.days.filter(d => Number(d.sleepHours) > 0).length, 0);
+  const sleepTotal = sum(g => g.sleepHoursTotal);
+  const items = [
+    ['Days logged', `${logged}/42`, 'of 42'],
+    ['Gym sessions', sum(g => g.gymCount), 'days with sets logged'],
+    ['Pushups', sum(g => g.pushups).toLocaleString(), 'total reps'],
+    ['Pull-ups', sum(g => g.pullups).toLocaleString(), 'total reps'],
+    ['Sauna', `${Math.round(sum(g => g.saunaMin))} min`, 'total'],
+    ['Avg sleep', sleepDays ? `${(sleepTotal / sleepDays).toFixed(1)} h` : '—', `${sleepDays} nights logged`],
+    ['Apps shipped', sum(g => g.apps), 'applications'],
+    ['Intros', sum(g => g.intros), 'new intros']
+  ];
+  items.forEach(([label, value, sub]) => root.appendChild(stat(label, value, sub)));
+}
+
 /* MISSION VIEW */
 function renderMission() {
+  renderSeason1Archive();
   const iso = todayIso();
   const day = Math.max(1, Math.min(MISSION_DAYS, missionDayFor(iso)));
   const pct = Math.round((day / MISSION_DAYS) * 100);
@@ -4562,7 +4638,7 @@ function renderHeader() {
   const wk = weekForDate(iso);
   document.getElementById('dayNum').textContent = (day < 1 || day > MISSION_DAYS) ? '—' : day;
   document.getElementById('weekLine').textContent = wk ? `Week ${wk.num}` : (day < 1 ? 'pre-mission' : 'complete');
-  document.getElementById('dateLine').textContent = `${fmtFull(iso)} · ${day < 1 ? `Day ${day}` : day > MISSION_DAYS ? 'Mission complete' : `Day ${day}/${MISSION_DAYS}`}`;
+  document.getElementById('dateLine').textContent = `${fmtFull(iso)} · ${day < 1 ? `Season 2 starts in ${1 - day} days` : day > MISSION_DAYS ? 'Mission complete' : `Day ${day}/${MISSION_DAYS}`}`;
 }
 
 document.querySelectorAll('nav.tabs button').forEach(btn => {
