@@ -4578,25 +4578,32 @@ function renderWeekPillarGrids(agg) {
 }
 
 /* ---------- Season 2 weekly goals (session counts, Sun–Sat) ----------
-   Cardio first, then strength. Jog 3x (3+ mi each) · Swim 2x · Intense jump rope 2x ·
-   Calisthenics 3x (pushups, pull-ups, dips) · Core 3x (crunches, heel taps, planks, ab work) · Cold plunge 1x.
+   VO2 max 3x (any jog, swim, jump rope, interval sprint) · Calisthenics 3x (ANY calisthenics: pushups, pull-ups,
+   dips, plank, crunches, heel taps, warm-up work, on any day) · Cold plunge 1x.
    Counted from what you log (Add-exercise dropdown, templates, calisthenics tiles). */
-const JOG_MIN_MILES = 3;
-const CALI_NAMES = ['Pushups','Pull-ups','Dips'];
-const CORE_NAMES = ['Plank','Crunches','Heel taps','Ab wheel','Weighted crunch','Russian twist','Leg raise','Core work (twist / crunch / plank)'];
+const VO2_NAMES = ['Jog','Swim laps','Open-water swim','Jump rope','Interval sprint'];
+const CALI_KEYS = ['pushups','pullups','dips','plankMinutes','mountedCrunches','heelTaps'];
+const CALI_NAMES = ['Pushups','Pull-ups','Dips','Plank','Crunches','Heel taps','Ab wheel','Weighted crunch','Russian twist','Leg raise','Core work (twist / crunch / plank)'];
 function goalSetsFor(d, names) {
   const out = [];
   names.forEach(n => { const t = d.exercises && d.exercises[n]; if (t && Array.isArray(t.sets)) out.push(...t.sets); });
   (d.customExercises || []).forEach(c => { if (names.includes(c.name) && Array.isArray(c.sets)) out.push(...c.sets); });
   return out;
 }
+/* Sessions done but never saved (tracking bug) — counted manually. */
+const CALI_BACKFILL = ['2026-11-05'];
+const VO2_BACKFILL = ['2026-11-05'];   // jog, 3.2 mi — done but never logged
+function didCalisthenics(d) {
+  if (d.iso && CALI_BACKFILL.includes(d.iso)) return true;
+  if (CALI_KEYS.some(k => Number(d[k]) > 0)) return true;                       // top-level totals
+  if (d.calisthenics && Object.keys(d.calisthenics).some(k => Array.isArray(d.calisthenics[k]) && d.calisthenics[k].length)) return true;   // per-set logs (any key, incl. warm-up)
+  if (goalSetsFor(d, CALI_NAMES).length) return true;                           // template / dropdown exercises
+  return (d.customExercises || []).some(c => c.group === 'Calisthenics' && Array.isArray(c.sets) && c.sets.length);
+}
 const WEEKLY_GOALS = [
-  { label: 'Jog 3+ mi',          target: 3, unit: 'mi',      fn: d => Math.max(0, ...goalSetsFor(d, ['Jog']).map(s => Number(s.weight) || 0).filter(m => m >= JOG_MIN_MILES)) },
-  { label: 'Swim',               target: 2, unit: 'session', fn: d => goalSetsFor(d, ['Swim laps','Open-water swim']).length ? 1 : 0 },
-  { label: 'Intense jump rope',  target: 2, unit: 'session', fn: d => goalSetsFor(d, ['Jump rope']).length ? 1 : 0 },
-  { label: 'Calisthenics',       target: 3, unit: 'session', fn: d => ((Number(d.pushups) || 0) + (Number(d.pullups) || 0) + (Number(d.dips) || 0) > 0 || goalSetsFor(d, CALI_NAMES).length) ? 1 : 0 },
-  { label: 'Core',               target: 3, unit: 'session', fn: d => ((Number(d.mountedCrunches) || 0) + (Number(d.heelTaps) || 0) + (Number(d.plankMinutes) || 0) > 0 || goalSetsFor(d, CORE_NAMES).length) ? 1 : 0 },
-  { label: 'Cold plunge',        target: 1, unit: 'min',     fn: d => Number(d.coldPlunge) > 0 ? Number(d.coldPlunge) : 0 }
+  { label: 'VO2 max',      target: 3, unit: 'session', fn: d => (goalSetsFor(d, VO2_NAMES).length || (d.iso && VO2_BACKFILL.includes(d.iso))) ? 1 : 0 },
+  { label: 'Calisthenics', target: 3, unit: 'session', fn: d => didCalisthenics(d) ? 1 : 0 },
+  { label: 'Cold plunge',  target: 1, unit: 'min',     fn: d => Number(d.coldPlunge) > 0 ? Number(d.coldPlunge) : 0 }
 ];
 function renderWeeklyGoals(gridId, ledeId, anchorIso) {
   const grid = document.getElementById(gridId);
@@ -4609,7 +4616,7 @@ function renderWeeklyGoals(gridId, ledeId, anchorIso) {
     const d = new Date(sun); d.setDate(sun.getDate() + i);
     const iso = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     if (i === 0) first = d; if (i === 6) last = d;
-    if (STATE.days[iso]) days.push({ iso, ...STATE.days[iso] });
+    if (STATE.days[iso] || CALI_BACKFILL.includes(iso) || VO2_BACKFILL.includes(iso)) days.push({ iso, ...(STATE.days[iso] || {}) });
   }
   const lede = document.getElementById(ledeId);
   if (lede) lede.textContent = `${first.toLocaleDateString('en-US',{month:'short',day:'numeric'})} – ${last.toLocaleDateString('en-US',{month:'short',day:'numeric'})} · tap a tile to see which days counted.`;
