@@ -2396,7 +2396,15 @@ const PILLAR_METRICS = {
     { key: 'mountedCrunches', label: 'Crunches',      target: 60,  input: 'sets', repLabel: 'reps' },
     { key: 'heelTaps',        label: 'Heel taps',     target: 75,  input: 'sets', repLabel: 'reps' },
     { key: 'pullups',         label: 'Pull-ups',      target: Math.round(CAL_TARGETS.pullups/7),         input: 'sets', repLabel: 'reps' },
-    { key: 'dips',            label: 'Dips',          target: null,                                      input: 'sets', repLabel: 'reps' }
+    { key: 'dips',            label: 'Dips',          target: null,                                      input: 'sets', repLabel: 'reps' },
+    // L-sit core progression (log-only tiles)
+    { key: 'doubleLegLift',   label: 'Double leg lift',     target: null, input: 'sets', repLabel: 'reps' },
+    { key: 'halfLift',        label: 'Half lift',           target: null, input: 'sets', repLabel: 'reps' },
+    { key: 'straddleLift',    label: 'Straddle lift',       target: null, input: 'sets', repLabel: 'reps' },
+    { key: 'altVKicks',       label: 'Alt. V kicks',        target: null, input: 'sets', repLabel: 'reps' },
+    { key: 'vHold',           label: 'V hold (bolt)',       target: null, unit: 'min', input: 'sets', repLabel: 'time', timeInput: true },
+    { key: 'isoLegLift',      label: 'Isolated leg lift',   target: null, input: 'sets', repLabel: 'reps' },
+    { key: 'lHold',           label: 'N hold',              target: null, unit: 'min', input: 'sets', repLabel: 'time', timeInput: true }
   ],
   recovery: [
     { key: 'sleepHours', label: 'Sleep',       target: 7,    unit: 'h',   input: 'number', step: 0.1 },
@@ -3633,13 +3641,23 @@ const EXERCISE_GROUPS = {
     { name: 'Crunches',        target: 'max reps × 3 sets' },
     { name: 'Heel taps',       target: 'max reps × 3 sets' },
     { name: 'Pull-ups',        target: 'max reps × 3 sets' },
-    { name: 'Dips',            target: 'max reps × 3 sets' }
+    { name: 'Dips',            target: 'max reps × 3 sets' },
+    // L-sit core progression
+    { name: 'Double leg lift',      target: 'max reps × 3 sets' },
+    { name: 'Half lift',            target: 'max reps × 3 sets' },
+    { name: 'Straddle lift',        target: 'max reps × 3 sets' },
+    { name: 'Alternating V kicks',  target: 'max reps × 3 sets' },
+    { name: 'V hold (bolt pose)',   target: '2 min' },
+    { name: 'Isolated leg lift',    target: 'max reps × 3 sets' },
+    { name: 'N hold',               target: '2 min' }
   ],
   'Cardio': [
     { name: 'Jog',             target: '3 miles · 30 min' },
     { name: 'Jump rope',       target: '20 min' },
     { name: 'Zone 2 walk/run', target: '30 min' },
-    { name: 'Interval sprint', target: '15 min' }
+    { name: 'Interval sprint', target: '15 min' },
+    { name: 'Cycling',         target: '45 min' },
+    { name: 'Indoor cycling',  target: '30 min' }
   ],
   'Swim / Apnea': [
     { name: 'Static apnea',    target: 'apnea · breath-hold' },
@@ -3690,9 +3708,12 @@ const AUTO_FOCUS = {
   'Chest':     [['Chest', 3], ['Shoulders', 1], ['Triceps', 1], ['Biceps', 1]],
   'Back':      [['Back', 3], ['Chest', 1], ['Biceps', 1], ['Triceps', 1]],
   'Shoulders': [['Shoulders', 3], ['Triceps', 1], ['Core', 1]],
-  'Arms':      [['Biceps', 2], ['Triceps', 2], ['Shoulders', 1], ['Core', 1]]
+  'Arms':      [['Biceps', 2], ['Triceps', 2], ['Shoulders', 1], ['Core', 1]],
+  'Calisthenics': [['LSit', 6]]   // L-sit core progression: 6 of the 7 L-sit moves, least recent first
 };
+const LSIT_NAMES = ['Double leg lift','Half lift','Straddle lift','Alternating V kicks','V hold (bolt pose)','Isolated leg lift','N hold'];
 function autoPool(g) {
+  if (g === 'LSit') return EXERCISE_GROUPS['Calisthenics'].filter(e => LSIT_NAMES.includes(e.name)).map(e => ({ name: e.name, target: e.target, pool: 'LSit', group: 'Calisthenics' }));
   if (g === 'Core') return EXERCISE_GROUPS['Calisthenics'].filter(e => /^(Plank|Crunches|Heel taps)$/.test(e.name)).map(e => ({ name: e.name, target: e.target, pool: 'Core', group: 'Calisthenics' }));
   const base = (g === 'Biceps' || g === 'Triceps') ? EXERCISE_GROUPS['Arms'].filter(e => new RegExp(g.slice(0, -1), 'i').test(e.name))
              : (EXERCISE_GROUPS[g] || []).filter(e => !/^Hip abduction/.test(e.name));
@@ -3701,7 +3722,12 @@ function autoPool(g) {
 function autoLastDone(names, uptoIso) {
   const out = {};
   Object.keys(STATE.days).filter(k => k < uptoIso).sort().forEach(iso => {
-    names.forEach(n => { const sets = findExerciseSetsOnDay(STATE.days[iso], n); if (sets && sets.length) out[n] = iso; });
+    names.forEach(n => {
+      const sets = findExerciseSetsOnDay(STATE.days[iso], n);
+      if (sets && sets.length) { out[n] = iso; return; }
+      const m = (PILLAR_METRICS.fitness || []).find(x => x.label === n || (x.label === 'Alt. V kicks' && n === 'Alternating V kicks') || (x.label === 'V hold (bolt)' && n === 'V hold (bolt pose)'));
+      if (m && caliSetsFromDay(STATE.days[iso], m.key).length) out[n] = iso;
+    });
   });
   return out;
 }
@@ -3755,7 +3781,7 @@ function renderAutoPlanner(wrap, container) {
       r.style.cssText = 'display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:8px; background:var(--bg-2); margin-bottom:4px; font-size:13px;';
       const ago = last[ex.name] ? autoDaysAgo(last[ex.name], iso) : null;
       const info = document.createElement('div'); info.style.cssText = 'flex:1; min-width:0;';
-      info.innerHTML = `<div>${ex.name} <span style="opacity:.6">· ${ex.target}</span></div><div style="font-size:11px; opacity:.6;">${ex.pool} · ${ago == null ? 'not logged yet' : ago + ' day' + (ago === 1 ? '' : 's') + ' ago'}</div>`;
+      info.innerHTML = `<div>${ex.name} <span style="opacity:.6">· ${ex.target}</span></div><div style="font-size:11px; opacity:.6;">${ex.pool === 'LSit' ? 'L-sit core' : ex.pool} · ${ago == null ? 'not logged yet' : ago + ' day' + (ago === 1 ? '' : 's') + ' ago'}</div>`;
       const sw = document.createElement('button'); sw.type = 'button'; sw.textContent = '⟳'; sw.title = 'Swap for another';
       const rm = document.createElement('button'); rm.type = 'button'; rm.textContent = '✕'; rm.title = 'Remove';
       [sw, rm].forEach(b => b.style.cssText = 'background:none; border:1px solid var(--line); color:var(--ink); width:28px; height:28px; border-radius:8px; cursor:pointer;');
@@ -4578,12 +4604,12 @@ function renderWeekPillarGrids(agg) {
 }
 
 /* ---------- Season 2 weekly goals (session counts, Sun–Sat) ----------
-   VO2 max 3x (any jog, swim, jump rope, interval sprint) · Calisthenics 3x (ANY calisthenics: pushups, pull-ups,
+   VO2 max 5x (any jog, hike, swim, jump rope, cycling, interval sprint) · Calisthenics 3x (ANY calisthenics: pushups, pull-ups,
    dips, plank, crunches, heel taps, warm-up work, on any day) · Cold plunge 1x.
    Counted from what you log (Add-exercise dropdown, templates, calisthenics tiles). */
-const VO2_NAMES = ['Jog','Swim laps','Open-water swim','Jump rope','Interval sprint'];
-const CALI_KEYS = ['pushups','pullups','dips','plankMinutes','mountedCrunches','heelTaps'];
-const CALI_NAMES = ['Pushups','Pull-ups','Dips','Plank','Crunches','Heel taps','Ab wheel','Weighted crunch','Russian twist','Leg raise','Core work (twist / crunch / plank)'];
+const VO2_NAMES = ['Jog','Hike','Swim laps','Open-water swim','Jump rope','Interval sprint','Cycling','Indoor cycling'];
+const CALI_KEYS = ['pushups','pullups','dips','plankMinutes','mountedCrunches','heelTaps','doubleLegLift','halfLift','straddleLift','altVKicks','vHold','isoLegLift','lHold'];
+const CALI_NAMES = ['Pushups','Pull-ups','Dips','Plank','Crunches','Heel taps','Double leg lift','Half lift','Straddle lift','Alternating V kicks','V hold (bolt pose)','Isolated leg lift','N hold','Ab wheel','Weighted crunch','Russian twist','Leg raise','Core work (twist / crunch / plank)'];
 function goalSetsFor(d, names) {
   const out = [];
   names.forEach(n => { const t = d.exercises && d.exercises[n]; if (t && Array.isArray(t.sets)) out.push(...t.sets); });
@@ -4601,7 +4627,7 @@ function didCalisthenics(d) {
   return (d.customExercises || []).some(c => c.group === 'Calisthenics' && Array.isArray(c.sets) && c.sets.length);
 }
 const WEEKLY_GOALS = [
-  { label: 'VO2 max',      target: 3, unit: 'session', fn: d => (goalSetsFor(d, VO2_NAMES).length || (d.iso && VO2_BACKFILL.includes(d.iso))) ? 1 : 0 },
+  { label: 'VO2 max',      target: 5, unit: 'session', fn: d => (goalSetsFor(d, VO2_NAMES).length || (d.iso && VO2_BACKFILL.includes(d.iso))) ? 1 : 0 },
   { label: 'Calisthenics', target: 3, unit: 'session', fn: d => didCalisthenics(d) ? 1 : 0 },
   { label: 'Cold plunge',  target: 1, unit: 'min',     fn: d => Number(d.coldPlunge) > 0 ? Number(d.coldPlunge) : 0 }
 ];
