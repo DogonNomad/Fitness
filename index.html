@@ -2022,6 +2022,20 @@
   #customSessionGrid .ex-tile .ex-label { height: 22px !important; font-size: 8.5px !important; letter-spacing: 0.03em !important; line-height: 1.2 !important; -webkit-line-clamp: 2; overflow-wrap: break-word; }
   #customSessionGrid .ex-deck summary { padding: 0 !important; }
   #customSessionGrid .ex-deck[open] .ex-tile { height: auto !important; min-height: 0 !important; }
+
+  /* ===== Weekly goals: compact 3-across grid so all five tiles show at a glance (no scroll) ===== */
+  #todayGoalsGrid, #weekGoalsGrid {
+    --tile-h: 84px;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    column-gap: 4px !important; row-gap: 4px !important;
+    justify-items: center;
+  }
+  #todayGoalsGrid > .ex-deck:not([open]), #weekGoalsGrid > .ex-deck:not([open]) { width: 100%; }
+  #todayGoalsGrid .ex-tile, #weekGoalsGrid .ex-tile { grid-template-rows: 50px 11px 20px !important; row-gap: 1px !important; padding: 1px 0 !important; }
+  #todayGoalsGrid .ex-tile .ring-svg-container, #weekGoalsGrid .ex-tile .ring-svg-container,
+  #todayGoalsGrid .ex-tile .ring-svg-container svg, #weekGoalsGrid .ex-tile .ring-svg-container svg { width: 50px !important; height: 50px !important; }
+  #todayGoalsGrid .ex-tile .sets-label, #weekGoalsGrid .ex-tile .sets-label { font-size: 9px !important; height: 11px !important; }
+  #todayGoalsGrid .ex-tile .ex-label, #weekGoalsGrid .ex-tile .ex-label { font-size: 8px !important; height: 20px !important; letter-spacing: .02em !important; line-height: 1.2 !important; }
 </style>
 </head>
 <body>
@@ -4656,10 +4670,10 @@ function renderWeekPillarGrids(agg) {
 }
 
 /* ---------- Season 2 weekly goals (session counts, Sun–Sat) ----------
-   VO2 max 5x (any jog, hike, swim, jump rope, cycling, interval sprint) · Swim 2x · Weight training 3x (weights only) · Calisthenics 3x (ANY calisthenics: pushups, pull-ups,
+   VO2 max 3x (jogging) · Swim 2x · Weight training 3x (weights only) · Calisthenics 3x (ANY calisthenics: pushups, pull-ups,
    dips, plank, crunches, heel taps, warm-up work, on any day) · Cold plunge 1x.
    Counted from what you log (Add-exercise dropdown, templates, calisthenics tiles). */
-const VO2_NAMES = ['Jog','Hike','Swim laps','Open-water swim','Jump rope','Interval sprint','Cycling','Indoor cycling'];
+const VO2_NAMES = ['Jog'];   // VO2 max = jogging (swim has its own goal)
 const CALI_KEYS = ['pushups','pullups','dips','plankMinutes','mountedCrunches','heelTaps','doubleLegLift','halfLift','straddleLift','altVKicks','vHold','isoLegLift','lHold'];
 const CALI_NAMES = ['Pushups','Pull-ups','Dips','Plank','Crunches','Heel taps','Double leg lift','Half lift','Straddle lift','Alternating V kicks','V hold (bolt pose)','Isolated leg lift','N hold','Ab wheel','Weighted crunch','Russian twist','Leg raise','Core work (twist / crunch / plank)'];
 function goalSetsFor(d, names) {
@@ -4670,7 +4684,16 @@ function goalSetsFor(d, names) {
 }
 /* Sessions done but never saved (tracking bug) — counted manually. */
 const CALI_BACKFILL = ['2026-11-05'];
+const SWIM_BACKFILL = [];   // add 'YYYY-MM-DD' for swims done but never logged
 const VO2_BACKFILL = ['2026-11-05'];   // jog, 3.2 mi — done but never logged
+/* Name-based matching so any jog / swim you log counts, however it was added (template, dropdown, any casing),
+   on any day — including past days. Having the exercise on the day counts, even before sets are saved. */
+function dayHasExercise(d, re) {
+  const inTpl = Object.keys(d.exercises || {}).some(n => re.test(n));
+  const inCustom = (d.customExercises || []).some(c => re.test(c.name || ''));
+  return inTpl || inCustom;
+}
+const JOG_RE = /\bjog/i, SWIM_RE = /swim/i;
 function didCalisthenics(d) {
   if (d.iso && CALI_BACKFILL.includes(d.iso)) return true;
   if (CALI_KEYS.some(k => Number(d[k]) > 0)) return true;                       // top-level totals
@@ -4687,8 +4710,8 @@ function didWeights(d) {
   return (d.customExercises || []).some(c => WEIGHT_GROUPS.includes(c.group) && Array.isArray(c.sets) && c.sets.length);
 }
 const WEEKLY_GOALS = [
-  { label: 'VO2 max',      target: 5, unit: 'session', fn: d => (goalSetsFor(d, VO2_NAMES).length || (d.iso && VO2_BACKFILL.includes(d.iso))) ? 1 : 0 },
-  { label: 'Swim',         target: 2, unit: 'session', fn: d => goalSetsFor(d, ['Swim laps','Open-water swim']).length ? 1 : 0 },
+  { label: 'VO2 max',      target: 3, unit: 'session', fn: d => (dayHasExercise(d, JOG_RE) || (d.iso && VO2_BACKFILL.includes(d.iso))) ? 1 : 0 },
+  { label: 'Swim',         target: 2, unit: 'session', fn: d => (dayHasExercise(d, SWIM_RE) || (d.iso && SWIM_BACKFILL.includes(d.iso))) ? 1 : 0 },
   { label: 'Weight training', target: 3, unit: 'session', fn: d => didWeights(d) ? 1 : 0 },
   { label: 'Calisthenics', target: 3, unit: 'session', fn: d => didCalisthenics(d) ? 1 : 0 },
   { label: 'Cold plunge',  target: 1, unit: 'min',     fn: d => Number(d.coldPlunge) > 0 ? Number(d.coldPlunge) : 0 }
@@ -4704,7 +4727,7 @@ function renderWeeklyGoals(gridId, ledeId, anchorIso) {
     const d = new Date(sun); d.setDate(sun.getDate() + i);
     const iso = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     if (i === 0) first = d; if (i === 6) last = d;
-    if (STATE.days[iso] || CALI_BACKFILL.includes(iso) || VO2_BACKFILL.includes(iso)) days.push({ iso, ...(STATE.days[iso] || {}) });
+    if (STATE.days[iso] || CALI_BACKFILL.includes(iso) || VO2_BACKFILL.includes(iso) || SWIM_BACKFILL.includes(iso)) days.push({ iso, ...(STATE.days[iso] || {}) });
   }
   const lede = document.getElementById(ledeId);
   if (lede) lede.textContent = `${first.toLocaleDateString('en-US',{month:'short',day:'numeric'})} – ${last.toLocaleDateString('en-US',{month:'short',day:'numeric'})} · tap a tile to see which days counted.`;
@@ -4719,7 +4742,7 @@ function renderWeeklyGoals(gridId, ledeId, anchorIso) {
     if (wasOpen.includes(g.label)) deck.open = true;
     grid.appendChild(deck);
   });
-  makeCollapsibleGrid(grid, { visible: 4, expand: true, peek: 0, fade: false });
+  makeCollapsibleGrid(grid, { visible: 6, expand: true, peek: 0, fade: false });
   if (gridId === 'todayGoalsGrid') {
     const pct = WEEKLY_GOALS.reduce((a, g) => a + Math.min(1, days.filter(d => g.fn(d) > 0).length / g.target), 0) / WEEKLY_GOALS.length;
     const bg = document.getElementById('pageBg');
