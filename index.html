@@ -2004,6 +2004,24 @@
   #recoveryGrid .ex-tile .ex-label,
   #careerGrid .ex-tile .ex-label,
   #workoutCard .workout-card > .ex-grid .ex-tile .ex-label { height: 22px !important; font-size: 8.5px !important; letter-spacing: 0.03em !important; line-height: 1.2 !important; -webkit-line-clamp: 2; word-break: normal; overflow-wrap: break-word; }
+
+  /* ===== Rest/swim/hike-day custom session: same fixed-size scroll window as the other tile cards ===== */
+  #customSessionGrid {
+    --tile-h: 110px;
+    grid-template-columns: 1fr 1fr !important;
+    column-gap: 58px !important; row-gap: 8px !important;
+    grid-auto-rows: minmax(var(--tile-h), auto) !important;
+    align-items: stretch !important;
+    padding: 0 !important; margin: 2px 4px 0 !important;
+  }
+  #customSessionGrid > .ex-deck:not([open]) { height: var(--tile-h); width: min(100px, 100%) !important; min-width: 0 !important; }
+  #customSessionGrid > .ex-deck:not([open]):nth-child(odd) { justify-self: end; }
+  #customSessionGrid > .ex-deck:not([open]):nth-child(even) { justify-self: start; }
+  #customSessionGrid .ex-tile { height: var(--tile-h) !important; min-height: var(--tile-h) !important; padding: 2px 0 !important;
+    grid-template-rows: 68px 12px 22px !important; row-gap: 2px !important; width: 100% !important; }
+  #customSessionGrid .ex-tile .ex-label { height: 22px !important; font-size: 8.5px !important; letter-spacing: 0.03em !important; line-height: 1.2 !important; -webkit-line-clamp: 2; overflow-wrap: break-word; }
+  #customSessionGrid .ex-deck summary { padding: 0 !important; }
+  #customSessionGrid .ex-deck[open] .ex-tile { height: auto !important; min-height: 0 !important; }
 </style>
 </head>
 <body>
@@ -3868,12 +3886,15 @@ function renderCustomSession(container, iso, dayData) {
   if (customList.length) {
     const grid = document.createElement('div');
     grid.className = 'ex-grid';
+    grid.id = 'customSessionGrid';
     customList.forEach((ex, idx) => {
       grid.appendChild(renderCustomExerciseDeck(ex, idx));
     });
     wrap.appendChild(grid);
+    wrap._customGrid = grid;
   }
   container.appendChild(wrap);
+  if (wrap._customGrid) makeCollapsibleGrid(wrap._customGrid, { visible: 4, zoom: 0.85, expand: true, peek: 0, fade: false });
 }
 
 function addCustomExercise(ex) {
@@ -4635,7 +4656,7 @@ function renderWeekPillarGrids(agg) {
 }
 
 /* ---------- Season 2 weekly goals (session counts, Sun–Sat) ----------
-   VO2 max 5x (any jog, hike, swim, jump rope, cycling, interval sprint) · Calisthenics 3x (ANY calisthenics: pushups, pull-ups,
+   VO2 max 5x (any jog, hike, swim, jump rope, cycling, interval sprint) · Swim 2x · Weight training 3x (weights only) · Calisthenics 3x (ANY calisthenics: pushups, pull-ups,
    dips, plank, crunches, heel taps, warm-up work, on any day) · Cold plunge 1x.
    Counted from what you log (Add-exercise dropdown, templates, calisthenics tiles). */
 const VO2_NAMES = ['Jog','Hike','Swim laps','Open-water swim','Jump rope','Interval sprint','Cycling','Indoor cycling'];
@@ -4657,8 +4678,18 @@ function didCalisthenics(d) {
   if (goalSetsFor(d, CALI_NAMES).length) return true;                           // template / dropdown exercises
   return (d.customExercises || []).some(c => c.group === 'Calisthenics' && Array.isArray(c.sets) && c.sets.length);
 }
+/* Weight training = anything lifted with weights (machines, dumbbells, barbell): Chest, Back, Shoulders, Arms, Legs.
+   Kept separate from Calisthenics (bodyweight). */
+const WEIGHT_GROUPS = ['Chest','Back','Shoulders','Arms','Legs'];
+const WEIGHT_NAMES = [...WEIGHT_GROUPS.flatMap(g => (EXERCISE_GROUPS[g] || []).map(e => e.name)), 'Hammer curl'];
+function didWeights(d) {
+  if (goalSetsFor(d, WEIGHT_NAMES).length) return true;
+  return (d.customExercises || []).some(c => WEIGHT_GROUPS.includes(c.group) && Array.isArray(c.sets) && c.sets.length);
+}
 const WEEKLY_GOALS = [
   { label: 'VO2 max',      target: 5, unit: 'session', fn: d => (goalSetsFor(d, VO2_NAMES).length || (d.iso && VO2_BACKFILL.includes(d.iso))) ? 1 : 0 },
+  { label: 'Swim',         target: 2, unit: 'session', fn: d => goalSetsFor(d, ['Swim laps','Open-water swim']).length ? 1 : 0 },
+  { label: 'Weight training', target: 3, unit: 'session', fn: d => didWeights(d) ? 1 : 0 },
   { label: 'Calisthenics', target: 3, unit: 'session', fn: d => didCalisthenics(d) ? 1 : 0 },
   { label: 'Cold plunge',  target: 1, unit: 'min',     fn: d => Number(d.coldPlunge) > 0 ? Number(d.coldPlunge) : 0 }
 ];
