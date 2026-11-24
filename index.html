@@ -2424,13 +2424,13 @@ const STORAGE_KEY = 'walkout_v4';
 const PILLAR_METRICS = {
   fitness: [
     // L-sit core progression first, then the everyday basics
-    { key: 'doubleLegLift',   label: 'Double leg lift',     target: null, input: 'sets', repLabel: 'reps' },
-    { key: 'halfLift',        label: 'Half lift',           target: null, input: 'sets', repLabel: 'reps' },
-    { key: 'straddleLift',    label: 'Straddle lift',       target: null, input: 'sets', repLabel: 'reps' },
-    { key: 'altVKicks',       label: 'Alt. V kicks',        target: null, input: 'sets', repLabel: 'reps' },
-    { key: 'vHold',           label: 'V hold (bolt)',       target: null, unit: 'min', input: 'sets', repLabel: 'time', timeInput: true },
-    { key: 'isoLegLift',      label: 'Isolated leg lift',   target: null, input: 'sets', repLabel: 'reps' },
-    { key: 'lHold',           label: 'N hold',              target: null, unit: 'min', input: 'sets', repLabel: 'time', timeInput: true },
+    { key: 'doubleLegLift',   label: 'Double leg lift',     target: 18, input: 'sets', repLabel: 'reps', goalNote: '3 sets × 6-7 reps' },
+    { key: 'halfLift',        label: 'Half lift',           target: 18, input: 'sets', repLabel: 'reps', goalNote: '3 sets × 6-7 reps' },
+    { key: 'straddleLift',    label: 'Straddle lift',       target: 18, input: 'sets', repLabel: 'reps', goalNote: '3 sets × 6-7 reps' },
+    { key: 'altVKicks',       label: 'Alt. V kicks',        target: 18, input: 'sets', repLabel: 'reps', goalNote: '3 sets × 6-7 reps' },
+    { key: 'vHold',           label: 'V hold (bolt)',       target: 60, unit: 'sec', input: 'sets', repLabel: 'sec', secInput: true, goalNote: '3 sets × 20 sec' },
+    { key: 'isoLegLift',      label: 'Isolated leg lift',   target: 18, input: 'sets', repLabel: 'reps', goalNote: '3 sets × 6-7 reps' },
+    { key: 'lHold',           label: 'N hold',              target: 60, unit: 'sec', input: 'sets', repLabel: 'sec', secInput: true, goalNote: '3 sets × 20 sec' },
     { key: 'plankMinutes',    label: 'Plank',         target: 8,   unit: 'min', input: 'sets', repLabel: 'time', timeInput: true },
     { key: 'pushups',         label: 'Pushups',       target: 100, input: 'sets', repLabel: 'reps' },
     { key: 'mountedCrunches', label: 'Crunches',      target: 60,  input: 'sets', repLabel: 'reps' },
@@ -2921,7 +2921,11 @@ function renderWorkoutCard(iso, dayData) {
       const logForm = document.createElement('div');
       logForm.className = 'set-log-form';
       let wIn, rIn;
-      if (mode === 'duration') {
+      if (mode === 'seconds') {
+        logForm.style.gridTemplateColumns = '1fr auto';
+        rIn = document.createElement('input');
+        rIn.type = 'number'; rIn.min = '0'; rIn.step = '1'; rIn.placeholder = 'Seconds';
+      } else if (mode === 'duration') {
         logForm.style.gridTemplateColumns = '1fr auto';
         rIn = document.createElement('input');
         rIn.type = 'number'; rIn.min = '0'; rIn.step = '0.5'; rIn.placeholder = 'Minutes';
@@ -3464,8 +3468,8 @@ function createSetsPillarInput(pillar, metric) {
   const updateHint = () => {
     const curSets = caliSetsFromDay(STATE.days[activeDate()] || {}, metric.key);
     const curTotal = curSets.reduce((a, s) => a + (Number(s.reps) || 0), 0);
-    const totalStr = metric.timeInput ? `${Math.round(curTotal*10)/10} min total` : (Math.round(curTotal*10)/10 + ' total ' + repLabel);
-    hint.textContent = `${curSets.length} set${curSets.length === 1 ? '' : 's'} logged · ${totalStr}`;
+    const totalStr = metric.timeInput ? `${Math.round(curTotal*10)/10} min total` : metric.secInput ? `${Math.round(curTotal)} sec total` : (Math.round(curTotal*10)/10 + ' total ' + repLabel);
+    hint.textContent = `${curSets.length} set${curSets.length === 1 ? '' : 's'} logged · ${totalStr}` + (metric.goalNote ? ` · goal ${metric.goalNote}` : '');
   };
   updateHint();
   wrap.appendChild(hint);
@@ -3484,8 +3488,9 @@ function createSetsPillarInput(pillar, metric) {
     // input in the app — so 3.5, 4.5, 2.5, 2 etc. type in directly.
     rIn.type = 'number'; rIn.min = '0'; rIn.step = '0.1'; rIn.placeholder = 'Minutes (e.g. 3.5)';
   } else {
-    rIn.type = 'number'; rIn.min = '0'; rIn.placeholder = repLabel;
+    rIn.type = 'number'; rIn.min = '0'; rIn.placeholder = metric.secInput ? 'Seconds' : repLabel;
     if (metric.repStep) rIn.step = metric.repStep;
+    if (metric.secInput) rIn.step = '1';
   }
   const logBtn = document.createElement('button');
   logBtn.type = 'button'; logBtn.textContent = '+ Log set';
@@ -3703,13 +3708,13 @@ const EXERCISE_GROUPS = {
     { name: 'Pull-ups',        target: 'max reps × 3 sets' },
     { name: 'Dips',            target: 'max reps × 3 sets' },
     // L-sit core progression
-    { name: 'Double leg lift',      target: 'max reps × 3 sets' },
-    { name: 'Half lift',            target: 'max reps × 3 sets' },
-    { name: 'Straddle lift',        target: 'max reps × 3 sets' },
-    { name: 'Alternating V kicks',  target: 'max reps × 3 sets' },
-    { name: 'V hold (bolt pose)',   target: '2 min' },
-    { name: 'Isolated leg lift',    target: 'max reps × 3 sets' },
-    { name: 'N hold',               target: '2 min' }
+    { name: 'Double leg lift',      target: '3x6+ reps · BW' },
+    { name: 'Half lift',            target: '3x6+ reps · BW' },
+    { name: 'Straddle lift',        target: '3x6+ reps · BW' },
+    { name: 'Alternating V kicks',  target: '3x6+ reps · BW' },
+    { name: 'V hold (bolt pose)',   target: '3x20 sec' },
+    { name: 'Isolated leg lift',    target: '3x6+ reps · BW' },
+    { name: 'N hold',               target: '3x20 sec' }
   ],
   'Cardio': [
     { name: 'Jog',             target: '3 miles · 30 min' },
@@ -4029,7 +4034,11 @@ function renderCustomExerciseDeck(ex, idx) {
   const logForm = document.createElement('div');
   logForm.className = 'set-log-form';
   let wIn, rIn;
-  if (mode === 'duration') {
+  if (mode === 'seconds') {
+    logForm.style.gridTemplateColumns = '1fr auto';
+    rIn = document.createElement('input');
+    rIn.type = 'number'; rIn.min = '0'; rIn.step = '1'; rIn.placeholder = 'Seconds';
+  } else if (mode === 'duration') {
     logForm.style.gridTemplateColumns = '1fr auto';
     rIn = document.createElement('input');
     rIn.type = 'number'; rIn.min = '0'; rIn.step = '0.5'; rIn.placeholder = 'Minutes';
@@ -4099,7 +4108,8 @@ function renderCustomSetRow(exIdx, s, setIdx, mode) {
   row.className = 'set-row';
   const num = document.createElement('span'); num.className = 'set-num'; num.textContent = 'Set ' + (setIdx + 1);
   const det = document.createElement('span'); det.className = 'set-detail';
-  if (mode === 'duration') det.textContent = `${s.reps} min`;
+  if (mode === 'seconds') det.textContent = `${s.reps} sec`;
+  else if (mode === 'duration') det.textContent = `${s.reps} min`;
   else if (mode === 'bodyweight') det.textContent = `BW × ${s.reps} reps`;
   else if (mode === 'apnea') {
     const hold = Number(s.reps) || 0;
@@ -4141,8 +4151,9 @@ function exerciseInputMode(target) {
   if (!target) return 'weighted';
   if (/apnea|breath.?hold/i.test(target)) return 'apnea';
   if (/^hike|miles.*min|hike\s*·/i.test(target)) return 'hike';
-  if (/\d+\s*(min|sec)/i.test(target)) return 'duration';
-  if (/max reps|to failure|max\s*x/i.test(target)) return 'bodyweight';
+  if (/\d+\s*sec/i.test(target)) return 'seconds';
+  if (/\d+\s*min/i.test(target)) return 'duration';
+  if (/max reps|to failure|max\s*x|\bBW\b/i.test(target)) return 'bodyweight';
   return 'weighted';
 }
 
@@ -4224,7 +4235,9 @@ function renderSetRow(exName, s, idx, mode) {
   row.className = 'set-row';
   const num = document.createElement('span'); num.className = 'set-num'; num.textContent = 'Set ' + (idx + 1);
   const det = document.createElement('span'); det.className = 'set-detail';
-  if (mode === 'duration') {
+  if (mode === 'seconds') {
+    det.textContent = `${s.reps} sec`;
+  } else if (mode === 'duration') {
     det.textContent = `${s.reps} min`;
   } else if (mode === 'bodyweight') {
     det.textContent = `BW × ${s.reps} reps`;
