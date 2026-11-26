@@ -3786,10 +3786,28 @@ function autoLastDone(names, uptoIso) {
   return out;
 }
 function autoDaysAgo(iso, fromIso) { return Math.round((parseIso(fromIso) - parseIso(iso)) / 86400000); }
+function fullBodyEmphasis(iso) {
+  const lowNames = autoPool('Legs').map(e => e.name);
+  const upNames = ['Chest', 'Back', 'Shoulders', 'Arms'].flatMap(g => autoPool(g).map(e => e.name));
+  const last = autoLastDone([...lowNames, ...upNames], iso);
+  const ago = names => { const v = names.filter(n => last[n]).map(n => autoDaysAgo(last[n], iso)); return v.length ? Math.min(...v) : 999; };
+  const lo = ago(lowNames), up = ago(upNames);
+  if (lo - up >= 3) return { kind: 'lower', lo, up };
+  if (up - lo >= 3) return { kind: 'upper', lo, up };
+  return { kind: 'balanced', lo, up };
+}
 function buildAutoPlan(focus, dayData, iso, jitter, keep) {
   if (focus === 'Calisthenics' || focus === 'Full body') jitter = Math.max(jitter || 0, 8);   // always shuffle these picks
   const taken = new Set([...(dayData.customExercises || []).map(c => c.name), ...Object.keys(dayData.exercises || {})]);
-  const spec = AUTO_FOCUS[focus] || [];
+  let spec = AUTO_FOCUS[focus] || [];
+  let note = '';
+  if (focus === 'Full body') {   // lean toward whichever half of the body has gone longest without weights
+    const em = fullBodyEmphasis(iso);
+    const agoTxt = n => n >= 999 ? 'not trained yet' : `${n} day${n === 1 ? '' : 's'} ago`;
+    if (em.kind === 'lower') { spec = [['Plank', 1], ['LSit', 1], ['Legs', 3], ['Chest', 1], ['Back', 1]]; note = `Emphasis: legs (last trained ${agoTxt(em.lo)}; upper body ${agoTxt(em.up)})`; }
+    else if (em.kind === 'upper') { spec = [['Plank', 1], ['LSit', 1], ['Legs', 1], ['Chest', 1], ['Back', 1], ['Shoulders', 1], ['Arms', 1]]; note = `Emphasis: upper body (last trained ${agoTxt(em.up)}; legs ${agoTxt(em.lo)})`; }
+    else note = 'Balanced: upper and lower body trained about equally lately';
+  }
   const allNames = spec.flatMap(([g]) => autoPool(g).map(e => e.name));
   const last = autoLastDone(allNames, iso);
   const plan = [];
@@ -3802,7 +3820,7 @@ function buildAutoPlan(focus, dayData, iso, jitter, keep) {
     })).sort((a, b) => b.score - a.score);
     for (let i = 0; i < n - picked.length && i < cands.length; i++) plan.push(cands[i].e);
   });
-  return { plan, last };
+  return { plan, last, note };
 }
 function renderAutoPlanner(wrap, container) {
   const box = document.createElement('div');
@@ -3816,7 +3834,7 @@ function renderAutoPlanner(wrap, container) {
   const preview = document.createElement('div');
   preview.style.cssText = 'margin-top:10px;';
   const btnCss = 'background:var(--bg-2); border:1px solid var(--line); color:var(--ink); padding:7px 12px; border-radius:999px; font:inherit; font-size:13px; cursor:pointer;';
-  let plan = [], last = {}, focus = null;
+  let plan = [], last = {}, focus = null, note = '';
 
   const refreshCont = () => { wrap.remove(); renderCustomSession(container, activeDate(), STATE.days[activeDate()] || {}); };
   const draw = () => {
@@ -3827,6 +3845,7 @@ function renderAutoPlanner(wrap, container) {
     hd.textContent = `${focus} focus · ${plan.length} exercises`;
     hd.style.cssText = 'font-size:13px; font-weight:600; margin-bottom:6px;';
     preview.appendChild(hd);
+    if (note) { const nt = document.createElement('div'); nt.textContent = note; nt.style.cssText = 'font-size:12px; opacity:.75; margin:-2px 0 8px;'; preview.appendChild(nt); }
     if (!plan.length) {
       const e = document.createElement('div'); e.textContent = 'Nothing left to suggest — everything in this mix is already on today.'; e.style.cssText = 'font-size:13px; opacity:.8;';
       preview.appendChild(e);
@@ -3860,7 +3879,7 @@ function renderAutoPlanner(wrap, container) {
     const shuf = document.createElement('button'); shuf.type = 'button'; shuf.textContent = 'Shuffle'; shuf.style.cssText = btnCss;
     const cancel = document.createElement('button'); cancel.type = 'button'; cancel.textContent = 'Cancel'; cancel.style.cssText = btnCss;
     add.addEventListener('click', () => { plan.forEach(ex => addCustomExercise({ name: ex.name, target: ex.target, group: ex.group })); refreshCont(); });
-    shuf.addEventListener('click', () => { const r = buildAutoPlan(focus, STATE.days[iso] || {}, iso, 8); plan = r.plan; last = r.last; draw(); });
+    shuf.addEventListener('click', () => { const r = buildAutoPlan(focus, STATE.days[iso] || {}, iso, 8); plan = r.plan; last = r.last; note = r.note || ''; draw(); });
     cancel.addEventListener('click', () => { focus = null; plan = []; draw(); });
     act.appendChild(add); act.appendChild(shuf); act.appendChild(cancel);
     preview.appendChild(act);
@@ -3871,7 +3890,7 @@ function renderAutoPlanner(wrap, container) {
     b.addEventListener('click', () => {
       const iso = activeDate();
       const r = buildAutoPlan(f, STATE.days[iso] || {}, iso, 0);
-      focus = f; plan = r.plan; last = r.last; draw();
+      focus = f; plan = r.plan; last = r.last; note = r.note || ''; draw();
     });
     row.appendChild(b);
   });
