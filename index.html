@@ -2671,7 +2671,7 @@ function renderTodayPlan() {
   if (tpl.type === 'gym') {
     const names = tpl.exercises.map(e => e.name);
     sub = `${names.length} exercises · ${names.slice(0, 3).join(', ')}${names.length > 3 ? '…' : ''}`;
-  } else if (tpl.type === 'outdoor') sub = 'Pick a hike or a swim from "+ Add exercise" and log it.';
+  } else if (tpl.type === 'outdoor') sub = 'Pick Running, Cycling or Swimming from "+ Add exercise" and log it.';
   else if (tpl.type === 'optional') sub = 'Wildcard day — a workout or a swim, your call.';
   else if (tpl.type === 'swim') sub = 'Swim day — log laps or open-water time.';
   else if (tpl.type === 'hike') sub = 'Hike day — log miles and minutes.';
@@ -3715,16 +3715,9 @@ const EXERCISE_GROUPS = {
   ],
   'Cardio': [
     { name: 'Running',         target: 'cardio · miles and/or min' },
-    { name: 'Cycling',         target: 'cardio · miles and/or min' }
-  ],
-  'Swim / Apnea': [
-    { name: 'Static apnea',    target: 'apnea · breath-hold' },
-    { name: 'Depth attempt',   target: 'apnea · depth + hold' },
-    { name: 'Swim laps',       target: '30 min' },
-    { name: 'Open-water swim', target: '45 min' }
-  ],
-  'Hike': [
-    { name: 'Hike',            target: 'hike · miles + minutes' }
+    { name: 'Cycling',         target: 'cardio · miles and/or min' },
+    { name: 'Swimming',        target: 'cardio · miles and/or min' },
+    { name: 'Apnea training',  target: 'apnea · depth + hold' }
   ]
 };
 
@@ -4135,7 +4128,7 @@ function renderCustomSetRow(exIdx, s, setIdx, mode) {
 /* One place that decides how an exercise behaves. The mode comes from the CATALOG entry for that exercise name,
    not from a target string frozen onto the day when it was added — so older entries pick up changes automatically. */
 function catalogTarget(name) {
-  const ALIAS = { 'Jog': 'Running', 'Indoor cycling': 'Cycling' };   // legacy names from before the Cardio cleanup
+  const ALIAS = { 'Jog': 'Running', 'Hike': 'Running', 'Indoor cycling': 'Cycling', 'Swim laps': 'Swimming', 'Open-water swim': 'Swimming', 'Static apnea': 'Apnea training', 'Depth attempt': 'Apnea training' };   // legacy names from before the Cardio cleanup
   name = ALIAS[name] || name;
   for (const g of Object.keys(EXERCISE_GROUPS)) { const e = EXERCISE_GROUPS[g].find(x => x.name === name); if (e) return e.target; }
   return null;
@@ -4744,7 +4737,7 @@ function dayHasExercise(d, re) {
 const JOG_RE = /\bjog|jump\s*rope|cycl|\bbike|biking|sprint/i;   // VO2 max work: jog, jump rope, cycling (indoor/outdoor), sprints
 const SWIM_RE = /swim|\blaps?\b|\bpool\b/i;
 /* VO2 max / aerobic capacity = everything in Cardio, Hike and Swim (apnea holds excluded), plus name fallbacks. */
-const AEROBIC_GROUPS = ['Cardio', 'Hike', 'Swim / Apnea'];
+const AEROBIC_GROUPS = ['Cardio'];
 const APNEA_RE = /apnea|depth|breath/i;
 const AEROBIC_NAMES = AEROBIC_GROUPS.flatMap(g => (EXERCISE_GROUPS[g] || []).map(e => e.name)).filter(n => !APNEA_RE.test(n));
 const AEROBIC_RE = /hike|walk|zone\s*2|\brun\b|running|row(ing)?\s*machine|elliptical|stair/i;
