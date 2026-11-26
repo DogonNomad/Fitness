@@ -2894,7 +2894,7 @@ function renderWorkoutCard(iso, dayData) {
       }
       if (best) {
         const bLine = document.createElement('div');
-        bLine.innerHTML = `<strong>Best set:</strong> ${best.weight || 'BW'} lbs × ${best.reps} reps · ${fmtShort(best.iso)}`;
+        bLine.innerHTML = `<strong>${(mode === 'cardio' || mode === 'hike') ? 'Longest' : 'Best set'}:</strong> ${fmtSetForMode(best.s, mode)} · ${fmtShort(best.iso)}`;
         hist.appendChild(bLine);
       }
       details.appendChild(hist);
@@ -3966,8 +3966,9 @@ function removeCustomExercise(idx) {
 }
 
 function renderCustomExerciseDeck(ex, idx) {
-  const mode = exerciseInputMode(ex.target);
-  const targetSets = parseTargetSets(ex.target);
+  const effTarget = catalogTarget(ex.name) || ex.target;
+  const mode = exerciseInputMode(effTarget);
+  const targetSets = parseTargetSets(effTarget);
   const doneSets = ex.sets ? ex.sets.length : 0;
   const pct = targetSets ? Math.min(150, Math.round((doneSets / targetSets) * 100)) : 0;
 
@@ -3993,12 +3994,16 @@ function renderCustomExerciseDeck(ex, idx) {
     const w = Number(lastSet && lastSet.weight);
     if (w > 0) _prevW = w;
   }
-  setsLbl.textContent = _prevW != null
+  if (mode === 'cardio') {
+    const mi = (ex.sets || []).reduce((a, x) => a + (Number(x.weight) || 0), 0);
+    const mn = (ex.sets || []).reduce((a, x) => a + (Number(x.reps) || 0), 0);
+    setsLbl.textContent = doneSets ? [mi ? `${Math.round(mi * 10) / 10} mi` : '', mn ? `${mn} min` : ''].filter(Boolean).join(' · ') : 'tap to log';
+  } else setsLbl.textContent = _prevW != null
     ? `${doneSets}/${targetSets} · prev ${_prevW}`
     : `${doneSets} / ${targetSets} sets`;
   const nameLbl = document.createElement('div');
   nameLbl.className = 'ex-label';
-  nameLbl.innerHTML = `${escapeHtml(ex.name)} <span class="ex-target-inline">· ${escapeHtml(ex.target)}</span>`;
+  nameLbl.innerHTML = `${escapeHtml(ex.name)} <span class="ex-target-inline">· ${escapeHtml(effTarget || '')}</span>`;
   tile.appendChild(svg); tile.appendChild(setsLbl); tile.appendChild(nameLbl);
   summary.appendChild(tile);
   deck.appendChild(summary);
@@ -4010,9 +4015,9 @@ function renderCustomExerciseDeck(ex, idx) {
   // logged via the +Add dropdown builds the same historical record.
   const hist = document.createElement('div');
   hist.className = 'set-history';
-  const best = findBestSet(ex.name);
+  const best = bestSetForMode(ex.name, mode);
   if (_last) {
-    const setsStr = _last.sets.map(s => `${s.weight || 'BW'}×${s.reps}`).join(', ');
+    const setsStr = _last.sets.map(st => fmtSetForMode(st, mode)).join(', ');
     hist.innerHTML = `<div><strong>Last session (${fmtShort(_last.iso)}):</strong> ${setsStr}</div>`;
   } else {
     hist.innerHTML = `<div class="empty">No prior sessions logged for this exercise.</div>`;
@@ -4112,27 +4117,7 @@ function renderCustomSetRow(exIdx, s, setIdx, mode) {
   row.className = 'set-row';
   const num = document.createElement('span'); num.className = 'set-num'; num.textContent = 'Set ' + (setIdx + 1);
   const det = document.createElement('span'); det.className = 'set-detail';
-  if (mode === 'cardio') det.textContent = cardioText(s);
-  else if (mode === 'seconds') det.textContent = `${s.reps} sec`;
-  else if (mode === 'duration') det.textContent = `${s.reps} min`;
-  else if (mode === 'bodyweight') det.textContent = `BW × ${s.reps} reps`;
-  else if (mode === 'apnea') {
-    const hold = Number(s.reps) || 0;
-    const mm = Math.floor(hold / 60), ss = String(hold % 60).padStart(2, '0');
-    const holdStr = hold >= 60 ? `${mm}:${ss}` : `${hold}s`;
-    const parts = [];
-    if (hold > 0) parts.push(`${holdStr} hold`);
-    if (s.weight != null && s.weight !== '') parts.push(`${s.weight} m depth`);
-    det.textContent = parts.join(' · ') || '—';
-  }
-  else if (mode === 'hike') {
-    const mi = (s.weight != null && s.weight !== '') ? s.weight : '?';
-    det.textContent = `${mi} mi · ${s.reps} min`;
-  }
-  else {
-    const wStr = (s.weight === null || s.weight === undefined || s.weight === '') ? 'BW' : (s.weight + ' lbs');
-    det.textContent = `${wStr} × ${s.reps} reps`;
-  }
+  det.textContent = fmtSetForMode(s, mode);
   const del = document.createElement('button');
   del.className = 'set-delete'; del.type = 'button'; del.textContent = '×';
   del.addEventListener('click', () => {
@@ -4152,6 +4137,45 @@ function renderCustomSetRow(exIdx, s, setIdx, mode) {
    'duration'  → jump rope, plank-style (minutes only)
    'bodyweight'→ pull-ups, dips, push-ups (reps only, no weight)
    'weighted'  → default (weight + reps) */
+/* One place that decides how an exercise behaves. The mode comes from the CATALOG entry for that exercise name,
+   not from a target string frozen onto the day when it was added — so older entries pick up changes automatically. */
+function catalogTarget(name) {
+  for (const g of Object.keys(EXERCISE_GROUPS)) { const e = EXERCISE_GROUPS[g].find(x => x.name === name); if (e) return e.target; }
+  return null;
+}
+/* One formatter for a logged set, per mode — used by set rows, "last session" and "best" lines. */
+function fmtSetForMode(s, mode) {
+  const w = (s.weight != null && s.weight !== '') ? Number(s.weight) : null;
+  const r = Number(s.reps) || 0;
+  if (mode === 'cardio') return cardioText(s);
+  if (mode === 'seconds') return `${r} sec`;
+  if (mode === 'duration') return `${r} min`;
+  if (mode === 'bodyweight') return `BW × ${r} reps`;
+  if (mode === 'hike') return `${w != null ? w : '?'} mi · ${r} min`;
+  if (mode === 'apnea') {
+    const parts = [];
+    if (r > 0) parts.push(`${r >= 60 ? Math.floor(r / 60) + ':' + String(r % 60).padStart(2, '0') : r + 's'} hold`);
+    if (w != null) parts.push(`${w} m depth`);
+    return parts.join(' · ') || '—';
+  }
+  return `${w != null ? w + ' lbs' : 'BW'} × ${r} reps`;
+}
+/* "Best" depends on the exercise: weighted = most volume, cardio/hike = longest distance, holds/duration/bodyweight = most. */
+function bestSetForMode(name, mode) {
+  let best = null, bestScore = -1;
+  Object.keys(STATE.days).forEach(iso => {
+    const sets = findExerciseSetsOnDay(STATE.days[iso], name);
+    if (!sets) return;
+    sets.forEach(st => {
+      const w = Number(st.weight) || 0, r = Number(st.reps) || 0;
+      const score = mode === 'weighted' ? w * r
+        : (mode === 'cardio' || mode === 'hike') ? w * 1000 + r
+        : r;
+      if (score > bestScore) { bestScore = score; best = { s: st, iso }; }
+    });
+  });
+  return bestScore > 0 ? best : null;
+}
 function cardioText(s) {
   const mi = Number(s.weight) > 0 ? `${s.weight} mi` : '';
   const mn = Number(s.reps) > 0 ? `${s.reps} min` : '';
