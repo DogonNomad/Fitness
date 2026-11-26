@@ -3760,7 +3760,8 @@ const AUTO_FOCUS = {
   'Back':      [['Back', 3], ['Chest', 1], ['Biceps', 1], ['Triceps', 1]],
   'Shoulders': [['Shoulders', 3], ['Triceps', 1], ['Core', 1]],
   'Arms':      [['Biceps', 2], ['Triceps', 2], ['Shoulders', 1], ['Core', 1]],
-  'Calisthenics': [['Plank', 1], ['LSit', 5], ['CaliBase', 1]]   // 70/30: 5 L-sit moves + 2 basics, randomized each time
+  'Calisthenics': [['Plank', 1], ['LSit', 5], ['CaliBase', 1]],   // 70/30: 5 L-sit moves + 2 basics, randomized each time
+  'Full body': [['Plank', 1], ['LSit', 1], ['Chest', 1], ['Back', 1], ['Shoulders', 1], ['Legs', 2]]   // calisthenics + a little upper + a little lower, 7 moves
 };
 const LSIT_NAMES = ['Double leg lift','Half lift','Straddle lift','Alternating V kicks','V hold (bolt pose)','Isolated leg lift','N hold'];
 function autoPool(g) {
@@ -3786,7 +3787,7 @@ function autoLastDone(names, uptoIso) {
 }
 function autoDaysAgo(iso, fromIso) { return Math.round((parseIso(fromIso) - parseIso(iso)) / 86400000); }
 function buildAutoPlan(focus, dayData, iso, jitter, keep) {
-  if (focus === 'Calisthenics') jitter = Math.max(jitter || 0, 8);   // always shuffle the calisthenics picks
+  if (focus === 'Calisthenics' || focus === 'Full body') jitter = Math.max(jitter || 0, 8);   // always shuffle these picks
   const taken = new Set([...(dayData.customExercises || []).map(c => c.name), ...Object.keys(dayData.exercises || {})]);
   const spec = AUTO_FOCUS[focus] || [];
   const allNames = spec.flatMap(([g]) => autoPool(g).map(e => e.name));
