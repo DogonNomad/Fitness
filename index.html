@@ -2893,7 +2893,7 @@ function renderWorkoutCard(iso, dayData) {
       }
       if (best) {
         const bLine = document.createElement('div');
-        bLine.innerHTML = `<strong>${(mode === 'cardio' || mode === 'hike') ? 'Longest' : 'Best set'}:</strong> ${fmtSetForMode(best.s, mode)} · ${fmtShort(best.iso)}`;
+        bLine.innerHTML = `<strong>Best set:</strong> ${best.weight || 'BW'} lbs × ${best.reps} reps · ${fmtShort(best.iso)}`;
         hist.appendChild(bLine);
       }
       details.appendChild(hist);
@@ -4032,7 +4032,7 @@ function renderCustomExerciseDeck(ex, idx) {
   }
   if (best) {
     const bLine = document.createElement('div');
-    bLine.innerHTML = `<strong>Best set:</strong> ${best.weight || 'BW'} lbs × ${best.reps} reps · ${fmtShort(best.iso)}`;
+    bLine.innerHTML = `<strong>${(mode === 'cardio' || mode === 'hike') ? 'Longest' : 'Best set'}:</strong> ${fmtSetForMode(best.s, mode)} · ${fmtShort(best.iso)}`;
     hist.appendChild(bLine);
   }
   details.appendChild(hist);
