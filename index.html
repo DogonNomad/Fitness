@@ -2341,7 +2341,6 @@ const WORKOUT_TEMPLATE = {
   ]},
   // Sat · optional (full body + cardio if you want, or rest)
   6: { name: 'Optional · Full body + Cardio (or rest)', type: 'optional', exercises: [
-    { name: 'Jump rope', target: '20 min' },
     { name: 'Bench press', target: '3x10' },
     { name: 'BB Bicep curl', target: '3x10' },
     { name: 'Shoulder shrug', target: '3x15' },
@@ -3715,12 +3714,8 @@ const EXERCISE_GROUPS = {
     { name: 'N hold',               target: '3x20 sec' }
   ],
   'Cardio': [
-    { name: 'Jog',             target: '3 miles · 30 min' },
-    { name: 'Jump rope',       target: '20 min' },
-    { name: 'Zone 2 walk/run', target: '30 min' },
-    { name: 'Interval sprint', target: '15 min' },
-    { name: 'Cycling',         target: 'cardio · miles and/or min' },
-    { name: 'Indoor cycling',  target: 'cardio · miles and/or min' }
+    { name: 'Running',         target: 'cardio · miles and/or min' },
+    { name: 'Cycling',         target: 'cardio · miles and/or min' }
   ],
   'Swim / Apnea': [
     { name: 'Static apnea',    target: 'apnea · breath-hold' },
@@ -4140,6 +4135,8 @@ function renderCustomSetRow(exIdx, s, setIdx, mode) {
 /* One place that decides how an exercise behaves. The mode comes from the CATALOG entry for that exercise name,
    not from a target string frozen onto the day when it was added — so older entries pick up changes automatically. */
 function catalogTarget(name) {
+  const ALIAS = { 'Jog': 'Running', 'Indoor cycling': 'Cycling' };   // legacy names from before the Cardio cleanup
+  name = ALIAS[name] || name;
   for (const g of Object.keys(EXERCISE_GROUPS)) { const e = EXERCISE_GROUPS[g].find(x => x.name === name); if (e) return e.target; }
   return null;
 }
@@ -4721,10 +4718,10 @@ function renderWeekPillarGrids(agg) {
 }
 
 /* ---------- Season 2 weekly goals (session counts, Sun–Sat) ----------
-   VO2 max 3x (any aerobic work: Cardio, Hike, Swim) · Swim 2x · Weight training 3x (weights only) · Calisthenics 3x (ANY calisthenics: pushups, pull-ups,
+   VO2 max 3x (any aerobic work: Running, Cycling, Hike, Swim) · Swim 2x · Weight training 3x (weights only) · Calisthenics 3x (ANY calisthenics: pushups, pull-ups,
    dips, plank, crunches, heel taps, warm-up work, on any day) · Cold plunge 1x.
    Counted from what you log (Add-exercise dropdown, templates, calisthenics tiles). */
-const VO2_NAMES = ['Jog','Jump rope','Cycling','Indoor cycling','Interval sprint'];   // VO2 max (swim has its own goal)
+const VO2_NAMES = ['Running','Cycling'];   // VO2 max (swim has its own goal)
 const CALI_KEYS = ['pushups','pullups','dips','plankMinutes','mountedCrunches','heelTaps','doubleLegLift','halfLift','straddleLift','altVKicks','vHold','isoLegLift','lHold'];
 const CALI_NAMES = ['Pushups','Pull-ups','Dips','Plank','Crunches','Heel taps','Double leg lift','Half lift','Straddle lift','Alternating V kicks','V hold (bolt pose)','Isolated leg lift','N hold','Ab wheel','Weighted crunch','Russian twist','Leg raise','Core work (twist / crunch / plank)'];
 function goalSetsFor(d, names) {
