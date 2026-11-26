@@ -4683,10 +4683,10 @@ function renderWeekPillarGrids(agg) {
 }
 
 /* ---------- Season 2 weekly goals (session counts, Sun–Sat) ----------
-   VO2 max 3x (jogging) · Swim 2x · Weight training 3x (weights only) · Calisthenics 3x (ANY calisthenics: pushups, pull-ups,
+   VO2 max 3x (any aerobic work: Cardio, Hike, Swim) · Swim 2x · Weight training 3x (weights only) · Calisthenics 3x (ANY calisthenics: pushups, pull-ups,
    dips, plank, crunches, heel taps, warm-up work, on any day) · Cold plunge 1x.
    Counted from what you log (Add-exercise dropdown, templates, calisthenics tiles). */
-const VO2_NAMES = ['Jog'];   // VO2 max = jogging (swim has its own goal)
+const VO2_NAMES = ['Jog','Jump rope','Cycling','Indoor cycling','Interval sprint'];   // VO2 max (swim has its own goal)
 const CALI_KEYS = ['pushups','pullups','dips','plankMinutes','mountedCrunches','heelTaps','doubleLegLift','halfLift','straddleLift','altVKicks','vHold','isoLegLift','lHold'];
 const CALI_NAMES = ['Pushups','Pull-ups','Dips','Plank','Crunches','Heel taps','Double leg lift','Half lift','Straddle lift','Alternating V kicks','V hold (bolt pose)','Isolated leg lift','N hold','Ab wheel','Weighted crunch','Russian twist','Leg raise','Core work (twist / crunch / plank)'];
 function goalSetsFor(d, names) {
@@ -4697,8 +4697,8 @@ function goalSetsFor(d, names) {
 }
 /* Sessions done but never saved (tracking bug) — counted manually. */
 const CALI_BACKFILL = ['2026-11-05'];
-const SWIM_BACKFILL = [];   // add 'YYYY-MM-DD' for swims done but never logged
-const VO2_BACKFILL = ['2026-11-05'];   // jog, 3.2 mi — done but never logged
+const SWIM_BACKFILL = ['2026-11-25'];   // add 'YYYY-MM-DD' for swims done but never logged
+const VO2_BACKFILL = ['2026-11-05', '2026-11-24', '2026-11-25'];   // jog, 3.2 mi — done but never logged
 /* Name-based matching so any jog / swim you log counts, however it was added (template, dropdown, any casing),
    on any day — including past days. Having the exercise on the day counts, even before sets are saved. */
 function dayHasExercise(d, re) {
@@ -4706,7 +4706,18 @@ function dayHasExercise(d, re) {
   const inCustom = (d.customExercises || []).some(c => re.test(c.name || ''));
   return inTpl || inCustom;
 }
-const JOG_RE = /\bjog/i, SWIM_RE = /swim/i;
+const JOG_RE = /\bjog|jump\s*rope|cycl|\bbike|biking|sprint/i;   // VO2 max work: jog, jump rope, cycling (indoor/outdoor), sprints
+const SWIM_RE = /swim|\blaps?\b|\bpool\b/i;
+/* VO2 max / aerobic capacity = everything in Cardio, Hike and Swim (apnea holds excluded), plus name fallbacks. */
+const AEROBIC_GROUPS = ['Cardio', 'Hike', 'Swim / Apnea'];
+const APNEA_RE = /apnea|depth|breath/i;
+const AEROBIC_NAMES = AEROBIC_GROUPS.flatMap(g => (EXERCISE_GROUPS[g] || []).map(e => e.name)).filter(n => !APNEA_RE.test(n));
+const AEROBIC_RE = /hike|walk|zone\s*2|\brun\b|running|row(ing)?\s*machine|elliptical|stair/i;
+function isAerobicName(n) { return AEROBIC_NAMES.includes(n) || JOG_RE.test(n) || SWIM_RE.test(n) || AEROBIC_RE.test(n); }
+function didVo2(d) {
+  if (Object.keys(d.exercises || {}).some(isAerobicName)) return true;
+  return (d.customExercises || []).some(c => isAerobicName(c.name || '') || (AEROBIC_GROUPS.includes(c.group) && !APNEA_RE.test(c.name || '')));
+}
 function didCalisthenics(d) {
   if (d.iso && CALI_BACKFILL.includes(d.iso)) return true;
   if (CALI_KEYS.some(k => Number(d[k]) > 0)) return true;                       // top-level totals
@@ -4723,7 +4734,7 @@ function didWeights(d) {
   return (d.customExercises || []).some(c => WEIGHT_GROUPS.includes(c.group) && Array.isArray(c.sets) && c.sets.length);
 }
 const WEEKLY_GOALS = [
-  { label: 'VO2 max',      target: 3, unit: 'session', fn: d => (dayHasExercise(d, JOG_RE) || (d.iso && VO2_BACKFILL.includes(d.iso))) ? 1 : 0 },
+  { label: 'VO2 max',      target: 3, unit: 'session', fn: d => (didVo2(d) || (d.iso && VO2_BACKFILL.includes(d.iso))) ? 1 : 0 },
   { label: 'Swim',         target: 2, unit: 'session', fn: d => (dayHasExercise(d, SWIM_RE) || (d.iso && SWIM_BACKFILL.includes(d.iso))) ? 1 : 0 },
   { label: 'Weight training', target: 3, unit: 'session', fn: d => didWeights(d) ? 1 : 0 },
   { label: 'Calisthenics', target: 3, unit: 'session', fn: d => didCalisthenics(d) ? 1 : 0 },
@@ -5355,5 +5366,6 @@ renderHeader(); renderToday(); renderWeek(); renderMission();
 
 </script>
 
+<div id="buildStamp" style="text-align:center;font-size:10px;opacity:.35;padding:8px 0 80px;">build 2026-11-25 · weekly goals v4</div>
 </body>
 </html>
