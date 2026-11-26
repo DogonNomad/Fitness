@@ -2126,11 +2126,6 @@
       <div class="ex-grid" id="recoveryGrid"></div>
     </div>
 
-    <div id="sec-career" class="toc-scroll-target card pillar-career" style="margin-top:18px;">
-      <h2><span class="accent"></span> People &amp; Career</h2>
-      <div class="lede">Real-world contacts and the pipeline.</div>
-      <div class="ex-grid" id="careerGrid"></div>
-    </div>
 
     <div class="card" style="margin-top:18px;">
       <h2>Notes for today</h2>
@@ -2181,11 +2176,6 @@
       <div class="ex-grid" id="weekFitnessGrid"></div>
     </div>
 
-    <div class="card pillar-career" style="margin-top:18px;">
-      <h2><span class="accent"></span> People &amp; Career</h2>
-      <div class="lede">IRL contacts and the job pipeline this week.</div>
-      <div class="ex-grid" id="weekCareerGrid"></div>
-    </div>
 
     <div class="card" id="weekRecapPanel" style="margin-top:18px;">
       <h2>Last week's recap</h2>
@@ -2921,7 +2911,13 @@ function renderWorkoutCard(iso, dayData) {
       const logForm = document.createElement('div');
       logForm.className = 'set-log-form';
       let wIn, rIn;
-      if (mode === 'seconds') {
+      if (mode === 'cardio') {
+        logForm.style.gridTemplateColumns = '1fr 1fr auto';
+        wIn = document.createElement('input');
+        wIn.type = 'number'; wIn.min = '0'; wIn.step = '0.1'; wIn.placeholder = 'Miles (optional)';
+        rIn = document.createElement('input');
+        rIn.type = 'number'; rIn.min = '0'; rIn.step = '1'; rIn.placeholder = 'Minutes (optional)';
+      } else if (mode === 'seconds') {
         logForm.style.gridTemplateColumns = '1fr auto';
         rIn = document.createElement('input');
         rIn.type = 'number'; rIn.min = '0'; rIn.step = '1'; rIn.placeholder = 'Seconds';
@@ -2943,8 +2939,10 @@ function renderWorkoutCard(iso, dayData) {
       logBtn.type = 'button'; logBtn.textContent = '+ Log';
       logBtn.addEventListener('click', () => {
         const reps = Number(rIn.value);
-        if (!reps || reps <= 0) { rIn.focus(); return; }
-        const weight = (mode === 'weighted' && wIn && wIn.value !== '') ? Number(wIn.value) : null;
+        const wRaw = (wIn && wIn.value !== '') ? Number(wIn.value) : null;
+        if (mode === 'cardio') { if (!(reps > 0) && !(wRaw > 0)) { (wIn || rIn).focus(); return; } }
+        else if (!reps || reps <= 0) { rIn.focus(); return; }
+        const weight = ((mode === 'weighted' || mode === 'cardio') && wRaw != null) ? wRaw : null;
         logSet(ex.name, weight, reps);
         const idx = (STATE.days[iso].exercises[ex.name].sets.length - 1);
         setList.appendChild(renderSetRow(ex.name, { weight, reps, mode }, idx, mode));
@@ -3232,7 +3230,7 @@ function renderPillarGrids() {
   const iso = activeDate();
   const dayData = STATE.days[iso] || {};
 
-  ['fitness', 'recovery', 'career'].forEach(pillar => {
+  ['fitness', 'recovery'].forEach(pillar => {
     const grid = document.getElementById(pillar + 'Grid');
     if (!grid) return;
     grid.innerHTML = '';
@@ -3721,8 +3719,8 @@ const EXERCISE_GROUPS = {
     { name: 'Jump rope',       target: '20 min' },
     { name: 'Zone 2 walk/run', target: '30 min' },
     { name: 'Interval sprint', target: '15 min' },
-    { name: 'Cycling',         target: '45 min' },
-    { name: 'Indoor cycling',  target: '30 min' }
+    { name: 'Cycling',         target: 'cardio · miles and/or min' },
+    { name: 'Indoor cycling',  target: 'cardio · miles and/or min' }
   ],
   'Swim / Apnea': [
     { name: 'Static apnea',    target: 'apnea · breath-hold' },
@@ -4034,7 +4032,13 @@ function renderCustomExerciseDeck(ex, idx) {
   const logForm = document.createElement('div');
   logForm.className = 'set-log-form';
   let wIn, rIn;
-  if (mode === 'seconds') {
+  if (mode === 'cardio') {
+    logForm.style.gridTemplateColumns = '1fr 1fr auto';
+    wIn = document.createElement('input');
+    wIn.type = 'number'; wIn.min = '0'; wIn.step = '0.1'; wIn.placeholder = 'Miles (optional)';
+    rIn = document.createElement('input');
+    rIn.type = 'number'; rIn.min = '0'; rIn.step = '1'; rIn.placeholder = 'Minutes (optional)';
+  } else if (mode === 'seconds') {
     logForm.style.gridTemplateColumns = '1fr auto';
     rIn = document.createElement('input');
     rIn.type = 'number'; rIn.min = '0'; rIn.step = '1'; rIn.placeholder = 'Seconds';
@@ -4070,12 +4074,12 @@ function renderCustomExerciseDeck(ex, idx) {
     const reps = Number(rIn.value);
     const weightRaw = (wIn && wIn.value !== '') ? Number(wIn.value) : null;
     // Apnea: allow logging depth-only (no hold time yet) — need at least one field
-    if (mode === 'apnea') {
-      if ((!reps || reps <= 0) && (weightRaw == null || weightRaw <= 0)) { rIn.focus(); return; }
+    if (mode === 'apnea' || mode === 'cardio') {   // need at least one of the two fields
+      if ((!reps || reps <= 0) && (weightRaw == null || weightRaw <= 0)) { (mode === 'cardio' && wIn ? wIn : rIn).focus(); return; }
     } else {
       if (!reps || reps <= 0) { rIn.focus(); return; }
     }
-    const weight = (['weighted', 'apnea', 'hike'].includes(mode)) ? weightRaw : null;
+    const weight = (['weighted', 'apnea', 'hike', 'cardio'].includes(mode)) ? weightRaw : null;
     logCustomSet(idx, weight, reps);
     const arr = STATE.days[activeDate()].customExercises[idx].sets;
     setList.appendChild(renderCustomSetRow(idx, { weight, reps }, arr.length - 1, mode));
@@ -4108,7 +4112,8 @@ function renderCustomSetRow(exIdx, s, setIdx, mode) {
   row.className = 'set-row';
   const num = document.createElement('span'); num.className = 'set-num'; num.textContent = 'Set ' + (setIdx + 1);
   const det = document.createElement('span'); det.className = 'set-detail';
-  if (mode === 'seconds') det.textContent = `${s.reps} sec`;
+  if (mode === 'cardio') det.textContent = cardioText(s);
+  else if (mode === 'seconds') det.textContent = `${s.reps} sec`;
   else if (mode === 'duration') det.textContent = `${s.reps} min`;
   else if (mode === 'bodyweight') det.textContent = `BW × ${s.reps} reps`;
   else if (mode === 'apnea') {
@@ -4147,8 +4152,14 @@ function renderCustomSetRow(exIdx, s, setIdx, mode) {
    'duration'  → jump rope, plank-style (minutes only)
    'bodyweight'→ pull-ups, dips, push-ups (reps only, no weight)
    'weighted'  → default (weight + reps) */
+function cardioText(s) {
+  const mi = Number(s.weight) > 0 ? `${s.weight} mi` : '';
+  const mn = Number(s.reps) > 0 ? `${s.reps} min` : '';
+  return [mi, mn].filter(Boolean).join(' · ') || '—';
+}
 function exerciseInputMode(target) {
   if (!target) return 'weighted';
+  if (/^cardio\s*·/i.test(target)) return 'cardio';   // miles and/or minutes, either or both
   if (/apnea|breath.?hold/i.test(target)) return 'apnea';
   if (/^hike|miles.*min|hike\s*·/i.test(target)) return 'hike';
   if (/\d+\s*sec/i.test(target)) return 'seconds';
@@ -4160,6 +4171,7 @@ function exerciseInputMode(target) {
 /* Parse target sets from template target string, e.g. "3x8" → 3, "max reps × 3 sets" → 3, "20 min" → 1 */
 function parseTargetSets(target) {
   if (!target) return 3;
+  if (/^cardio/i.test(target)) return 1;
   let m = target.match(/^(\d+)\s*x\s*\d+/i);
   if (m) return Number(m[1]);
   m = target.match(/[×x]\s*(\d+)\s*sets?/i);
@@ -4235,7 +4247,9 @@ function renderSetRow(exName, s, idx, mode) {
   row.className = 'set-row';
   const num = document.createElement('span'); num.className = 'set-num'; num.textContent = 'Set ' + (idx + 1);
   const det = document.createElement('span'); det.className = 'set-detail';
-  if (mode === 'seconds') {
+  if (mode === 'cardio') {
+    det.textContent = cardioText(s);
+  } else if (mode === 'seconds') {
     det.textContent = `${s.reps} sec`;
   } else if (mode === 'duration') {
     det.textContent = `${s.reps} min`;
