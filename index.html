@@ -2513,6 +2513,30 @@ function saveAll(data) {
   if (typeof refreshTodayGoalsSoon === 'function' && typeof document !== 'undefined' && document.getElementById('todayGoalsGrid')) refreshTodayGoalsSoon();
 }
 let STATE = loadAll();
+/* One-off entries for sessions done but not yet logged. Applied once per key per device (no duplicates, never re-added
+   after you delete them). */
+const SEED_LOGS = [
+  { key: 'seed-jumprope-2026-11-27', iso: '2026-11-27', name: 'Jump rope', group: 'Cardio', target: '20 min', sets: [{ weight: null, reps: 15 }] }
+];
+(function applySeedLogs() {
+  try {
+    let changed = false;
+    SEED_LOGS.forEach(sl => {
+      const day = STATE.days[sl.iso] || {};
+      day._seeded = day._seeded || [];
+      if (day._seeded.includes(sl.key)) return;
+      day.customExercises = Array.isArray(day.customExercises) ? day.customExercises : [];
+      if (!day.customExercises.some(c => c.name === sl.name && (c.sets || []).length)) {
+        day.customExercises.push({ name: sl.name, target: sl.target, group: sl.group, sets: sl.sets.map(x => ({ ...x })) });
+      }
+      day._seeded.push(sl.key);
+      day.savedAt = new Date().toISOString();
+      STATE.days[sl.iso] = day;
+      changed = true;
+    });
+    if (changed) { STATE.updatedAt = new Date().toISOString(); localStorage.setItem(STORAGE_KEY, JSON.stringify(STATE)); }
+  } catch (e) {}
+})();
 
 /* Selected-day state — drives what the TODAY tab displays.
    Defaults to real today; day-strip lets the user peek at other days. */
@@ -3716,7 +3740,8 @@ const EXERCISE_GROUPS = {
   'Cardio': [
     { name: 'Running',         target: 'cardio · miles and/or min' },
     { name: 'Cycling',         target: 'cardio · miles and/or min' },
-    { name: 'Swimming',        target: 'cardio · miles and/or min' },
+    { name: 'Jump rope',       target: '20 min' },
+    { name: 'Swimming',        target: 'swim · laps + technique' },
     { name: 'Apnea training',  target: 'apnea · depth + hold' }
   ]
 };
@@ -3933,6 +3958,16 @@ function addCustomExercise(ex) {
   updateSavedLabel(iso);
   renderDayStrip();
 }
+function logSwimSet(idx, laps, technique) {
+  const iso = activeDate();
+  const day = STATE.days[iso] || {};
+  if (!day.customExercises || !day.customExercises[idx]) return;
+  day.customExercises[idx].sets.push({ weight: null, reps: 0, laps: Number(laps), technique: technique || 'Dolphin kick' });
+  day.savedAt = new Date().toISOString();
+  STATE.days[iso] = day;
+  saveAll(STATE);
+  updateSavedLabel(iso);
+}
 function logCustomSet(idx, weight, reps) {
   const iso = activeDate();
   const day = STATE.days[iso] || {};
@@ -4002,7 +4037,10 @@ function renderCustomExerciseDeck(ex, idx) {
     const w = Number(lastSet && lastSet.weight);
     if (w > 0) _prevW = w;
   }
-  if (mode === 'cardio') {
+  if (mode === 'swim') {
+    const laps = (ex.sets || []).reduce((a, x) => a + (Number(x.laps) || 0), 0);
+    setsLbl.textContent = laps ? `${laps} lap${laps === 1 ? '' : 's'}` : (doneSets ? `${doneSets} logged` : 'tap to log');
+  } else if (mode === 'cardio') {
     const mi = (ex.sets || []).reduce((a, x) => a + (Number(x.weight) || 0), 0);
     const mn = (ex.sets || []).reduce((a, x) => a + (Number(x.reps) || 0), 0);
     setsLbl.textContent = doneSets ? [mi ? `${Math.round(mi * 10) / 10} mi` : '', mn ? `${mn} min` : ''].filter(Boolean).join(' · ') : 'tap to log';
@@ -4032,7 +4070,7 @@ function renderCustomExerciseDeck(ex, idx) {
   }
   if (best) {
     const bLine = document.createElement('div');
-    bLine.innerHTML = `<strong>${(mode === 'cardio' || mode === 'hike') ? 'Longest' : 'Best set'}:</strong> ${fmtSetForMode(best.s, mode)} · ${fmtShort(best.iso)}`;
+    bLine.innerHTML = `<strong>${(mode === 'cardio' || mode === 'hike') ? 'Longest' : mode === 'swim' ? 'Most laps' : 'Best set'}:</strong> ${fmtSetForMode(best.s, mode)} · ${fmtShort(best.iso)}`;
     hist.appendChild(bLine);
   }
   details.appendChild(hist);
@@ -4045,7 +4083,14 @@ function renderCustomExerciseDeck(ex, idx) {
   const logForm = document.createElement('div');
   logForm.className = 'set-log-form';
   let wIn, rIn;
-  if (mode === 'cardio') {
+  if (mode === 'swim') {
+    logForm.style.gridTemplateColumns = '1fr 1.4fr auto';
+    wIn = document.createElement('input');   // laps
+    wIn.type = 'number'; wIn.min = '0'; wIn.step = '1'; wIn.placeholder = 'Laps';
+    rIn = document.createElement('select');  // technique
+    rIn.style.cssText = 'background:var(--bg-2); border:1px solid var(--line); color:var(--ink); padding:8px 10px; border-radius:8px; font:inherit; font-size:13px; outline:none; min-width:0;';
+    ['Dolphin kick', 'Freestyle', 'Backstroke', 'Breaststroke', 'Butterfly'].forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; rIn.appendChild(o); });
+  } else if (mode === 'cardio') {
     logForm.style.gridTemplateColumns = '1fr 1fr auto';
     wIn = document.createElement('input');
     wIn.type = 'number'; wIn.min = '0'; wIn.step = '0.1'; wIn.placeholder = 'Miles (optional)';
@@ -4084,6 +4129,15 @@ function renderCustomExerciseDeck(ex, idx) {
   const logBtn = document.createElement('button');
   logBtn.type = 'button'; logBtn.textContent = '+ Log';
   logBtn.addEventListener('click', () => {
+    if (mode === 'swim') {
+      const laps = Number(wIn.value);
+      if (!(laps > 0)) { wIn.focus(); return; }
+      logSwimSet(idx, laps, rIn.value);
+      const arr = STATE.days[activeDate()].customExercises[idx].sets;
+      setList.appendChild(renderCustomSetRow(idx, arr[arr.length - 1], arr.length - 1, mode));
+      wIn.value = ''; wIn.focus();   // technique stays selected for the next set
+      return;
+    }
     const reps = Number(rIn.value);
     const weightRaw = (wIn && wIn.value !== '') ? Number(wIn.value) : null;
     // Apnea: allow logging depth-only (no hold time yet) — need at least one field
@@ -4157,6 +4211,7 @@ function catalogTarget(name) {
 function fmtSetForMode(s, mode) {
   const w = (s.weight != null && s.weight !== '') ? Number(s.weight) : null;
   const r = Number(s.reps) || 0;
+  if (mode === 'swim') return s.laps ? `${s.laps} lap${Number(s.laps) === 1 ? '' : 's'} · ${s.technique || 'Dolphin kick'}` : (r ? `${r} min` : '—');   // older swims logged minutes only
   if (mode === 'cardio') return cardioText(s);
   if (mode === 'seconds') return `${r} sec`;
   if (mode === 'duration') return `${r} min`;
@@ -4178,7 +4233,8 @@ function bestSetForMode(name, mode) {
     if (!sets) return;
     sets.forEach(st => {
       const w = Number(st.weight) || 0, r = Number(st.reps) || 0;
-      const score = mode === 'weighted' ? w * r
+      const score = mode === 'swim' ? (Number(st.laps) || 0) * 1000 + r
+        : mode === 'weighted' ? w * r
         : (mode === 'cardio' || mode === 'hike') ? w * 1000 + r
         : r;
       if (score > bestScore) { bestScore = score; best = { s: st, iso }; }
@@ -4193,6 +4249,7 @@ function cardioText(s) {
 }
 function exerciseInputMode(target) {
   if (!target) return 'weighted';
+  if (/^swim\s*·/i.test(target)) return 'swim';   // laps + technique
   if (/^cardio\s*·/i.test(target)) return 'cardio';   // miles and/or minutes, either or both
   if (/apnea|breath.?hold/i.test(target)) return 'apnea';
   if (/^hike|miles.*min|hike\s*·/i.test(target)) return 'hike';
@@ -4205,7 +4262,7 @@ function exerciseInputMode(target) {
 /* Parse target sets from template target string, e.g. "3x8" → 3, "max reps × 3 sets" → 3, "20 min" → 1 */
 function parseTargetSets(target) {
   if (!target) return 3;
-  if (/^cardio/i.test(target)) return 1;
+  if (/^(cardio|swim)/i.test(target)) return 1;
   let m = target.match(/^(\d+)\s*x\s*\d+/i);
   if (m) return Number(m[1]);
   m = target.match(/[×x]\s*(\d+)\s*sets?/i);
